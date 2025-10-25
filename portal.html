@@ -455,7 +455,6 @@
           return digits.length === 11 ? digits : "";
         };
         let cpf = sanitizeCpf(cpfInput?.value);
-        const solicitacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/cbda8a38-3a07-4b85-9d63-7ebda0294f6a";
         const solicitacaoDetalheEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2";
         const novaSolicitacaoEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2";
         const hierarquiaEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/d594b31c-8ca0-4cbe-a380-4e5112128402";
@@ -543,6 +542,23 @@
         });
 
         const normalizeText = (value) => (value ?? "").toString().trim();
+        const templatePlaceholderPattern = /\{\{\s*[^}]+\s*\}\}/;
+        const resolveTemplateValue = (value) => {
+          const text = normalizeText(value);
+          if (!text) return "";
+          const lower = text.toLowerCase();
+          if (lower === "null" || lower === "undefined") return "";
+          if (templatePlaceholderPattern.test(text)) return "";
+          return text;
+        };
+        const formatPrimeiroNome = (nome) => {
+          const texto = resolveTemplateValue(nome);
+          if (!texto) return "";
+          const [primeiro] = texto.split(/\s+/).filter(Boolean);
+          if (!primeiro) return "";
+          const base = primeiro.toLowerCase();
+          return base.charAt(0).toUpperCase() + base.slice(1);
+        };
         const escapeHtml = (value) => normalizeText(value).replace(/[&<>"']/g, (match) => ({
           "&": "&amp;",
           "<": "&lt;",
@@ -554,6 +570,48 @@
           const base = normalizeText(value);
           return base.normalize ? base.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : base.toLowerCase();
         };
+
+        const dadosServidorTemplate = {
+          matricula: resolveTemplateValue("{{ $json.matricula }}"),
+          nome: resolveTemplateValue("{{ $json.nome }}"),
+          cpf: resolveTemplateValue("{{ $json.cpf }}"),
+          admissao: resolveTemplateValue("{{ $json.admissao }}"),
+          nascimento: resolveTemplateValue("{{ $json.nascimento }}"),
+          cargo: resolveTemplateValue("{{ $json.cargo }}"),
+          grupo: resolveTemplateValue("{{ $json.grupo }}"),
+          vinculo: resolveTemplateValue("{{ $json.vinculo }}"),
+          carga_horaria: resolveTemplateValue("{{ $json.carga_horaria }}"),
+          cep: resolveTemplateValue("{{ $json.cep }}"),
+          logradouro: resolveTemplateValue("{{ $json.logradouro }}"),
+          numero: resolveTemplateValue("{{ $json.numero }}"),
+          complemento: resolveTemplateValue("{{ $json.complemento }}"),
+          bairro: resolveTemplateValue("{{ $json.bairro }}"),
+          cidade: resolveTemplateValue("{{ $json.cidade }}"),
+          uf: resolveTemplateValue("{{ $json.uf }}"),
+          whatsapp: resolveTemplateValue("{{ $json.whatsapp }}"),
+          tel_alternativo: resolveTemplateValue("{{ $json.tel_alternativo }}"),
+          email: resolveTemplateValue("{{ $json.email }}"),
+          distrito: resolveTemplateValue("{{ $json.distrito }}"),
+          lotacao: resolveTemplateValue("{{ $json.lotacao }}"),
+          turno: resolveTemplateValue("{{ $json.turno }}"),
+          regime: resolveTemplateValue("{{ $json.regime }}")
+        };
+        if (dadosServidorTemplate.cpf) {
+          dadosServidorTemplate.cpf = onlyDigits(dadosServidorTemplate.cpf);
+        }
+        const registrosServidorPreCarregados = Object.values(dadosServidorTemplate).some(valor => normalizeText(valor))
+          ? [dadosServidorTemplate]
+          : [];
+        if (!cpf) {
+          const cpfTemplate = onlyDigits(dadosServidorTemplate.cpf);
+          if (cpfTemplate) {
+            cpf = cpfTemplate;
+            if (cpfInput) {
+              cpfInput.value = cpfTemplate;
+              cpfInput.setAttribute("value", cpfTemplate);
+            }
+          }
+        }
 
         const setOptions = (select, list, placeholder) => {
           if (!select) return;
@@ -757,36 +815,44 @@
 
         const normalizarDadosServidor = (item) => {
           if (!item || typeof item !== "object") return null;
+          const prefer = (...values) => {
+            for (const valor of values) {
+              const resolved = resolveTemplateValue(valor);
+              if (resolved) return resolved;
+            }
+            return "";
+          };
           const cadastro = {
-            nome: normalizeText(item.nome || item.NOME || ""),
-            matricula: normalizeText(item.matricula || item.MATRICULA || ""),
-            cargo: normalizeText(item.cargo || item.CARGO || ""),
-            cpf: onlyDigits(item.cpf || item.CPF || cpf),
-            whatsapp: onlyDigits(item.whatsapp || item.WHATSAPP || item.telefone || item.TELEFONE || ""),
+            nome: prefer(item.nome, item.NOME),
+            matricula: prefer(item.matricula, item.MATRICULA),
+            cargo: prefer(item.cargo, item.CARGO),
+            cpf: onlyDigits(prefer(item.cpf, item.CPF, cpf)),
+            whatsapp: onlyDigits(prefer(item.whatsapp, item.WHATSAPP, item.telefone, item.TELEFONE)),
             telAlternativo: onlyDigits(
-              item.tel_alternativo || item.telAlternativo || item.telefoneAlternativo || item.TEL_ALTERNATIVO || ""
+              prefer(item.tel_alternativo, item.telAlternativo, item.telefoneAlternativo, item.TEL_ALTERNATIVO)
             ),
-            email: normalizeText(item.email || item.EMAIL || ""),
-            cep: onlyDigits(item.cep || item.CEP || ""),
-            logradouro: normalizeText(item.logradouro || item.LOGRADOURO || item.endereco || item.ENDERECO || ""),
-            numero: normalizeText(item.numero || item.NUMERO || ""),
-            complemento: normalizeText(item.complemento || item.COMPLEMENTO || ""),
-            bairro: normalizeText(item.bairro || item.BAIRRO || ""),
-            cidade: normalizeText(item.cidade || item.CIDADE || ""),
-            uf: normalizeText(item.uf || item.UF || ""),
-            distrito: normalizeText(item.distrito || item.DISTRITO || item.ds || item.executiva || item["ds/executiva"] || ""),
-            unidade: normalizeText(item.lotacao || item.LOTACAO || item.unidade || item.local || ""),
-            turno: normalizeText(item.turno || item.TURNO || ""),
-            regime: normalizeText(item.regime || item.REGIME || "")
+            email: prefer(item.email, item.EMAIL),
+            cep: onlyDigits(prefer(item.cep, item.CEP)),
+            logradouro: prefer(item.logradouro, item.LOGRADOURO, item.endereco, item.ENDERECO),
+            numero: prefer(item.numero, item.NUMERO),
+            complemento: prefer(item.complemento, item.COMPLEMENTO),
+            bairro: prefer(item.bairro, item.BAIRRO),
+            cidade: prefer(item.cidade, item.CIDADE),
+            uf: prefer(item.uf, item.UF),
+            distrito: prefer(item.distrito, item.DISTRITO, item.ds, item.executiva, item["ds/executiva"]),
+            unidade: prefer(item.lotacao, item.LOTACAO, item.unidade, item.local),
+            turno: prefer(item.turno, item.TURNO),
+            regime: prefer(item.regime, item.REGIME)
           };
           return cadastro;
         };
 
         const atualizarSaudacao = () => {
           if (!saudacao) return;
-          const nome = dadosServidor?.nome;
-          if (nome) {
-            saudacao.innerHTML = `Olá, <strong>${escapeHtml(nome)}</strong>! Este é o seu painel de mobilidade interna.`;
+          const nomeReferencia = dadosServidor?.nome || dadosServidorTemplate.nome;
+          const primeiroNome = formatPrimeiroNome(nomeReferencia);
+          if (primeiroNome) {
+            saudacao.innerHTML = `Olá, <strong>${escapeHtml(primeiroNome)}</strong>! Este é o seu painel de mobilidade interna.`;
           } else {
             saudacao.textContent = "Olá, servidor(a)! Este é o seu painel de mobilidade interna.";
           }
@@ -880,9 +946,9 @@
 
           const mapa = new Map();
           items.forEach(entry => {
-            const matricula = normalizeText(entry?.matricula || entry?.MATRICULA || entry?.id || entry?.titulo || "");
+            const matricula = resolveTemplateValue(entry?.matricula ?? entry?.MATRICULA ?? entry?.id ?? entry?.titulo ?? "");
             if (!matricula) return;
-            const cargo = normalizeText(entry?.cargo || entry?.CARGO || entry?.subtitulo || entry?.descricao || "");
+            const cargo = resolveTemplateValue(entry?.cargo ?? entry?.CARGO ?? entry?.subtitulo ?? entry?.descricao ?? "");
             const atual = mapa.get(matricula) || { matricula, cargo: cargo || "Cargo não informado" };
             if (!atual.cargo && cargo) atual.cargo = cargo;
             mapa.set(matricula, atual);
@@ -1089,31 +1155,28 @@
           const atual = sanitizeCpf(cpfInput?.value);
           if (atual) cpf = atual;
           if (emptyBox) emptyBox.textContent = emptyBoxDefaultMessage;
+
+          registrarDadosServidor(registrosServidorPreCarregados);
+
           if (!cpf) {
             solicitacoesAtuais = [];
             setOptions(selMatricula, [], "Selecione a matrícula");
+            if (emptyBox) {
+              emptyBox.textContent = "Informe ou aguarde o CPF do servidor para carregar as solicitações.";
+            }
             setMinhasState("empty");
             validateUpdateForm();
             return;
           }
-          setMinhasState("loading");
-          fetch(solicitacoesEndpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cpf })
-          })
-            .then(r => { if (!r.ok) throw new Error("Falha na consulta"); return r.json(); })
-            .then(data => {
-              registrarDadosServidor(data);
-              renderSolicitacoes(normalizeSolicitacoes(data));
-            })
-            .catch(() => {
-              solicitacoesAtuais = [];
-              setOptions(selMatricula, [], "Selecione a matrícula");
-              if (emptyBox) emptyBox.textContent = "Não foi possível carregar suas solicitações. Tente novamente mais tarde.";
-              setMinhasState("empty");
-              validateUpdateForm();
-            });
+
+          if (registrosServidorPreCarregados.length) {
+            renderSolicitacoes(normalizeSolicitacoes(registrosServidorPreCarregados));
+          } else {
+            solicitacoesAtuais = [];
+            setOptions(selMatricula, [], "Selecione a matrícula");
+            setMinhasState("empty");
+            validateUpdateForm();
+          }
         }
 
         function normalizarHierarquiaCadastro(data) {
@@ -1318,17 +1381,8 @@
         });
 
         function iniciarFluxosCpf() {
+          carregarMinhasSolicitacoes();
           carregarDadosIniciais();
-          if (cpf) {
-            carregarMinhasSolicitacoes();
-          } else {
-            solicitacoesAtuais = [];
-            setOptions(selMatricula, [], "Selecione a matrícula");
-            if (emptyBox) {
-              emptyBox.textContent = "Informe ou aguarde o CPF do servidor para carregar as solicitações.";
-            }
-            setMinhasState("empty");
-          }
           validateUpdateForm();
         }
 
