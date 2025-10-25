@@ -260,7 +260,9 @@
     </header>
 
     <main class="container my-5">
-      <p class="user-greeting">Olá, servidor(a)! Este é o seu painel de mobilidade interna.</p>
+      <p class="user-greeting">
+        Olá, <strong id="saudacao-nome" data-nome-completo="{{ $json.nome }}">servidor(a)</strong>! Este é o seu painel de mobilidade interna.
+      </p>
 
       <!-- CARD: Mobilidade Interna -->
       <section class="mb-5">
@@ -301,60 +303,60 @@
 
                   <div class="mt-3">
                     <label class="form-label" for="sel-matricula">Matrícula</label>
-                    <select class="form-select" id="sel-matricula" required></select>
+                    <select class="form-select" id="sel-matricula" data-valor-atual="{{ $json.matricula }}" required></select>
                     <div class="form-text">Selecione o vínculo a atualizar.</div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="in-whatsapp">WhatsApp</label>
-                      <input class="form-control" type="tel" id="in-whatsapp" inputmode="numeric" maxlength="11" placeholder="DDD + número" />
+                      <input class="form-control" type="tel" id="in-whatsapp" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.whatsapp }}" />
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="in-telefone-alt">Telefone alternativo</label>
-                      <input class="form-control" type="tel" id="in-telefone-alt" inputmode="numeric" maxlength="11" placeholder="DDD + número" />
+                      <input class="form-control" type="tel" id="in-telefone-alt" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.tel_alternativo }}" />
                     </div>
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-email">E-mail</label>
-                    <input class="form-control" type="email" id="in-email" placeholder="nome@exemplo.com" autocomplete="email" />
+                    <input class="form-control" type="email" id="in-email" placeholder="nome@exemplo.com" autocomplete="email" value="{{ $json.email }}" />
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-cep">CEP</label>
-                    <input class="form-control" type="text" id="in-cep" inputmode="numeric" maxlength="8" placeholder="00000000" />
+                    <input class="form-control" type="text" id="in-cep" inputmode="numeric" maxlength="8" placeholder="00000000" value="{{ $json.cep }}" />
                     <div class="form-text">Ao informar o CEP, os demais campos de endereço serão preenchidos automaticamente.</div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-8">
                       <label class="form-label" for="in-logradouro">Logradouro</label>
-                      <input class="form-control" type="text" id="in-logradouro" />
+                      <input class="form-control" type="text" id="in-logradouro" value="{{ $json.logradouro }}" />
                     </div>
                     <div class="col-md-4">
                       <label class="form-label" for="in-numero">Número</label>
-                      <input class="form-control" type="text" id="in-numero" />
+                      <input class="form-control" type="text" id="in-numero" value="{{ $json.numero }}" />
                     </div>
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-complemento">Complemento</label>
-                    <input class="form-control" type="text" id="in-complemento" />
+                    <input class="form-control" type="text" id="in-complemento" value="{{ $json.complemento }}" />
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="in-bairro">Bairro</label>
-                      <input class="form-control" type="text" id="in-bairro" />
+                      <input class="form-control" type="text" id="in-bairro" value="{{ $json.bairro }}" />
                     </div>
                     <div class="col-md-4">
                       <label class="form-label" for="in-cidade">Cidade</label>
-                      <input class="form-control" type="text" id="in-cidade" />
+                      <input class="form-control" type="text" id="in-cidade" value="{{ $json.cidade }}" />
                     </div>
                     <div class="col-md-2">
                       <label class="form-label" for="in-uf">UF</label>
-                      <input class="form-control text-uppercase" type="text" id="in-uf" maxlength="2" />
+                      <input class="form-control text-uppercase" type="text" id="in-uf" maxlength="2" value="{{ $json.uf }}" />
                     </div>
                   </div>
 
@@ -363,22 +365,22 @@
                   <div class="row g-3">
                     <div class="col-md-6">
                       <label class="form-label" for="sel-ds">DS/Executiva atual</label>
-                      <select class="form-select" id="sel-ds"></select>
+                      <select class="form-select" id="sel-ds" data-valor-atual="{{ $json.distrito }}"></select>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="sel-unidade">Unidade atual</label>
-                      <select class="form-select" id="sel-unidade"></select>
+                      <select class="form-select" id="sel-unidade" data-valor-atual="{{ $json.lotacao }}"></select>
                     </div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="sel-turno">Turno atual</label>
-                      <select class="form-select" id="sel-turno"></select>
+                      <select class="form-select" id="sel-turno" data-valor-atual="{{ $json.turno }}"></select>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="sel-regime">Regime atual</label>
-                      <select class="form-select" id="sel-regime"></select>
+                      <select class="form-select" id="sel-regime" data-valor-atual="{{ $json.regime }}"></select>
                     </div>
                   </div>
 
@@ -482,6 +484,7 @@
         };
         let hierarquiaCarregada = false;
         const saudacao = document.querySelector(".user-greeting");
+        const saudacaoNome = document.getElementById("saudacao-nome");
 
         const openModal = (title, html, actions = []) => {
           modalTitle.textContent = title || "Detalhes";
@@ -551,6 +554,12 @@
           if (templatePlaceholderPattern.test(text)) return "";
           return text;
         };
+        const valorMatriculaPreferida = resolveTemplateValue(selMatricula?.dataset?.valorAtual);
+        const valorDistritoPreferido = resolveTemplateValue(selDistrito?.dataset?.valorAtual);
+        const valorUnidadePreferida = resolveTemplateValue(selUnidade?.dataset?.valorAtual);
+        const valorTurnoPreferido = resolveTemplateValue(selTurno?.dataset?.valorAtual);
+        const valorRegimePreferido = resolveTemplateValue(selRegime?.dataset?.valorAtual);
+        const saudacaoNomeTemplate = resolveTemplateValue(saudacaoNome?.dataset?.nomeCompleto);
         const formatPrimeiroNome = (nome) => {
           const texto = resolveTemplateValue(nome);
           if (!texto) return "";
@@ -572,8 +581,8 @@
         };
 
         const dadosServidorTemplate = {
-          matricula: resolveTemplateValue("{{ $json.matricula }}"),
-          nome: resolveTemplateValue("{{ $json.nome }}"),
+          matricula: resolveTemplateValue("{{ $json.matricula }}") || valorMatriculaPreferida,
+          nome: resolveTemplateValue("{{ $json.nome }}") || saudacaoNomeTemplate,
           cpf: resolveTemplateValue("{{ $json.cpf }}"),
           admissao: resolveTemplateValue("{{ $json.admissao }}"),
           nascimento: resolveTemplateValue("{{ $json.nascimento }}"),
@@ -591,11 +600,26 @@
           whatsapp: resolveTemplateValue("{{ $json.whatsapp }}"),
           tel_alternativo: resolveTemplateValue("{{ $json.tel_alternativo }}"),
           email: resolveTemplateValue("{{ $json.email }}"),
-          distrito: resolveTemplateValue("{{ $json.distrito }}"),
-          lotacao: resolveTemplateValue("{{ $json.lotacao }}"),
-          turno: resolveTemplateValue("{{ $json.turno }}"),
-          regime: resolveTemplateValue("{{ $json.regime }}")
+          distrito: resolveTemplateValue("{{ $json.distrito }}") || valorDistritoPreferido,
+          lotacao: resolveTemplateValue("{{ $json.lotacao }}") || valorUnidadePreferida,
+          turno: resolveTemplateValue("{{ $json.turno }}") || valorTurnoPreferido,
+          regime: resolveTemplateValue("{{ $json.regime }}") || valorRegimePreferido
         };
+        if (!valoresPreferidos.matricula && dadosServidorTemplate.matricula) {
+          valoresPreferidos.matricula = dadosServidorTemplate.matricula;
+        }
+        if (!valoresPreferidos.distrito && dadosServidorTemplate.distrito) {
+          valoresPreferidos.distrito = dadosServidorTemplate.distrito;
+        }
+        if (!valoresPreferidos.unidade && dadosServidorTemplate.lotacao) {
+          valoresPreferidos.unidade = dadosServidorTemplate.lotacao;
+        }
+        if (!valoresPreferidos.turno && dadosServidorTemplate.turno) {
+          valoresPreferidos.turno = dadosServidorTemplate.turno;
+        }
+        if (!valoresPreferidos.regime && dadosServidorTemplate.regime) {
+          valoresPreferidos.regime = dadosServidorTemplate.regime;
+        }
         if (dadosServidorTemplate.cpf) {
           dadosServidorTemplate.cpf = onlyDigits(dadosServidorTemplate.cpf);
         }
@@ -848,13 +872,14 @@
         };
 
         const atualizarSaudacao = () => {
-          if (!saudacao) return;
-          const nomeReferencia = dadosServidor?.nome || dadosServidorTemplate.nome;
+          if (!saudacao || !saudacaoNome) return;
+          const nomeReferencia = dadosServidor?.nome || dadosServidorTemplate.nome || resolveTemplateValue(saudacaoNome.dataset.nomeCompleto);
           const primeiroNome = formatPrimeiroNome(nomeReferencia);
           if (primeiroNome) {
-            saudacao.innerHTML = `Olá, <strong>${escapeHtml(primeiroNome)}</strong>! Este é o seu painel de mobilidade interna.`;
+            saudacaoNome.textContent = primeiroNome;
+            saudacaoNome.dataset.nomeCompleto = nomeReferencia;
           } else {
-            saudacao.textContent = "Olá, servidor(a)! Este é o seu painel de mobilidade interna.";
+            saudacaoNome.textContent = "servidor(a)";
           }
         };
 
