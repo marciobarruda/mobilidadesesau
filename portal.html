@@ -564,7 +564,25 @@
           if (!texto) return "";
           const partes = texto.split(/\s+/).filter(Boolean);
           if (!partes.length) return "";
-          const selecionadas = partes.slice(0, Math.min(2, partes.length));
+          const conectores = new Set(["da", "de", "di", "do", "dos", "das", "du"]);
+          const selecionadas = [partes[0]];
+          if (partes.length > 1) {
+            let segundoNome = null;
+            for (let i = 1; i < partes.length; i++) {
+              const candidato = partes[i];
+              if (!candidato) continue;
+              const candLower = candidato.toLocaleLowerCase("pt-BR");
+              if (conectores.has(candLower)) continue;
+              segundoNome = candidato;
+              break;
+            }
+            if (!segundoNome) {
+              segundoNome = partes[1];
+            }
+            if (segundoNome) {
+              selecionadas.push(segundoNome);
+            }
+          }
           return selecionadas
             .map(parte => {
               const lower = parte.toLocaleLowerCase("pt-BR");
@@ -774,6 +792,93 @@
             }
           }
           return false;
+        };
+
+        const selecionarOuCriarOpcao = (select, valor, label) => {
+          if (!select || !valor) return false;
+          const alvo = normalizeText(valor).toLowerCase();
+          const valorAntes = select.value;
+
+          Array.from(select.options)
+            .filter(option => option.dataset && option.dataset.synthetic === "true")
+            .forEach(option => {
+              const optValue = normalizeText(option.value).toLowerCase();
+              const optText = normalizeText(option.textContent).toLowerCase();
+              if (optValue !== alvo && optText !== alvo) {
+                option.remove();
+              }
+            });
+
+          let selecionou = false;
+          for (const option of Array.from(select.options)) {
+            const optValue = normalizeText(option.value).toLowerCase();
+            const optText = normalizeText(option.textContent).toLowerCase();
+            if (optValue === alvo || optText === alvo) {
+              if (select.value !== option.value) {
+                select.value = option.value;
+              }
+              selecionou = true;
+              break;
+            }
+          }
+
+          if (!selecionou) {
+            const opcaoSintetica = document.createElement("option");
+            opcaoSintetica.value = valor;
+            opcaoSintetica.textContent = label || valor;
+            opcaoSintetica.dataset.synthetic = "true";
+            const temPlaceholder = select.options.length && select.options[0].value === "";
+            if (temPlaceholder) {
+              select.insertBefore(opcaoSintetica, select.options[1] || null);
+            } else {
+              select.insertBefore(opcaoSintetica, select.options[0] || null);
+            }
+            select.value = valor;
+            selecionou = true;
+          }
+
+          return selecionou && select.value !== valorAntes;
+        };
+
+        const limparSelecao = (select) => {
+          if (!select) return;
+          Array.from(select.options)
+            .filter(option => option.dataset && option.dataset.synthetic === "true")
+            .forEach(option => option.remove());
+          select.value = "";
+        };
+
+        const aplicarDadosVinculoNosSelects = (dados) => {
+          if (!dados) return;
+          if (resolveTemplateValue(dados.distrito)) selecionarOuCriarOpcao(selDistrito, dados.distrito, dados.distrito);
+          else limparSelecao(selDistrito);
+          if (resolveTemplateValue(dados.unidade)) selecionarOuCriarOpcao(selUnidade, dados.unidade, dados.unidade);
+          else limparSelecao(selUnidade);
+          if (resolveTemplateValue(dados.turno)) selecionarOuCriarOpcao(selTurno, dados.turno, dados.turno);
+          else limparSelecao(selTurno);
+          if (resolveTemplateValue(dados.regime)) selecionarOuCriarOpcao(selRegime, dados.regime, dados.regime);
+          else limparSelecao(selRegime);
+        };
+
+        const sincronizarMetadadosMatriculas = () => {
+          if (!selMatricula) return;
+          Array.from(selMatricula.options).forEach(option => {
+            if (!option || !option.value) return;
+            const chave = resolveTemplateValue(option.value);
+            if (!chave) return;
+            const dados = vinculosPreferidosPorMatricula.get(chave);
+            if (!dados) {
+              delete option.dataset.distrito;
+              delete option.dataset.unidade;
+              delete option.dataset.turno;
+              delete option.dataset.regime;
+              return;
+            }
+            option.dataset.distrito = dados.distrito || "";
+            option.dataset.unidade = dados.unidade || "";
+            option.dataset.turno = dados.turno || "";
+            option.dataset.regime = dados.regime || "";
+          });
         };
 
         const formatarData = (valor) => {
@@ -997,22 +1102,44 @@
 
         const aplicarHierarquiaPreferida = () => {
           if (!hierarquiaCarregada) return;
-          const valorDistritoAntes = selDistrito?.value ?? "";
-          const selecionouDistrito = tentarSelecionarValor(selDistrito, valoresPreferidos.distrito);
-          if (selecionouDistrito && selDistrito.value !== valorDistritoAntes) {
+          let distritoAlterou = false;
+          if (valoresPreferidos.distrito) {
+            distritoAlterou = selecionarOuCriarOpcao(selDistrito, valoresPreferidos.distrito, valoresPreferidos.distrito);
+          } else if (selDistrito && selDistrito.value) {
+            limparSelecao(selDistrito);
+            distritoAlterou = true;
+          }
+          if (distritoAlterou) {
             atualizarLotacoes();
           }
-          const valorUnidadeAntes = selUnidade?.value ?? "";
-          const selecionouUnidade = tentarSelecionarValor(selUnidade, valoresPreferidos.unidade);
-          if (selecionouUnidade && selUnidade.value !== valorUnidadeAntes) {
+
+          let unidadeAlterou = false;
+          if (valoresPreferidos.unidade) {
+            unidadeAlterou = selecionarOuCriarOpcao(selUnidade, valoresPreferidos.unidade, valoresPreferidos.unidade);
+          } else if (selUnidade && selUnidade.value) {
+            limparSelecao(selUnidade);
+            unidadeAlterou = true;
+          }
+          if (unidadeAlterou) {
             atualizarTurnos();
           }
-          const valorTurnoAntes = selTurno?.value ?? "";
-          const selecionouTurno = tentarSelecionarValor(selTurno, valoresPreferidos.turno);
-          if (selecionouTurno && selTurno.value !== valorTurnoAntes) {
+
+          let turnoAlterou = false;
+          if (valoresPreferidos.turno) {
+            turnoAlterou = selecionarOuCriarOpcao(selTurno, valoresPreferidos.turno, valoresPreferidos.turno);
+          } else if (selTurno && selTurno.value) {
+            limparSelecao(selTurno);
+            turnoAlterou = true;
+          }
+          if (turnoAlterou) {
             atualizarRegimes();
           }
-          tentarSelecionarValor(selRegime, valoresPreferidos.regime);
+
+          if (valoresPreferidos.regime) {
+            selecionarOuCriarOpcao(selRegime, valoresPreferidos.regime, valoresPreferidos.regime);
+          } else {
+            limparSelecao(selRegime);
+          }
           validateUpdateForm();
         };
 
@@ -1076,6 +1203,7 @@
             dadosServidor = null;
             resetarPreferenciasHierarquia();
             aplicarDadosServidor();
+            sincronizarMetadadosMatriculas();
             return;
           }
 
@@ -1083,6 +1211,7 @@
           resetarPreferenciasHierarquia();
           definirPreferenciasHierarquia(basePreferida);
           aplicarDadosServidor();
+          sincronizarMetadadosMatriculas();
         };
         function normalizeSolicitacoes(data) {
           let items = [];
@@ -1250,6 +1379,7 @@
               .map(item => [item.matricula, { value: item.matricula, label: item.matricula }])
           ).values());
           setOptions(selMatricula, matriculaOptions, "Selecione a matrícula");
+          sincronizarMetadadosMatriculas();
           aplicarSelecaoMatriculaPreferida();
 
           solicitacoesAtuais.forEach(entry => {
@@ -1480,22 +1610,26 @@
         const handleMatriculaChange = () => {
           const selecionada = resolveTemplateValue(selMatricula?.value);
           resetarPreferenciasHierarquia();
+          let dadosMatricula = null;
 
           if (selecionada) {
             valoresPreferidos.matricula = selecionada;
-            const dadosMatricula = vinculosPreferidosPorMatricula.get(selecionada);
+            dadosMatricula = vinculosPreferidosPorMatricula.get(selecionada);
             if (dadosMatricula) {
               definirPreferenciasHierarquia(dadosMatricula);
               dadosServidor = { ...(dadosServidor || {}), ...dadosMatricula };
             }
             aplicarDadosServidor(false);
+            aplicarDadosVinculoNosSelects(dadosMatricula);
           } else {
             if (dadosServidor) {
               dadosServidor = { ...dadosServidor, matricula: "" };
             }
             aplicarDadosServidor(false);
+            [selDistrito, selUnidade, selTurno, selRegime].forEach(limparSelecao);
           }
 
+          sincronizarMetadadosMatriculas();
           aplicarHierarquiaPreferida();
           validateUpdateForm();
         };
