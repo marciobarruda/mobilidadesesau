@@ -244,7 +244,7 @@
   </head>
   <body>
     <!-- Campos ocultos (carregados junto à carta) -->
-    <input type="hidden" id="cpf" value="{{ $json.data.dadosComuns.cpf }}" />
+    <input type="hidden" id="cpf" value="{{ $json.data.dadosComuns.cpf || '' }}" />
     <script id="portal-template-data" type="application/json">
       {{ JSON.stringify($json) }}
     </script>
@@ -306,60 +306,64 @@
 
                   <div class="mt-3">
                     <label class="form-label" for="sel-matricula">Matrícula</label>
-                    <select class="form-select" id="sel-matricula" data-valor-atual="{{ $json.data.vinculos[0].matricula }}" required></select>
+                    <select class="form-select" id="sel-matricula" data-valor-atual="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].matricula || '' : '' }}" required>
+                      <option value="">Selecione a matrícula</option>
+                      <option value="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].matricula || '' : '' }}">{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].matricula || '' : '' }}</option>
+                      <option value="{{ $json.data.vinculos && $json.data.vinculos[1] ? $json.data.vinculos[1].matricula || '' : '' }}">{{ $json.data.vinculos && $json.data.vinculos[1] ? $json.data.vinculos[1].matricula || '' : '' }}</option>
+                    </select>
                     <div class="form-text">Selecione o vínculo a atualizar.</div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="in-whatsapp">WhatsApp</label>
-                      <input class="form-control" type="tel" id="in-whatsapp" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.data.dadosComuns.whatsapp }}" />
+                      <input class="form-control" type="tel" id="in-whatsapp" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.data.dadosComuns.whatsapp || '' }}" />
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="in-telefone-alt">Telefone alternativo</label>
-                      <input class="form-control" type="tel" id="in-telefone-alt" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.data.dadosComuns.tel_alternativo }}" />
+                      <input class="form-control" type="tel" id="in-telefone-alt" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.data.dadosComuns.tel_alternativo || '' }}" />
                     </div>
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-email">E-mail</label>
-                    <input class="form-control" type="email" id="in-email" placeholder="nome@exemplo.com" autocomplete="email" value="{{ $json.data.dadosComuns.email }}" />
+                    <input class="form-control" type="email" id="in-email" placeholder="nome@exemplo.com" autocomplete="email" value="{{ $json.data.dadosComuns.email || '' }}" />
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-cep">CEP</label>
-                    <input class="form-control" type="text" id="in-cep" inputmode="numeric" maxlength="8" placeholder="00000000" value="{{ $json.data.dadosComuns.endereco.cep }}" />
+                    <input class="form-control" type="text" id="in-cep" inputmode="numeric" maxlength="8" placeholder="00000000" value="{{ $json.data.dadosComuns.endereco.cep || '' }}" />
                     <div class="form-text">Ao informar o CEP, os demais campos de endereço serão preenchidos automaticamente.</div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-8">
                       <label class="form-label" for="in-logradouro">Logradouro</label>
-                      <input class="form-control" type="text" id="in-logradouro" value="{{ $json.data.dadosComuns.endereco.logradouro }}" />
+                      <input class="form-control" type="text" id="in-logradouro" value="{{ $json.data.dadosComuns.endereco.logradouro || '' }}" />
                     </div>
                     <div class="col-md-4">
                       <label class="form-label" for="in-numero">Número</label>
-                      <input class="form-control" type="text" id="in-numero" value="{{ $json.data.dadosComuns.endereco.numero }}" />
+                      <input class="form-control" type="text" id="in-numero" value="{{ $json.data.dadosComuns.endereco.numero || '' }}" />
                     </div>
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-complemento">Complemento</label>
-                    <input class="form-control" type="text" id="in-complemento" value="{{ $json.data.dadosComuns.endereco.complemento }}" />
+                    <input class="form-control" type="text" id="in-complemento" value="{{ $json.data.dadosComuns.endereco.complemento || '' }}" />
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="in-bairro">Bairro</label>
-                      <input class="form-control" type="text" id="in-bairro" value="{{ $json.data.dadosComuns.endereco.bairro }}" />
+                      <input class="form-control" type="text" id="in-bairro" value="{{ $json.data.dadosComuns.endereco.bairro || '' }}" />
                     </div>
                     <div class="col-md-4">
                       <label class="form-label" for="in-cidade">Cidade</label>
-                      <input class="form-control" type="text" id="in-cidade" value="{{ $json.data.dadosComuns.endereco.cidade }}" />
+                      <input class="form-control" type="text" id="in-cidade" value="{{ $json.data.dadosComuns.endereco.cidade || '' }}" />
                     </div>
                     <div class="col-md-2">
                       <label class="form-label" for="in-uf">UF</label>
-                      <input class="form-control text-uppercase" type="text" id="in-uf" maxlength="2" value="{{ $json.data.dadosComuns.endereco.uf }}" />
+                      <input class="form-control text-uppercase" type="text" id="in-uf" maxlength="2" value="{{ $json.data.dadosComuns.endereco.uf || '' }}" />
                     </div>
                   </div>
 
@@ -368,22 +372,22 @@
                   <div class="row g-3">
                     <div class="col-md-6">
                       <label class="form-label" for="sel-ds">DS/Executiva atual</label>
-                      <select class="form-select" id="sel-ds" data-valor-atual="{{ $json.data.vinculos[0].distrito }}"></select>
+                      <select class="form-select" id="sel-ds" data-valor-atual="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].distrito || '' : '' }}"></select>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="sel-unidade">Unidade atual</label>
-                      <select class="form-select" id="sel-unidade" data-valor-atual="{{ $json.data.vinculos[0].lotacao }}"></select>
+                      <select class="form-select" id="sel-unidade" data-valor-atual="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].lotacao || '' : '' }}"></select>
                     </div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="sel-turno">Turno atual</label>
-                      <select class="form-select" id="sel-turno" data-valor-atual="{{ $json.data.vinculos[0].turno }}"></select>
+                      <select class="form-select" id="sel-turno" data-valor-atual="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].turno || '' : '' }}"></select>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="sel-regime">Regime atual</label>
-                      <select class="form-select" id="sel-regime" data-valor-atual="{{ $json.data.vinculos[0].regime }}"></select>
+                      <select class="form-select" id="sel-regime" data-valor-atual="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].regime || '' : '' }}"></select>
                     </div>
                   </div>
 
@@ -554,6 +558,14 @@
           if (templatePlaceholderPattern.test(text)) return "";
           return text;
         };
+        const formatarPrimeiroNome = (nome) => {
+          const texto = resolveTemplateValue(nome);
+          if (!texto) return "";
+          const partes = texto.split(/\s+/).filter(Boolean);
+          if (!partes.length) return "";
+          const primeiro = partes[0].toLowerCase();
+          return primeiro.charAt(0).toUpperCase() + primeiro.slice(1);
+        };
         const preferTemplateValue = (...values) => {
           for (const valor of values) {
             const resolved = resolveTemplateValue(valor);
@@ -679,6 +691,10 @@
         }
         if (!valoresPreferidos.regime && dadosServidorTemplate.regime) {
           valoresPreferidos.regime = dadosServidorTemplate.regime;
+        }
+        const primeiroNomeSaudacao = formatarPrimeiroNome(dadosServidorTemplate.nome || greetingStrong?.textContent);
+        if (greetingStrong && primeiroNomeSaudacao) {
+          greetingStrong.textContent = primeiroNomeSaudacao;
         }
         if (dadosServidorTemplate.cpf) {
           dadosServidorTemplate.cpf = onlyDigits(dadosServidorTemplate.cpf);
