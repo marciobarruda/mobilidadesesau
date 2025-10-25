@@ -217,17 +217,18 @@
         z-index: 1050;
       }
       .feedback-modal-backdrop.active { display: flex; }
-      .feedback-modal {
-        background: #ffffff;
-        border-radius: 1rem;
-        max-width: 860px;
-        width: 100%;
-        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
-        padding: 1.75rem;
-        margin: 0 auto;
+      .feedback-modal { 
+        background: #ffffff; 
+        border-radius: 1rem; 
+        max-width: 860px; 
+        width: 100%; 
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18); 
+        padding: 1.75rem; 
+        margin: 0 auto; 
       }
       .feedback-modal-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--text-strong); }
       .feedback-modal-message { font-size: 0.95rem; line-height: 1.6; color: var(--text-strong); max-height: 60vh; overflow-y: auto; }
+      .feedback-modal-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
 
       footer {
         color: var(--text-muted);
@@ -248,12 +249,12 @@
     <header class="site-header">
       <div class="container">
         <span class="badge-open">Secretaria de Saúde — SESAU • Prefeitura do Recife</span>
-        <h1 class="display-6 fw-semibold mt-3">Portal do Servidor</h1>
+        <h1 class="display-6 fw-semibold mt-3">Portal do Servidor SESAU</h1>
         <p class="lead mt-2" id="resumo-mobilidade">
-          A mobilidade interna na SESAU organiza formas e critérios para deslocamento de servidores entre unidades da rede,
-          podendo ocorrer a pedido do servidor ou ex officio, sempre sem reduzir a oferta de serviços. Os pedidos são
-          protocolados exclusivamente em sistema eletrônico, têm validade de 12 meses e seguem ordem de prioridade por data
-          de protocolo, observadas vedações e critérios de desempate previstos na Portaria nº 127/2023.
+          A Portaria nº 127/2023 disciplina a mobilidade interna dos servidores da Secretaria de Saúde do Recife, garantindo
+          que as movimentações respeitem a carga horária do cargo, ocorram via sistema eletrônico específico e mantenham a
+          continuidade da assistência. Os pedidos têm validade de 12 meses, devem ser renovados com antecedência e seguem
+          prioridade pela ordem de protocolo, observadas as vedações e critérios definidos na norma.
         </p>
       </div>
     </header>
@@ -273,9 +274,9 @@
               </div>
               <div class="card-body">
                 <ul class="mb-3 text-muted">
-                  <li>Mobilidade <strong>a pedido</strong> ou <strong>ex officio</strong>, conforme Portaria nº 127/2023.</li>
-                  <li>Pedidos válidos por 12 meses, com necessidade de renovação.</li>
-                  <li>Sem impacto na continuidade dos serviços nas unidades.</li>
+                  <li>Mobilidade interna <strong>a pedido</strong>, com critérios definidos pela Portaria nº 127/2023.</li>
+                  <li>Pedidos registrados exclusivamente no sistema eletrônico oficial.</li>
+                  <li>Validade de 12 meses, com necessidade de renovação antes do vencimento.</li>
                 </ul>
 
                 <div class="d-flex flex-wrap gap-2">
@@ -361,22 +362,22 @@
 
                   <div class="row g-3">
                     <div class="col-md-6">
-                      <label class="form-label" for="sel-ds">DS/Executiva</label>
+                      <label class="form-label" for="sel-ds">DS/Executiva atual</label>
                       <select class="form-select" id="sel-ds"></select>
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label" for="sel-unidade">Unidade</label>
+                      <label class="form-label" for="sel-unidade">Unidade atual</label>
                       <select class="form-select" id="sel-unidade"></select>
                     </div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
-                      <label class="form-label" for="sel-turno">Turno</label>
+                      <label class="form-label" for="sel-turno">Turno atual</label>
                       <select class="form-select" id="sel-turno"></select>
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label" for="sel-regime">Regime</label>
+                      <label class="form-label" for="sel-regime">Regime atual</label>
                       <select class="form-select" id="sel-regime"></select>
                     </div>
                   </div>
@@ -439,7 +440,9 @@
       <div class="feedback-modal">
         <h4 class="feedback-modal-title" id="feedback-modal-title">Detalhes</h4>
         <div class="feedback-modal-message" id="feedback-modal-message"></div>
-        <button type="button" class="btn btn-primary mt-4" id="feedback-modal-close">Fechar</button>
+        <div class="feedback-modal-actions" id="feedback-modal-actions">
+          <button type="button" class="btn btn-secondary" id="feedback-modal-close">Fechar</button>
+        </div>
       </div>
     </div>
 
@@ -447,20 +450,34 @@
       document.addEventListener("DOMContentLoaded", function () {
         const cpf = (document.getElementById("cpf")?.value || "").replace(/\\D/g, "");
         const solicitacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/cbda8a38-3a07-4b85-9d63-7ebda0294f6a";
+        const solicitacaoDetalheEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2";
+        const novaSolicitacaoEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2";
+        const hierarquiaEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/d594b31c-8ca0-4cbe-a380-4e5112128402";
         const publicacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/7b3f9046-f11b-4cc3-b570-c3e586748f6c";
 
-        // Endpoints de dados iniciais (preencher selects). Ajuste conforme sua API.
-        const initialDataEndpoint = ""; // ex.: "https://.../webhook/dados-iniciais"
         const atualizarCadastroEndpoint = ""; // ex.: "https://.../webhook/atualizar-cadastro"
 
         // UI helpers
         const modal = document.getElementById("feedback-modal");
         const modalTitle = document.getElementById("feedback-modal-title");
         const modalMessage = document.getElementById("feedback-modal-message");
+        const modalActions = document.getElementById("feedback-modal-actions");
         const modalClose = document.getElementById("feedback-modal-close");
-        const openModal = (title, html) => {
+        const detalhesCache = new Map();
+        const hierarquiaMapa = new Map();
+        let resumoSolicitacaoAtual = null;
+        let solicitacoesAtuais = [];
+
+        const openModal = (title, html, actions = []) => {
           modalTitle.textContent = title || "Detalhes";
           modalMessage.innerHTML = html || "<p class='mb-0 text-muted'>Sem conteúdo.</p>";
+          if (modalActions) {
+            while (modalActions.firstChild) modalActions.removeChild(modalActions.firstChild);
+            (actions || []).forEach(btn => {
+              if (btn) modalActions.appendChild(btn);
+            });
+            if (modalClose) modalActions.appendChild(modalClose);
+          }
           modal.classList.add("active");
           modal.setAttribute("aria-hidden", "false");
           modalClose?.focus();
@@ -468,10 +485,96 @@
         const closeModal = () => {
           modal.classList.remove("active");
           modal.setAttribute("aria-hidden", "true");
+          resumoSolicitacaoAtual = null;
         };
         modalClose?.addEventListener("click", closeModal);
         modal?.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
         document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+        const btnNovaSolicitacao = document.getElementById("btn-nova-solicitacao");
+        const selMatricula = document.getElementById("sel-matricula");
+        const selDistrito = document.getElementById("sel-ds");
+        const selUnidade = document.getElementById("sel-unidade");
+        const selTurno = document.getElementById("sel-turno");
+        const selRegime = document.getElementById("sel-regime");
+        const redirectPost = (url, data) => {
+          if (!url) return;
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = url;
+          form.style.display = "none";
+          Object.entries(data || {}).forEach(([key, value]) => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = typeof value === "string" ? value : JSON.stringify(value);
+            form.appendChild(input);
+          });
+          document.body.appendChild(form);
+          form.submit();
+          setTimeout(() => form.remove(), 1000);
+        };
+
+        btnNovaSolicitacao?.addEventListener("click", (event) => {
+          event.preventDefault();
+          if (!cpf) {
+            openModal("⚠️ CPF não localizado", "<p>Não foi possível identificar o CPF do servidor para iniciar a solicitação.</p>");
+            return;
+          }
+          redirectPost(novaSolicitacaoEndpoint, { cpf });
+        });
+
+        const normalizeText = (value) => (value ?? "").toString().trim();
+        const escapeHtml = (value) => normalizeText(value).replace(/[&<>"']/g, (match) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        })[match] || match);
+        const slugify = (value) => {
+          const base = normalizeText(value);
+          return base.normalize ? base.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : base.toLowerCase();
+        };
+
+        const setOptions = (select, list, placeholder) => {
+          if (!select) return;
+          const currentValue = select.value;
+          select.innerHTML = "";
+          const opt0 = document.createElement("option");
+          opt0.value = "";
+          opt0.textContent = placeholder || "Selecione...";
+          select.appendChild(opt0);
+          const options = (list || []).filter(Boolean);
+          options.forEach(item => {
+            const value = item?.value ?? item?.label ?? item;
+            if (!value) return;
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = item?.label ?? value;
+            option.dataset.key = item?.key || slugify(value);
+            select.appendChild(option);
+          });
+          select.disabled = options.length === 0;
+          if (options.some(item => (item?.value ?? item?.label ?? item) === currentValue)) {
+            select.value = currentValue;
+          } else {
+            select.value = "";
+          }
+        };
+
+        const formatarData = (valor) => {
+          if (!valor) return "";
+          const texto = normalizeText(valor);
+          const iso = new Date(texto);
+          if (!isNaN(iso)) return iso.toLocaleDateString("pt-BR");
+          const partes = texto.match(/^([0-3]?\d)\/([0-1]?\d)\/(\d{4})$/);
+          if (partes) {
+            const [ , dia, mes, ano ] = partes;
+            return `${dia.padStart(2,"0")}/${mes.padStart(2,"0")}/${ano}`;
+          }
+          return texto;
+        };
 
         // CEP -> autopreencher
         const inCep = document.getElementById("in-cep");
@@ -481,34 +584,61 @@
         const inBairro = document.getElementById("in-bairro");
         const inCidade = document.getElementById("in-cidade");
         const inUf = document.getElementById("in-uf");
-        let lastCep = "";
         const onlyDigits = (v) => (v || "").replace(/\\D/g, "");
-        function cepLookup() {
+        const brasilApiBase = "https://brasilapi.com.br/api/cep/v1/";
+        let lastCep = "";
+        let cepTimer = null;
+
+        const sanitizeCep = () => {
           const cepVal = onlyDigits(inCep?.value).slice(0, 8);
           if (inCep && inCep.value !== cepVal) inCep.value = cepVal;
-          if (cepVal.length !== 8 || cepVal === lastCep) return;
+          return cepVal;
+        };
+
+        const preencherEndereco = (data) => {
+          if (!data) return;
+          const logradouro = data.street || data.logradouro;
+          const bairro = data.neighborhood || data.bairro;
+          const cidade = data.city || data.localidade || data.cidade;
+          const estado = data.state || data.estado || data.uf;
+          const complemento = data.complement || data.complemento;
+          if (inLogradouro && logradouro) inLogradouro.value = String(logradouro).toUpperCase();
+          if (inBairro && bairro) inBairro.value = String(bairro).toUpperCase();
+          if (inCidade && cidade) inCidade.value = String(cidade).toUpperCase();
+          if (inUf && estado) inUf.value = String(estado).toUpperCase();
+          if (inComplemento && complemento && !inComplemento.value) inComplemento.value = String(complemento).toUpperCase();
+        };
+
+        const buscarCep = () => {
+          const cepVal = sanitizeCep();
+          if (cepVal.length !== 8 || cepVal === lastCep) {
+            validateUpdateForm();
+            return;
+          }
           lastCep = cepVal;
 
-          fetch("https://brasilapi.com.br/api/cep/v1/" + cepVal)
+          fetch(brasilApiBase + cepVal, { cache: "no-store" })
             .then(r => { if (!r.ok) throw new Error("CEP não encontrado"); return r.json(); })
             .then(data => {
-              if (data) {
-                if (inLogradouro && data.street) inLogradouro.value = String(data.street).toUpperCase();
-                if (inBairro && data.neighborhood) inBairro.value = String(data.neighborhood).toUpperCase();
-                if (inCidade && data.city) inCidade.value = String(data.city).toUpperCase();
-                if (inUf && data.state) inUf.value = String(data.state).toUpperCase();
-              }
+              preencherEndereco(data);
               validateUpdateForm();
             })
             .catch(() => {
               lastCep = "";
               openModal("⚠️ Atenção", "<p>Não encontramos informações para o CEP informado. Você pode preencher os campos manualmente.</p>");
             });
-        }
-        inCep?.addEventListener("input", cepLookup);
-        inCep?.addEventListener("keyup", cepLookup);
-        inCep?.addEventListener("change", cepLookup);
-        inCep?.addEventListener("blur", cepLookup);
+        };
+
+        inCep?.addEventListener("input", () => {
+          const cepVal = sanitizeCep();
+          if (cepTimer) clearTimeout(cepTimer);
+          if (cepVal.length === 8) {
+            cepTimer = setTimeout(buscarCep, 300);
+          }
+          validateUpdateForm();
+        });
+        inCep?.addEventListener("change", buscarCep);
+        inCep?.addEventListener("blur", buscarCep);
 
         // Carregar publicações
         fetch(publicacoesEndpoint)
@@ -583,26 +713,166 @@
           else if (Array.isArray(data?.result)) items = data.result;
           else if (data && typeof data === "object") items = [data];
 
-          return items.map(x => {
-            const matricula = (x.matricula || x.MATRICULA || x.id || x.titulo || "").toString().trim();
-            const cargo = (x.cargo || x.CARGO || x.subtitulo || "Cargo não informado").toString().trim();
-            const resumo = x.resumo || x.descricao || "";
-            return { matricula, cargo, resumo, raw: x };
-          }).filter(x => x.matricula);
+          const mapa = new Map();
+          items.forEach(entry => {
+            const matricula = normalizeText(entry?.matricula || entry?.MATRICULA || entry?.id || entry?.titulo || "");
+            if (!matricula) return;
+            const cargo = normalizeText(entry?.cargo || entry?.CARGO || entry?.subtitulo || entry?.descricao || "");
+            const atual = mapa.get(matricula) || { matricula, cargo: cargo || "Cargo não informado" };
+            if (!atual.cargo && cargo) atual.cargo = cargo;
+            mapa.set(matricula, atual);
+          });
+
+          return Array.from(mapa.values());
         }
 
-        function buildResumo(obj) {
-          const safe = (v) => typeof v === "string" ? v : JSON.stringify(v, null, 2);
-          const lines = Object.entries(obj || {}).slice(0, 30).map(([k,v]) => {
-            const label = k.replace(/([a-z])([A-Z])/g,"$1 $2").replace(/[_-]+/g," ").replace(/\\s+/g," ").trim();
-            return "<dt class='col-sm-4'>" + label + "</dt><dd class='col-sm-8'><pre class='mb-0' style='white-space:pre-wrap;background:#f6f8fb;border-radius:.5rem;padding:.5rem'>" + safe(v) + "</pre></dd>";
-          }).join("");
-          return "<dl class='row g-2 mb-0'>" + (lines || "<p class='mb-0 text-muted'>Sem dados.</p>") + "</dl>";
+        function normalizarDetalhesSolicitacao(data, matriculaPadrao) {
+          let items = [];
+          if (Array.isArray(data)) items = data;
+          else if (Array.isArray(data?.items)) items = data.items;
+          else if (Array.isArray(data?.data)) items = data.data;
+          else if (Array.isArray(data?.result)) items = data.result;
+          else if (data && typeof data === "object") {
+            items = [];
+            Object.values(data).forEach(value => {
+              if (Array.isArray(value)) items.push(...value);
+              else items.push(value);
+            });
+          }
+
+          return items
+            .map(item => {
+              if (!item || typeof item !== "object") return null;
+              const matricula = normalizeText(item.matricula || item.MATRICULA || matriculaPadrao || "");
+              if (!matricula) return null;
+              const distrito = normalizeText(item.distrito || item.DISTRITO || item.ds || item.executiva || item["ds/executiva"] || "");
+              const lotacao = normalizeText(item.lotacao || item.LOTACAO || item.unidade || item.local || item.descricao || "");
+              const turno = normalizeText(item.turno || item.TURNO || "");
+              const regime = normalizeText(item.regime || item.REGIME || "");
+              const prioridadeRaw = item.prioridade ?? item.PRIORIDADE ?? item.ordem ?? item.ORDEM;
+              const prioridadeNum = typeof prioridadeRaw === "number" ? prioridadeRaw : parseInt(prioridadeRaw, 10);
+              const prioridade = Number.isFinite(prioridadeNum) ? prioridadeNum : "";
+              const dataCredenciamento = item.data_credenciamento || item.dataCredenciamento || item.credenciamento || "";
+              const dataSolicitacao = item.data_solicitacao || item.dataSolicitacao || item.solicitacao || item.data || "";
+              const protocolo = normalizeText(item.protocolo || item.PROTOCOLO || "");
+              return { matricula, distrito, lotacao, turno, regime, prioridade, dataCredenciamento, dataSolicitacao, protocolo };
+            })
+            .filter(Boolean);
+        }
+
+        function montarResumoSolicitacao(matricula, detalhes) {
+          const protocolo = normalizeText(detalhes.find(item => item.protocolo)?.protocolo || "");
+          const cabecalho = [
+            `<p class="mb-1"><strong>Matrícula:</strong> ${escapeHtml(matricula)}</p>`
+          ];
+          if (protocolo) {
+            cabecalho.push(`<p class="mb-1"><strong>Protocolo:</strong> ${escapeHtml(protocolo)}</p>`);
+          }
+          cabecalho.push(`<p class="text-muted mb-2">Total de registros: ${detalhes.length}</p>`);
+
+          const linhas = detalhes.map(item => {
+            const prioridade = item.prioridade === "" || item.prioridade === null ? "-" : escapeHtml(String(item.prioridade));
+            const distrito = escapeHtml(item.distrito || "-");
+            const lotacao = escapeHtml(item.lotacao || "-");
+            const turnoRegime = [item.turno, item.regime].map(normalizeText).filter(Boolean).map(escapeHtml).join(" • ");
+            const dataSolic = escapeHtml(formatarData(item.dataSolicitacao));
+            const dataCred = escapeHtml(formatarData(item.dataCredenciamento));
+            const infoExtra = turnoRegime ? `<div class="small text-muted">${turnoRegime}</div>` : "";
+            return `<tr><td class="text-center">${prioridade}</td><td>${distrito}</td><td><div class="fw-semibold">${lotacao}</div>${infoExtra}</td><td>${dataSolic}</td><td>${dataCred}</td></tr>`;
+          }).join("") || `<tr><td colspan="5" class="text-center text-muted">Nenhum registro encontrado.</td></tr>`;
+
+          const tabela = `<div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead class="table-light"><tr><th class="text-center" style="width:110px">Prioridade</th><th style="width:140px">Distrito</th><th>Lotação</th><th style="width:140px">Data solicitação</th><th style="width:160px">Data credenciamento</th></tr></thead><tbody>${linhas}</tbody></table></div>`;
+
+          return { html: `<div class="mb-3">${cabecalho.join("")}</div>${tabela}`, protocolo, detalhes };
+        }
+
+        const criarBotaoModal = (texto, classe, aoClicar) => {
+          const botao = document.createElement("button");
+          botao.type = "button";
+          botao.className = classe;
+          botao.textContent = texto;
+          botao.addEventListener("click", aoClicar);
+          return botao;
+        };
+
+        const imprimirResumoSolicitacao = (modo) => {
+          if (!resumoSolicitacaoAtual?.html) {
+            openModal("ℹ️ Nenhum resumo disponível", "<p>Abra uma solicitação antes de imprimir ou salvar em PDF.</p>");
+            return;
+          }
+          const titulo = `${modo === "pdf" ? "Salvar PDF" : "Imprimir"} - Solicitação ${resumoSolicitacaoAtual.matricula || ""}`.trim();
+          const janela = window.open("", "_blank");
+          if (!janela) {
+            openModal("⚠️ Popup bloqueado", "<p>Permita pop-ups no navegador para gerar a impressão ou o PDF.</p>");
+            return;
+          }
+          janela.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8" /><title>${escapeHtml(titulo)}</title><style>body{font-family:'Public Sans',Arial,sans-serif;padding:24px;color:#1b263b;}h1{font-size:1.25rem;margin-bottom:1rem;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #d0d7e2;padding:8px;vertical-align:top;}th{background:#f4f7fb;font-weight:600;} .text-center{text-align:center;} .fw-semibold{font-weight:600;} .small{font-size:0.85rem;color:#5b6c8c;}</style></head><body><h1>${escapeHtml(resumoSolicitacaoAtual.titulo || "Resumo da solicitação")}</h1>${resumoSolicitacaoAtual.html}</body></html>`);
+          janela.document.close();
+          janela.focus();
+          janela.print();
+        };
+
+        function exibirResumoSolicitacao(matricula, resumo) {
+          if (!resumo) {
+            openModal("❌ Erro", "<p>Não foi possível exibir os dados desta solicitação.</p>");
+            return;
+          }
+          resumoSolicitacaoAtual = {
+            ...resumo,
+            matricula,
+            titulo: `📄 Resumo da solicitação ${matricula}`
+          };
+          const actions = [
+            criarBotaoModal("Salvar PDF", "btn btn-primary", () => imprimirResumoSolicitacao("pdf")),
+            criarBotaoModal("Imprimir", "btn btn-outline-primary", () => imprimirResumoSolicitacao("print"))
+          ];
+          openModal(resumoSolicitacaoAtual.titulo, resumo.html, actions);
+        }
+
+        function abrirResumoSolicitacao(matricula) {
+          const matriculaLimpa = normalizeText(matricula);
+          if (!matriculaLimpa) return;
+          const emCache = detalhesCache.get(matriculaLimpa);
+          if (emCache) {
+            exibirResumoSolicitacao(matriculaLimpa, emCache);
+            return;
+          }
+
+          resumoSolicitacaoAtual = null;
+          openModal("⏳ Carregando detalhes", `<p>Buscando informações da matrícula <strong>${escapeHtml(matriculaLimpa)}</strong>...</p>`);
+          fetch(solicitacaoDetalheEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ matricula: matriculaLimpa, cpf })
+          })
+            .then(r => { if (!r.ok) throw new Error("Falha na consulta"); return r.json(); })
+            .then(data => {
+              const detalhes = normalizarDetalhesSolicitacao(data, matriculaLimpa);
+              if (!detalhes.length) {
+                openModal("ℹ️ Sem registros", `<p>Não encontramos informações detalhadas para a matrícula <strong>${escapeHtml(matriculaLimpa)}</strong>.</p>`);
+                return;
+              }
+              const resumo = montarResumoSolicitacao(matriculaLimpa, detalhes);
+              detalhesCache.set(matriculaLimpa, resumo);
+              exibirResumoSolicitacao(matriculaLimpa, resumo);
+            })
+            .catch(() => {
+              openModal("❌ Erro", `<p>Não foi possível carregar o resumo da matrícula <strong>${escapeHtml(matriculaLimpa)}</strong>. Tente novamente.</p>`);
+            });
         }
 
         function renderSolicitacoes(entries) {
+          solicitacoesAtuais = Array.isArray(entries) ? entries : [];
           grid.innerHTML = "";
-          entries.forEach(entry => {
+
+          const matriculaOptions = Array.from(new Map(
+            solicitacoesAtuais
+              .filter(item => item.matricula)
+              .map(item => [item.matricula, { value: item.matricula, label: item.matricula }])
+          ).values());
+          setOptions(selMatricula, matriculaOptions, "Selecione a matrícula");
+
+          solicitacoesAtuais.forEach(entry => {
             const col = document.createElement("div");
             col.className = "col";
 
@@ -611,6 +881,7 @@
             card.setAttribute("role", "button");
             card.setAttribute("tabindex", "0");
             card.setAttribute("aria-label", "Solicitação da matrícula " + entry.matricula);
+            card.dataset.matricula = entry.matricula;
 
             const body = document.createElement("div");
             body.className = "card-body";
@@ -625,24 +896,34 @@
             body.appendChild(sub);
             card.appendChild(body);
 
-            card.addEventListener("click", () => {
-              openModal("📄 Resumo da solicitação", buildResumo(entry.raw));
-            });
+            const abrir = () => abrirResumoSolicitacao(entry.matricula);
+            card.addEventListener("click", abrir);
             card.addEventListener("keydown", (e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                openModal("📄 Resumo da solicitação", buildResumo(entry.raw));
+                abrir();
               }
             });
 
             col.appendChild(card);
             grid.appendChild(col);
           });
-          setMinhasState(entries.length ? "ready" : "empty");
+
+          setMinhasState(solicitacoesAtuais.length ? "ready" : "empty");
+          if (!solicitacoesAtuais.length) {
+            setOptions(selMatricula, [], "Selecione a matrícula");
+          }
+          validateUpdateForm();
         }
 
         function carregarMinhasSolicitacoes() {
-          if (!cpf) { setMinhasState("empty"); return; }
+          if (!cpf) {
+            solicitacoesAtuais = [];
+            setOptions(selMatricula, [], "Selecione a matrícula");
+            setMinhasState("empty");
+            validateUpdateForm();
+            return;
+          }
           setMinhasState("loading");
           fetch(solicitacoesEndpoint, {
             method: "POST",
@@ -652,67 +933,135 @@
             .then(r => { if (!r.ok) throw new Error("Falha na consulta"); return r.json(); })
             .then(data => renderSolicitacoes(normalizeSolicitacoes(data)))
             .catch(() => {
+              solicitacoesAtuais = [];
+              setOptions(selMatricula, [], "Selecione a matrícula");
               if (emptyBox) emptyBox.textContent = "Não foi possível carregar suas solicitações. Tente novamente mais tarde.";
               setMinhasState("empty");
+              validateUpdateForm();
             });
         }
 
-        // Dados iniciais (preencher selects). Se não houver endpoint, usa placeholders.
-        function carregarDadosIniciais() {
-          const selMat = document.getElementById("sel-matricula");
-          const selDs = document.getElementById("sel-ds");
-          const selUn = document.getElementById("sel-unidade");
-          const selTurno = document.getElementById("sel-turno");
-          const selRegime = document.getElementById("sel-regime");
-
-          function setOptions(select, list, placeholder) {
-            if (!select) return;
-            select.innerHTML = "";
-            const opt0 = document.createElement("option");
-            opt0.value = "";
-            opt0.textContent = placeholder || "Selecione...";
-            select.appendChild(opt0);
-            (list || []).forEach(item => {
-              const opt = document.createElement("option");
-              if (typeof item === "string") {
-                opt.value = item;
-                opt.textContent = item;
-              } else {
-                opt.value = item.value ?? item.id ?? item.codigo ?? item.nome ?? "";
-                opt.textContent = item.label ?? item.nome ?? item.descricao ?? String(opt.value);
-              }
-              select.appendChild(opt);
+        function normalizarHierarquiaCadastro(data) {
+          let items = [];
+          if (Array.isArray(data)) items = data;
+          else if (Array.isArray(data?.items)) items = data.items;
+          else if (Array.isArray(data?.data)) items = data.data;
+          else if (Array.isArray(data?.result)) items = data.result;
+          else if (data && typeof data === "object") {
+            items = [];
+            Object.values(data).forEach(value => {
+              if (Array.isArray(value)) items.push(...value);
+              else items.push(value);
             });
           }
 
-          if (!initialDataEndpoint) {
-            // Placeholders
-            setOptions(selMat, [{id:"20201234",label:"20201234"},{id:"20194567",label:"20194567"}], "Selecione a matrícula");
-            setOptions(selDs, ["DS I", "DS II", "Executiva"], "Selecione DS/Executiva");
-            setOptions(selUn, ["UPA Ibura", "PA Imaging", "Policlínica Centro"], "Selecione a unidade");
-            setOptions(selTurno, ["Manhã", "Tarde", "Noite", "12x36"], "Selecione o turno");
-            setOptions(selRegime, ["20h", "30h", "40h", "Plantão"], "Selecione o regime");
+          return items
+            .map(item => {
+              if (!item || typeof item !== "object") return null;
+              const distrito = normalizeText(item.distrito || item.ds || item.executiva || item["ds/executiva"] || item.DISTRITO || "");
+              const lotacao = normalizeText(item.lotacao || item.unidade || item.local || item.LOTACAO || "");
+              const turno = normalizeText(item.turno || item.TURNO || "");
+              const regime = normalizeText(item.regime || item.REGIME || "");
+              if (!distrito || !lotacao) return null;
+              return { distrito, lotacao, turno, regime };
+            })
+            .filter(Boolean);
+        }
+
+        function adicionarRegistroHierarquia(registro) {
+          const dsKey = slugify(registro?.distrito);
+          if (!dsKey) return;
+          if (!hierarquiaMapa.has(dsKey)) {
+            hierarquiaMapa.set(dsKey, { label: registro.distrito, lotacoes: new Map() });
+          }
+          const dsItem = hierarquiaMapa.get(dsKey);
+          const lotKey = slugify(registro.lotacao);
+          if (!lotKey) return;
+          if (!dsItem.lotacoes.has(lotKey)) {
+            dsItem.lotacoes.set(lotKey, { label: registro.lotacao, turnos: new Map() });
+          }
+          const lotItem = dsItem.lotacoes.get(lotKey);
+          const turnoLabel = registro.turno || (registro.regime ? "Não informado" : "");
+          if (turnoLabel) {
+            const turnoKey = slugify(turnoLabel);
+            if (!lotItem.turnos.has(turnoKey)) {
+              lotItem.turnos.set(turnoKey, { label: turnoLabel, regimes: new Set() });
+            }
+            if (registro.regime) {
+              lotItem.turnos.get(turnoKey).regimes.add(registro.regime);
+            }
+          }
+        }
+
+        function atualizarLotacoes() {
+          const dsItem = hierarquiaMapa.get(slugify(selDistrito?.value));
+          const lotOptions = dsItem ? Array.from(dsItem.lotacoes.values()).map(lot => ({ value: lot.label, label: lot.label })) : [];
+          setOptions(selUnidade, lotOptions, "Selecione a unidade atual");
+          setOptions(selTurno, [], "Selecione o turno atual");
+          setOptions(selRegime, [], "Selecione o regime atual");
+          validateUpdateForm();
+        }
+
+        function atualizarTurnos() {
+          const dsItem = hierarquiaMapa.get(slugify(selDistrito?.value));
+          const lotItem = dsItem?.lotacoes.get(slugify(selUnidade?.value));
+          const turnoOptions = lotItem ? Array.from(lotItem.turnos.values()).map(turno => ({ value: turno.label, label: turno.label })) : [];
+          setOptions(selTurno, turnoOptions, "Selecione o turno atual");
+          setOptions(selRegime, [], "Selecione o regime atual");
+          validateUpdateForm();
+        }
+
+        function atualizarRegimes() {
+          const dsItem = hierarquiaMapa.get(slugify(selDistrito?.value));
+          const lotItem = dsItem?.lotacoes.get(slugify(selUnidade?.value));
+          const turnoItem = lotItem?.turnos.get(slugify(selTurno?.value));
+          const regimes = turnoItem ? Array.from(turnoItem.regimes).filter(Boolean) : [];
+          const regimeOptions = regimes.map(reg => ({ value: reg, label: reg }));
+          setOptions(selRegime, regimeOptions, "Selecione o regime atual");
+          validateUpdateForm();
+        }
+
+        function carregarDadosIniciais() {
+          setOptions(selDistrito, [], "Selecione a DS/Executiva atual");
+          setOptions(selUnidade, [], "Selecione a unidade atual");
+          setOptions(selTurno, [], "Selecione o turno atual");
+          setOptions(selRegime, [], "Selecione o regime atual");
+
+          if (!hierarquiaEndpoint) {
+            validateUpdateForm();
             return;
           }
 
-          fetch(initialDataEndpoint, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ cpf }) })
-            .then(r => r.json())
+          fetch(hierarquiaEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cpf })
+          })
+            .then(r => { if (!r.ok) throw new Error("Falha na consulta"); return r.json(); })
             .then(data => {
-              setOptions(selMat, data?.matriculas, "Selecione a matrícula");
-              setOptions(selDs, data?.dsExecutiva, "Selecione DS/Executiva");
-              setOptions(selUn, data?.unidades, "Selecione a unidade");
-              setOptions(selTurno, data?.turnos, "Selecione o turno");
-              setOptions(selRegime, data?.regimes, "Selecione o regime");
+              hierarquiaMapa.clear();
+              normalizarHierarquiaCadastro(data).forEach(adicionarRegistroHierarquia);
+              const dsOptions = Array.from(hierarquiaMapa.values())
+                .map(item => ({ value: item.label, label: item.label }))
+                .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
+              setOptions(selDistrito, dsOptions, "Selecione a DS/Executiva atual");
+              atualizarLotacoes();
             })
             .catch(() => {
-              // Fallback em caso de erro
-              setOptions(selMat, [{id:"20201234",label:"20201234"}], "Selecione a matrícula");
-              setOptions(selDs, ["DS I", "DS II", "Executiva"], "Selecione DS/Executiva");
-              setOptions(selUn, ["UPA Ibura"], "Selecione a unidade");
-              setOptions(selTurno, ["Manhã","Tarde"], "Selecione o turno");
-              setOptions(selRegime, ["30h","40h"], "Selecione o regime");
+              hierarquiaMapa.clear();
+              setOptions(selDistrito, [], "Selecione a DS/Executiva atual");
+              setOptions(selUnidade, [], "Selecione a unidade atual");
+              setOptions(selTurno, [], "Selecione o turno atual");
+              setOptions(selRegime, [], "Selecione o regime atual");
+            })
+            .finally(() => {
+              validateUpdateForm();
             });
         }
+
+        selDistrito?.addEventListener("change", atualizarLotacoes);
+        selUnidade?.addEventListener("change", atualizarTurnos);
+        selTurno?.addEventListener("change", atualizarRegimes);
 
         // Validação simples do formulário de atualização
         const btnAtualizar = document.getElementById("btn-atualizar-cadastro");
@@ -724,18 +1073,13 @@
           if (inWhats) inWhats.value = only11(inWhats.value);
           if (inTelAlt) inTelAlt.value = only11(inTelAlt.value);
           if (inCep) inCep.value = onlyDigits(inCep.value).slice(0,8);
-          const selMat = document.getElementById("sel-matricula");
-          const selDs = document.getElementById("sel-ds");
-          const selUn = document.getElementById("sel-unidade");
-          const selTurno = document.getElementById("sel-turno");
-          const selRegime = document.getElementById("sel-regime");
 
-          const emailOk = !!(inEmail?.value && /.+@.+\\..+/.test(inEmail.value));
+          const emailOk = !!(inEmail?.value && /.+@.+\..+/.test(inEmail.value));
           const wppOk = !!(inWhats?.value && inWhats.value.length === 11);
           const cepOk = !!(inCep?.value && inCep.value.length === 8);
-          const matOk = !!selMat?.value;
-          const dsOk = !!selDs?.value;
-          const unOk = !!selUn?.value;
+          const matOk = !!selMatricula?.value;
+          const dsOk = !!selDistrito?.value;
+          const unOk = !!selUnidade?.value;
           const turnoOk = !!selTurno?.value;
           const regimeOk = !!selRegime?.value;
 
@@ -752,8 +1096,7 @@
           inBairro?.addEventListener(evt, validateUpdateForm);
           inCidade?.addEventListener(evt, validateUpdateForm);
           inUf?.addEventListener(evt, validateUpdateForm);
-          ["sel-matricula","sel-ds","sel-unidade","sel-turno","sel-regime"].forEach(id => {
-            const el = document.getElementById(id);
+          [selMatricula, selDistrito, selUnidade, selTurno, selRegime].forEach(el => {
             el?.addEventListener(evt, validateUpdateForm);
           });
         });
@@ -761,7 +1104,7 @@
         btnAtualizar?.addEventListener("click", function () {
           const payload = {
             cpf,
-            matricula: document.getElementById("sel-matricula")?.value || "",
+            matricula: selMatricula?.value || "",
             whatsapp: inWhats?.value || "",
             telefoneAlternativo: inTelAlt?.value || "",
             email: inEmail?.value || "",
@@ -772,10 +1115,10 @@
             bairro: inBairro?.value || "",
             cidade: inCidade?.value || "",
             uf: (inUf?.value || "").toUpperCase(),
-            dsExecutiva: document.getElementById("sel-ds")?.value || "",
-            unidade: document.getElementById("sel-unidade")?.value || "",
-            turno: document.getElementById("sel-turno")?.value || "",
-            regime: document.getElementById("sel-regime")?.value || ""
+            dsExecutiva: selDistrito?.value || "",
+            unidade: selUnidade?.value || "",
+            turno: selTurno?.value || "",
+            regime: selRegime?.value || ""
           };
 
           if (!atualizarCadastroEndpoint) {
