@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SESAU • Formulário de Mobilidade Interna</title>
+    <link
+      rel="icon"
+      href="https://statics.recife.pe.gov.br/images/dynamics/conecta/icons/favicon.png?w=32&h=32&fit=fill&border=2,transparent,shrink"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      :root {
+        --brand-primary: #0053a4;
+        --brand-secondary: #003a73;
+        --brand-highlight: #00a3ff;
+        --surface: #f4f7fb;
+        --surface-strong: #ffffff;
+        --border-color: #d0d7e2;
+        --text-strong: #1b263b;
+        --text-muted: #5b6c8c;
+      }
+      *,*::before,*::after{box-sizing:border-box}
+      body{
+        font-family:"Public Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        background:var(--surface);color:var(--text-strong);min-height:100vh
+      }
+      header.site-header{
+        background:url("https://statics.recife.pe.gov.br/images/dynamics/automacao/header.png?w=3000") center/cover no-repeat;
+        color:#fff;padding:3rem 0 2.25rem
+      }
+      header .lead{color:rgba(255,255,255,.9);font-size:1rem;line-height:1.65;max-width:100%}
+      .badge-open{display:inline-flex;align-items:center;gap:.5rem;font-size:.95rem;font-weight:600;padding:.45rem .9rem;border-radius:999px;background:rgba(255,255,255,.14)}
+      .section-title{display:flex;align-items:center;gap:.65rem;font-weight:700;font-size:1.2rem;color:var(--text-strong)}
+      .section-title::before{content:"";display:inline-block;width:32px;height:3px;border-radius:999px;background:var(--brand-highlight)}
+      .card{border-radius:4px;overflow:hidden}
+      .card-programa{border:1px solid rgba(0,83,164,.08);border-radius:4px;background:var(--surface-strong);box-shadow:0 16px 34px rgba(0,45,98,.08)}
+      .card-programa .card-header{border-bottom:1px solid rgba(0,83,164,.08);background:linear-gradient(180deg,#fff 0%,#f5f8fc 100%);padding:1.25rem 1.25rem 1rem}
+      .collapsible-form{border:1px solid rgba(0,83,164,.15);border-radius:4px;background:rgba(0,83,164,.05);padding:1rem 1.25rem}
+      .collapsible-form summary{font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.5rem}
+      .collapsible-form summary::marker,.collapsible-form summary::-webkit-details-marker{display:none}
+      .collapsible-form summary::before{content:"➕";font-size:.9rem;transition:transform .2s ease}
+      .collapsible-form[open] summary::before{transform:rotate(45deg)}
+      .table-editable input, .table-editable select{width:100%;border:1px solid var(--border-color);border-radius:.25rem;padding:.35rem .5rem}
+      .table thead th{white-space:nowrap}
+      .actions-cell button{min-width:38px}
+      .muted{color:var(--text-muted)}
+      footer{color:var(--text-muted);padding:2rem 0 1.5rem;font-size:.9rem}
+      @media (max-width: 768px){header.site-header{padding:2.25rem 0 1.75rem}.badge-open{width:100%;justify-content:center}}
+    </style>
+  </head>
+  <body>
+    <!-- Campos ocultos carregados com a página -->
+    <input type="hidden" id="cpf" value="02763108458" />
+    <input type="hidden" id="grupo" value="" />
+
+    <header class="site-header">
+      <div class="container">
+        <span class="badge-open">Secretaria de Saúde — SESAU • Prefeitura do Recife</span>
+        <h1 class="display-6 fw-semibold mt-3">Formulário — Mobilidade Interna</h1>
+        <p class="lead mt-2">Preencha os dados para cadastrar ou atualizar sua solicitação de mobilidade.</p>
+      </div>
+    </header>
+
+    <main class="container my-5">
+      <section class="mb-4">
+        <h2 class="section-title">Identificação</h2>
+        <div class="card card-programa mb-4">
+          <div class="card-header"><strong>Dados pessoais e funcionais</strong></div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label for="sel-matricula" class="form-label">Matrícula</label>
+                <select id="sel-matricula" class="form-select" required></select>
+                <div class="form-text">Opções carregadas via CPF.</div>
+              </div>
+
+              <div class="col-md-4">
+                <label for="in-dt-admissao" class="form-label">Data de admissão</label>
+                <input id="in-dt-admissao" class="form-control" type="text" readonly />
+              </div>
+
+              <div class="col-md-4">
+                <label for="in-dt-nascimento" class="form-label">Data de nascimento</label>
+                <input id="in-dt-nascimento" class="form-control" type="text" readonly />
+              </div>
+
+              <div class="col-md-6">
+                <label for="in-nome" class="form-label">Nome</label>
+                <input id="in-nome" class="form-control" type="text" readonly />
+              </div>
+
+              <div class="col-md-6">
+                <label for="in-cargo" class="form-label">Cargo</label>
+                <input id="in-cargo" class="form-control" type="text" readonly />
+              </div>
+
+              <div class="col-md-3 d-none">
+                <label for="in-grupo" class="form-label">Grupo</label>
+                <input id="in-grupo" class="form-control" type="text" readonly />
+              </div>
+
+              <div class="col-md-3">
+                <label for="in-vinculo" class="form-label">Vínculo</label>
+                <input id="in-vinculo" class="form-control" type="text" readonly />
+              </div>
+
+              <div class="col-md-3">
+                <label for="in-carga-horaria" class="form-label">Carga horária de atuação</label>
+                <input id="in-carga-horaria" class="form-control" type="text" readonly />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-4">
+        <h2 class="section-title">Endereço e Contatos</h2>
+        <div class="card card-programa mb-4">
+          <div class="card-header"><strong>Endereço</strong></div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label for="in-cep" class="form-label">CEP</label>
+                <input id="in-cep" class="form-control" type="text" inputmode="numeric" maxlength="8" />
+                <div class="form-text">Autopreenche via BrasilAPI.</div>
+              </div>
+              <div class="col-md-5">
+                <label for="in-logradouro" class="form-label">Logradouro</label>
+                <input id="in-logradouro" class="form-control" type="text" />
+              </div>
+              <div class="col-md-2">
+                <label for="in-numero" class="form-label">Número</label>
+                <input id="in-numero" class="form-control" type="text" />
+              </div>
+              <div class="col-md-2">
+                <label for="in-complemento" class="form-label">Complemento</label>
+                <input id="in-complemento" class="form-control" type="text" />
+              </div>
+              <div class="col-md-4">
+                <label for="in-bairro" class="form-label">Bairro</label>
+                <input id="in-bairro" class="form-control" type="text" />
+              </div>
+              <div class="col-md-4">
+                <label for="in-cidade" class="form-label">Cidade</label>
+                <input id="in-cidade" class="form-control" type="text" />
+              </div>
+              <div class="col-md-2">
+                <label for="in-uf" class="form-label">UF</label>
+                <input id="in-uf" class="form-control text-uppercase" type="text" maxlength="2" />
+              </div>
+              <div class="col-md-4">
+                <label for="in-whatsapp" class="form-label">WhatsApp</label>
+                <input id="in-whatsapp" class="form-control" type="tel" inputmode="numeric" maxlength="11" placeholder="DDD + número" />
+              </div>
+              <div class="col-md-4">
+                <label for="in-telefone-alt" class="form-label">Telefone alternativo</label>
+                <input id="in-telefone-alt" class="form-control" type="tel" inputmode="numeric" maxlength="11" placeholder="DDD + número" />
+              </div>
+              <div class="col-md-4">
+                <label for="in-email" class="form-label">E-mail</label>
+                <input id="in-email" class="form-control" type="email" autocomplete="email" />
+              </div>
+              <div class="col-md-4">
+                <label for="in-email-2" class="form-label">Confirme o e-mail</label>
+                <input id="in-email-2" class="form-control" type="email" autocomplete="email" />
+                <div class="form-text" id="email-help"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-4">
+        <h2 class="section-title">Dados de Lotação Atual</h2>
+        <div class="card card-programa mb-4">
+          <div class="card-header"><strong>Dependentes por seleção</strong></div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label for="sel-distrito" class="form-label">Distrito atual</label>
+                <select id="sel-distrito" class="form-select"></select>
+              </div>
+              <div class="col-md-3">
+                <label for="sel-lotacao" class="form-label">Lotação atual</label>
+                <select id="sel-lotacao" class="form-select"></select>
+              </div>
+              <div class="col-md-3">
+                <label for="sel-horario" class="form-label">Horário atual</label>
+                <select id="sel-horario" class="form-select"></select>
+              </div>
+              <div class="col-md-3">
+                <label for="sel-regime" class="form-label">Regime de trabalho</label>
+                <select id="sel-regime" class="form-select"></select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-4">
+        <h2 class="section-title">Preferências (máx. 10)</h2>
+        <div class="card card-programa">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Tabela de preferências</strong>
+            <button id="btn-add-row" class="btn btn-sm btn-primary rounded-pill">Adicionar linha</button>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped align-middle table-editable" id="prefs-table">
+                <thead>
+                  <tr>
+                    <th style="width: 100px;">Prioridade</th>
+                    <th>Distrito</th>
+                    <th>Lotação</th>
+                    <th>Data de solicitação</th>
+                    <th>Data de credenciamento</th>
+                    <th class="text-center" style="width: 120px;">Ações</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <p class="muted mb-0">Linhas carregadas automaticamente não podem ser editadas (apenas removidas). A ordenação segue a prioridade (numérica).</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-white border-top">
+      <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
+        <span>Secretaria de Saúde — SESAU • Prefeitura do Recife</span>
+        <span class="text-muted">© 2025 • Gestão do Trabalho e Educação na Saúde</span>
+      </div>
+    </footer>
+
+    <template id="row-template">
+      <tr>
+        <td><input type="number" class="form-control" min="1" step="1" /></td>
+        <td><input type="text" class="form-control" /></td>
+        <td><input type="text" class="form-control" /></td>
+        <td><input type="date" class="form-control" /></td>
+        <td><input type="date" class="form-control" /></td>
+        <td class="text-center actions-cell">
+          <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-outline-danger btn-delete" title="Excluir linha">Excluir</button>
+          </div>
+        </td>
+      </tr>
+    </template>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const cpf = (document.getElementById("cpf")?.value || "").replace(/\\D/g, "");
+        const grupoHidden = document.getElementById("grupo");
+        const inGrupo = document.getElementById("in-grupo");
+
+        // ENDPOINTS
+        const matriculasEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/cbda8a38-3a07-4b85-9d63-7ebda0294f6a";
+        const lotacaoOpcoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/d594b31c-8ca0-4cbe-a380-4e5112128402";
+        const preferenciasEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2";
+
+        // ELEMENTOS
+        const selMatricula = document.getElementById("sel-matricula");
+        const inDtAdm = document.getElementById("in-dt-admissao");
+        const inDtNasc = document.getElementById("in-dt-nascimento");
+        const inNome = document.getElementById("in-nome");
+        const inCargo = document.getElementById("in-cargo");
+        const inVinculo = document.getElementById("in-vinculo");
+        const inCarga = document.getElementById("in-carga-horaria");
+
+        // Endereço/contatos
+        const inCep = document.getElementById("in-cep");
+        const inLogradouro = document.getElementById("in-logradouro");
+        const inNumero = document.getElementById("in-numero");
+        const inComplemento = document.getElementById("in-complemento");
+        const inBairro = document.getElementById("in-bairro");
+        const inCidade = document.getElementById("in-cidade");
+        const inUf = document.getElementById("in-uf");
+        const inWhats = document.getElementById("in-whatsapp");
+        const inTelAlt = document.getElementById("in-telefone-alt");
+        const inEmail = document.getElementById("in-email");
+        const inEmail2 = document.getElementById("in-email-2");
+        const emailHelp = document.getElementById("email-help");
+
+        // Selects dependentes
+        const selDistrito = document.getElementById("sel-distrito");
+        const selLotacao = document.getElementById("sel-lotacao");
+        const selHorario = document.getElementById("sel-horario");
+        const selRegime = document.getElementById("sel-regime");
+
+        // Tabela de preferências
+        const table = document.getElementById("prefs-table");
+        const tbody = table.querySelector("tbody");
+        const rowTpl = document.getElementById("row-template");
+        const btnAddRow = document.getElementById("btn-add-row");
+        const MAX_ROWS = 10;
+
+        // Helpers
+        const onlyDigits = (v) => (v || "").replace(/\\D/g, "");
+        const unique = (arr) => Array.from(new Set(arr.filter(Boolean)));
+        const setOptions = (select, list, placeholder) => {
+          if (!select) return;
+          select.innerHTML = "";
+          const opt0 = document.createElement("option");
+          opt0.value = ""; opt0.textContent = placeholder || "Selecione...";
+          select.appendChild(opt0);
+          (list || []).forEach(val => {
+            const opt = document.createElement("option");
+            opt.value = val; opt.textContent = val;
+            select.appendChild(opt);
+          });
+        };
+        const fmtDate = (raw) => {
+          if (!raw) return "";
+          const d = new Date(raw);
+          if (!isNaN(d)) return d.toISOString().slice(0,10);
+          // tenta dd/mm/yyyy
+          const m = String(raw).match(/^([0-3]?\\d)\\/([0-1]?\\d)\\/(\\d{4})$/);
+          if (m) return new Date(parseInt(m[3],10), parseInt(m[2],10)-1, parseInt(m[1],10)).toISOString().slice(0,10);
+          return String(raw);
+        };
+
+        // CEP -> BrasilAPI
+        let lastCep = "";
+        function cepLookup() {
+          const v = onlyDigits(inCep?.value).slice(0, 8);
+          if (inCep && inCep.value !== v) inCep.value = v;
+          if (v.length !== 8 || v === lastCep) return;
+          lastCep = v;
+          fetch("https://brasilapi.com.br/api/cep/v1/" + v)
+            .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+            .then(d => {
+              if (d?.street) inLogradouro.value = String(d.street).toUpperCase();
+              if (d?.neighborhood) inBairro.value = String(d.neighborhood).toUpperCase();
+              if (d?.city) inCidade.value = String(d.city).toUpperCase();
+              if (d?.state) inUf.value = String(d.state).toUpperCase();
+            })
+            .catch(() => { lastCep = ""; /* silencioso */ });
+        }
+        inCep?.addEventListener("input", cepLookup);
+        inCep?.addEventListener("change", cepLookup);
+        inCep?.addEventListener("blur", cepLookup);
+
+        // E-mail confirm
+        function validateEmailMatch() {
+          const e1 = (inEmail?.value || "").trim();
+          const e2 = (inEmail2?.value || "").trim();
+          const ok = !!e1 && !!e2 && e1.toLowerCase() === e2.toLowerCase();
+          emailHelp.textContent = ok ? "E-mails conferem." : "Os e-mails não conferem.";
+          emailHelp.className = ok ? "form-text text-success" : "form-text text-danger";
+          return ok;
+        }
+        inEmail?.addEventListener("input", validateEmailMatch);
+        inEmail2?.addEventListener("input", validateEmailMatch);
+
+        // 1) Carregar dados pelo CPF (matrículas + nome + nascimento + contato/endereço se houver)
+        function carregarPorCPF() {
+          if (!cpf) return;
+          fetch(matriculasEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cpf })
+          })
+            .then(r => { if (!r.ok) throw new Error("Falha"); return r.json(); })
+            .then(data => {
+              // Normaliza lista para popular SELECT matrícula; também tenta pegar nome/nascimento/endereço
+              const rows = Array.isArray(data) ? data : (data?.items || data?.data || data?.result || []);
+              const matriculas = unique(rows.map(x => String(x.matricula || x.MATRICULA || x.id || "").trim()).filter(Boolean));
+              setOptions(selMatricula, matriculas, "Selecione a matrícula");
+
+              // Nome e Nascimento (pelo CPF)
+              const any = rows?.[0] || {};
+              if (inNome) inNome.value = String(any.nome || any.NOME || any.nomePessoa || "").trim();
+              if (inDtNasc) inDtNasc.value = fmtDate(any.dataNascimento || any.nascimento || any.DATA_NASC || "");
+
+              // Contatos/endereço (pelo CPF) — se houver no retorno
+              inCep.value = onlyDigits(any.cep || any.CEP || inCep.value || "");
+              inLogradouro.value = String(any.logradouro || any.endereco || "").toUpperCase();
+              inNumero.value = String(any.numero || any.num || "");
+              inComplemento.value = String(any.complemento || "");
+              inBairro.value = String(any.bairro || "").toUpperCase();
+              inCidade.value = String(any.cidade || any.municipio || "").toUpperCase();
+              inUf.value = String(any.uf || any.UF || "").toUpperCase();
+              inWhats.value = onlyDigits(any.whatsapp || any.celular || "");
+              inTelAlt.value = onlyDigits(any.telefone || "");
+              inEmail.value = String(any.email || "");
+              inEmail2.value = String(any.email || "");
+              validateEmailMatch();
+            })
+            .catch(() => {
+              setOptions(selMatricula, [], "Sem resultados para este CPF");
+            });
+        }
+
+        // 2) Ao selecionar uma matrícula, tentar preencher dados funcionais e carregar tabela + selects dependentes
+        function onMatriculaChange() {
+          const mat = selMatricula?.value;
+          if (!mat) return;
+
+          // Reconsulta o endpoint de matrícula para obter dados da matrícula específica (se disponíveis no payload)
+          fetch(matriculasEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cpf, matricula: mat })
+          })
+            .then(r => r.json())
+            .then(data => {
+              const rows = Array.isArray(data) ? data : (data?.items || data?.data || data?.result || []);
+              // Procura o registro da matrícula
+              const found = rows.find(x => String(x.matricula || x.MATRICULA || x.id || "").trim() === mat) || rows[0] || {};
+              // Preenche campos funcionais
+              inDtAdm.value = fmtDate(found.dataAdmissao || found.admissao || found.DATA_ADMISSAO || "");
+              inCargo.value = String(found.cargo || found.CARGO || "").trim();
+              inVinculo.value = String(found.vinculo || found.VINCULO || "").trim();
+              inCarga.value = String(found.cargaHoraria || found.carga_horaria || found.CARGA_HORARIA || "").trim();
+              const grupoVal = String(found.grupo || found.GRUPO || found.grupo1 || "").trim();
+              if (grupoHidden) grupoHidden.value = grupoVal;
+              if (inGrupo) inGrupo.value = grupoVal;
+
+              // Carregar selects dependentes
+              carregarOpcoesLotacao(grupoHidden?.value || "");
+
+              // Carregar e montar tabela
+              carregarPreferencias(mat);
+            })
+            .catch(() => {
+              // fallback: limpa dependentes e tabela
+              setOptions(selDistrito, [], "—");
+              setOptions(selLotacao, [], "—");
+              setOptions(selHorario, [], "—");
+              setOptions(selRegime, [], "—");
+              tbody.innerHTML = "";
+            });
+        }
+
+        // 3) Carregar opções para os selects dependentes (filtrando por grupo)
+        let cacheOpcoes = [];
+        function carregarOpcoesLotacao(grupoVal) {
+          fetch(lotacaoOpcoesEndpoint)
+            .then(r => r.json())
+            .then(data => {
+              const items = Array.isArray(data) ? data : (data?.items || data?.data || data?.result || []);
+              // Filtra por grupo: o value do grupo precisa estar contido na string "grupos" do item
+              const filtered = (grupoVal ? items.filter(it => String(it.grupos || it.GRUPO || it.grupo || "").toUpperCase().includes(String(grupoVal).toUpperCase())) : items);
+              cacheOpcoes = filtered.map(it => ({
+                distrito: String(it.distrito || it.DISTRITO || it.ds || "").trim(),
+                lotacao: String(it.lotacao || it.LOTACAO || it.unidade || "").trim(),
+                horario: String(it.horario || it.HORARIO || it.turno || "").trim(),
+                regime: String(it.regime || it.REGIME || "").trim(),
+                grupos: String(it.grupos || "").trim()
+              }));
+
+              atualizarDependentes();
+            })
+            .catch(() => {
+              cacheOpcoes = [];
+              atualizarDependentes();
+            });
+        }
+
+        function atualizarDependentes() {
+          // Distrito únicos
+          const distritos = unique(cacheOpcoes.map(x => x.distrito));
+          setOptions(selDistrito, distritos, "Selecione o distrito");
+          setOptions(selLotacao, [], "Selecione a lotação");
+          setOptions(selHorario, [], "Selecione o horário");
+          setOptions(selRegime, [], "Selecione o regime");
+        }
+
+        selDistrito?.addEventListener("change", () => {
+          const d = selDistrito.value;
+          const lista = cacheOpcoes.filter(x => !d || x.distrito === d);
+          const lotacoes = unique(lista.map(x => x.lotacao));
+          setOptions(selLotacao, lotacoes, "Selecione a lotação");
+          setOptions(selHorario, [], "Selecione o horário");
+          setOptions(selRegime, [], "Selecione o regime");
+        });
+
+        selLotacao?.addEventListener("change", () => {
+          const d = selDistrito.value;
+          const l = selLotacao.value;
+          const lista = cacheOpcoes.filter(x => (!d || x.distrito === d) && (!l || x.lotacao === l));
+          const horarios = unique(lista.map(x => x.horario));
+          setOptions(selHorario, horarios, "Selecione o horário");
+          setOptions(selRegime, [], "Selecione o regime");
+        });
+
+        selHorario?.addEventListener("change", () => {
+          const d = selDistrito.value;
+          const l = selLotacao.value;
+          const h = selHorario.value;
+          const lista = cacheOpcoes.filter(x =>
+            (!d || x.distrito === d) &&
+            (!l || x.lotacao === l) &&
+            (!h || x.horario === h)
+          );
+          const regimes = unique(lista.map(x => x.regime));
+          setOptions(selRegime, regimes, "Selecione o regime");
+        });
+
+        // 4) Tabela de preferências (CRUD limitado + carregamento via matrícula)
+        function sortByPrioridade() {
+          const rows = Array.from(tbody.querySelectorAll("tr"));
+          rows.sort((a, b) => {
+            const va = parseInt(a.dataset.prioridade || a.querySelector("td:nth-child(1) input")?.value || "9999", 10);
+            const vb = parseInt(b.dataset.prioridade || b.querySelector("td:nth-child(1) input")?.value || "9999", 10);
+            return (va||9999) - (vb||9999);
+          });
+          rows.forEach(r => tbody.appendChild(r));
+        }
+
+        function addRow(data = null, locked = false) {
+          const count = tbody.querySelectorAll("tr").length;
+          if (count >= MAX_ROWS) { alert("Máximo de " + MAX_ROWS + " registros atingido."); return; }
+          const node = rowTpl.content.cloneNode(true);
+          const tr = node.querySelector("tr");
+          const [inpPri, inpDist, inpLot, inpDs, inpDc] = node.querySelectorAll("input");
+
+          if (data) {
+            inpPri.value = data.prioridade || "";
+            inpDist.value = data.distrito || "";
+            inpLot.value = data.lotacao || "";
+            inpDs.value = fmtDate(data.dataSolicitacao || data.data_solicitacao || "");
+            inpDc.value = fmtDate(data.dataCredenciamento || data.data_credenciamento || "");
+            tr.dataset.prioridade = inpPri.value;
+          }
+
+          if (locked) {
+            [inpPri, inpDist, inpLot, inpDs, inpDc].forEach(el => el.readOnly = true);
+            tr.classList.add("table-light");
+          }
+
+          tr.querySelector(".btn-delete").addEventListener("click", () => { tr.remove(); });
+
+          tbody.appendChild(node);
+          sortByPrioridade();
+        }
+
+        function carregarPreferencias(matricula) {
+          tbody.innerHTML = "";
+          fetch(preferenciasEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ matricula })
+          })
+            .then(r => r.json())
+            .then(data => {
+              const items = Array.isArray(data) ? data : (data?.items || data?.data || data?.result || []);
+              items.forEach(row => addRow({
+                prioridade: parseInt(row.prioridade || row.PRIORIDADE || "0", 10),
+                distrito: row.distrito || row.DISTRITO || "",
+                lotacao: row.lotacao || row.LOTACAO || "",
+                dataSolicitacao: row.dataSolicitacao || row.DATA_SOLICITACAO || row.solicitacao,
+                dataCredenciamento: row.dataCredenciamento || row.DATA_CREDENCIAMENTO || row.credenciamento
+              }, true /* locked */));
+            })
+            .catch(() => { /* silencioso */ });
+        }
+
+        const btnAddRow = document.getElementById("btn-add-row");
+        btnAddRow?.addEventListener("click", () => addRow());
+
+        // Eventos
+        selMatricula?.addEventListener("change", onMatriculaChange);
+
+        // Inicialização
+        carregarPorCPF();
+      });
+    </script>
+  </body>
+</html>
