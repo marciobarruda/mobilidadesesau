@@ -489,6 +489,7 @@
           turno: "",
           regime: ""
         };
+        const vinculosPreferidosPorMatricula = new Map();
         let hierarquiaCarregada = false;
         const openModal = (title, html, actions = []) => {
           modalTitle.textContent = title || "Detalhes";
@@ -563,8 +564,13 @@
           if (!texto) return "";
           const partes = texto.split(/\s+/).filter(Boolean);
           if (!partes.length) return "";
-          const primeiro = partes[0].toLowerCase();
-          return primeiro.charAt(0).toUpperCase() + primeiro.slice(1);
+          const selecionadas = partes.slice(0, Math.min(2, partes.length));
+          return selecionadas
+            .map(parte => {
+              const lower = parte.toLocaleLowerCase("pt-BR");
+              return lower.charAt(0).toLocaleUpperCase("pt-BR") + lower.slice(1);
+            })
+            .join(" ");
         };
         const preferTemplateValue = (...values) => {
           for (const valor of values) {
@@ -973,6 +979,14 @@
           if (dados.regime) valoresPreferidos.regime = dados.regime;
         };
 
+        const resetarPreferenciasHierarquia = () => {
+          valoresPreferidos.matricula = "";
+          valoresPreferidos.distrito = "";
+          valoresPreferidos.unidade = "";
+          valoresPreferidos.turno = "";
+          valoresPreferidos.regime = "";
+        };
+
         const aplicarSelecaoMatriculaPreferida = () => {
           if (!selMatricula || !valoresPreferidos.matricula) return;
           const valorAntes = selMatricula.value;
@@ -1014,7 +1028,7 @@
           return final;
         };
 
-        const aplicarDadosServidor = () => {
+        const aplicarDadosServidor = (reaplicarSelecoes = true) => {
           const dados = dadosServidor || {};
           atribuirValorCampo(inWhats, dados.whatsapp);
           atribuirValorCampo(inTelAlt, dados.telAlternativo);
@@ -1028,27 +1042,46 @@
           atribuirValorCampo(inCidade, dados.cidade, (val) => val.toUpperCase());
           atribuirValorCampo(inUf, dados.uf, (val) => val.toUpperCase());
 
-          aplicarSelecaoMatriculaPreferida();
-          aplicarHierarquiaPreferida();
+          if (reaplicarSelecoes) {
+            aplicarSelecaoMatriculaPreferida();
+            aplicarHierarquiaPreferida();
+          }
           validateUpdateForm();
         };
 
         const registrarDadosServidor = (data) => {
           const registros = coletarRegistros(data);
-          const encontrado = registros.find(item => item && typeof item === "object" && (item.cpf || item.CPF || item.matricula || item.MATRICULA));
-          const normalizado = normalizarDadosServidor(encontrado);
-          if (!normalizado) {
+          vinculosPreferidosPorMatricula.clear();
+          let primeiroNormalizado = null;
+          let primeiroComMatricula = null;
+
+          registros.forEach(item => {
+            const normalizadoAtual = normalizarDadosServidor(item);
+            if (!normalizadoAtual) return;
+            if (!primeiroNormalizado) primeiroNormalizado = normalizadoAtual;
+            if (normalizadoAtual.matricula) {
+              vinculosPreferidosPorMatricula.set(normalizadoAtual.matricula, normalizadoAtual);
+              if (!primeiroComMatricula) primeiroComMatricula = normalizadoAtual;
+            }
+          });
+
+          const basePreferida = (
+            (selMatricula?.value && vinculosPreferidosPorMatricula.get(resolveTemplateValue(selMatricula.value))) ||
+            (valoresPreferidos.matricula && vinculosPreferidosPorMatricula.get(valoresPreferidos.matricula)) ||
+            primeiroComMatricula ||
+            primeiroNormalizado
+          );
+
+          if (!basePreferida) {
             dadosServidor = null;
-            valoresPreferidos.matricula = "";
-            valoresPreferidos.distrito = "";
-            valoresPreferidos.unidade = "";
-            valoresPreferidos.turno = "";
-            valoresPreferidos.regime = "";
+            resetarPreferenciasHierarquia();
             aplicarDadosServidor();
             return;
           }
-          dadosServidor = normalizado;
-          definirPreferenciasHierarquia(normalizado);
+
+          dadosServidor = { ...basePreferida };
+          resetarPreferenciasHierarquia();
+          definirPreferenciasHierarquia(basePreferida);
           aplicarDadosServidor();
         };
         function normalizeSolicitacoes(data) {
@@ -1443,6 +1476,31 @@
 
           btnAtualizar.disabled = !(emailOk && wppOk && cepOk && matOk && dsOk && unOk && turnoOk && regimeOk);
         }
+
+        const handleMatriculaChange = () => {
+          const selecionada = resolveTemplateValue(selMatricula?.value);
+          resetarPreferenciasHierarquia();
+
+          if (selecionada) {
+            valoresPreferidos.matricula = selecionada;
+            const dadosMatricula = vinculosPreferidosPorMatricula.get(selecionada);
+            if (dadosMatricula) {
+              definirPreferenciasHierarquia(dadosMatricula);
+              dadosServidor = { ...(dadosServidor || {}), ...dadosMatricula };
+            }
+            aplicarDadosServidor(false);
+          } else {
+            if (dadosServidor) {
+              dadosServidor = { ...dadosServidor, matricula: "" };
+            }
+            aplicarDadosServidor(false);
+          }
+
+          aplicarHierarquiaPreferida();
+          validateUpdateForm();
+        };
+
+        selMatricula?.addEventListener("change", handleMatriculaChange);
         [ "input","change","blur" ].forEach(evt => {
           inWhats?.addEventListener(evt, validateUpdateForm);
           inTelAlt?.addEventListener(evt, validateUpdateForm);
