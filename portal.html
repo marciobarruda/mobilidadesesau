@@ -264,13 +264,13 @@
 
     <main class="container my-5">
       <p class="user-greeting">
-        Olá, <strong>{{ $json.data.dadosComuns.nome }}</strong>! Este é o seu painel de mobilidade interna.
+        Olá, <strong id="saudacao-nome">{{ $json.data.dadosComuns.nome }}</strong>! Este é o seu painel de mobilidade interna.
       </p>
 
       <!-- CARD: Mobilidade Interna -->
       <section class="mb-5">
         <div class="row g-4">
-          <div class="col-lg-5">
+          <div class="col-lg-4">
             <article class="card card-programa">
               <div class="card-header">
                 <span class="badge text-bg-light text-primary text-uppercase">Mobilidade interna</span>
@@ -293,7 +293,7 @@
           </div>
 
           <!-- CARD: Atualização cadastral (colapsado) -->
-          <div class="col-lg-7">
+          <div class="col-lg-8">
             <article class="card card-programa">
               <div class="card-header">
                 <span class="badge text-bg-light text-primary text-uppercase">Atualização cadastral</span>
@@ -584,10 +584,21 @@
             }
           }
           return selecionadas
-            .map(parte => {
-              const lower = parte.toLocaleLowerCase("pt-BR");
-              return lower.charAt(0).toLocaleUpperCase("pt-BR") + lower.slice(1);
-            })
+            .map(parte => parte.toLocaleLowerCase("pt-BR"))
+            .map(parte =>
+              parte
+                .split(/([-'])/)
+                .map((segmento, index, arr) => {
+                  if (segmento === "-" || segmento === "'") return segmento;
+                  if (!segmento) return segmento;
+                  const isConnector = conectores.has(segmento);
+                  if (isConnector && index !== 0 && index !== arr.length - 1) {
+                    return segmento;
+                  }
+                  return segmento.charAt(0).toLocaleUpperCase("pt-BR") + segmento.slice(1);
+                })
+                .join("")
+            )
             .join(" ");
         };
         const preferTemplateValue = (...values) => {
@@ -658,7 +669,7 @@
         };
         const templatePayload = obterTemplatePayload();
         const templateContexto = extrairTemplateContexto(templatePayload);
-        const greetingStrong = document.querySelector(".user-greeting strong");
+        const greetingStrong = document.getElementById("saudacao-nome");
         const primeiroVinculoTemplate = templateContexto.vinculos.length ? templateContexto.vinculos[0] : {};
         const dadosServidorTemplate = {
           matricula: preferTemplateValue(primeiroVinculoTemplate?.matricula, templateContexto.dadosComuns?.matricula, valorMatriculaPreferidaAttr),
@@ -717,8 +728,13 @@
           valoresPreferidos.regime = dadosServidorTemplate.regime;
         }
         const primeiroNomeSaudacao = formatarPrimeiroNome(dadosServidorTemplate.nome || greetingStrong?.textContent);
-        if (greetingStrong && primeiroNomeSaudacao) {
-          greetingStrong.textContent = primeiroNomeSaudacao;
+        if (greetingStrong) {
+          if (dadosServidorTemplate.nome) {
+            greetingStrong.dataset.nomeCompleto = dadosServidorTemplate.nome;
+          }
+          if (primeiroNomeSaudacao) {
+            greetingStrong.textContent = primeiroNomeSaudacao;
+          }
         }
         if (dadosServidorTemplate.cpf) {
           dadosServidorTemplate.cpf = onlyDigits(dadosServidorTemplate.cpf);
@@ -762,18 +778,27 @@
           opt0.value = "";
           opt0.textContent = placeholder || "Selecione...";
           select.appendChild(opt0);
-          const options = (list || []).filter(Boolean);
-          options.forEach(item => {
+          const seen = new Set();
+          const options = [];
+          (list || []).filter(Boolean).forEach(item => {
             const value = item?.value ?? item?.label ?? item;
-            if (!value) return;
+            const label = item?.label ?? item?.value ?? item;
+            if (!value || !label) return;
+            const key = (item?.key || slugify(value || label));
+            if (seen.has(key)) return;
+            seen.add(key);
+            options.push({ value, label, key });
+          });
+          options.sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
+          options.forEach(item => {
             const option = document.createElement("option");
-            option.value = value;
-            option.textContent = item?.label ?? value;
-            option.dataset.key = item?.key || slugify(value);
+            option.value = item.value;
+            option.textContent = item.label;
+            option.dataset.key = item.key;
             select.appendChild(option);
           });
           select.disabled = options.length === 0;
-          if (options.some(item => (item?.value ?? item?.label ?? item) === currentValue)) {
+          if (options.some(item => item.value === currentValue || item.label === currentValue)) {
             select.value = currentValue;
           } else {
             select.value = "";
@@ -1557,11 +1582,13 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ cpf }),
-                cache: "no-store"
+                cache: "no-store",
+                mode: "cors"
               }
             : {
                 method: "GET",
-                cache: "no-store"
+                cache: "no-store",
+                mode: "cors"
               };
 
           fetch(hierarquiaEndpoint, requestInit)
