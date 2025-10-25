@@ -270,7 +270,7 @@
       <!-- CARD: Mobilidade Interna -->
       <section class="mb-5">
         <div class="row g-4">
-          <div class="col-lg-7">
+          <div class="col-lg-5">
             <article class="card card-programa">
               <div class="card-header">
                 <span class="badge text-bg-light text-primary text-uppercase">Mobilidade interna</span>
@@ -293,7 +293,7 @@
           </div>
 
           <!-- CARD: Atualização cadastral (colapsado) -->
-          <div class="col-lg-5">
+          <div class="col-lg-7">
             <article class="card card-programa">
               <div class="card-header">
                 <span class="badge text-bg-light text-primary text-uppercase">Atualização cadastral</span>
@@ -1547,16 +1547,24 @@
           hierarquiaMapa.clear();
           hierarquiaCarregada = false;
 
-          if (!hierarquiaEndpoint || !cpf) {
+          if (!hierarquiaEndpoint) {
             validateUpdateForm();
             return;
           }
 
-          fetch(hierarquiaEndpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cpf })
-          })
+          const requestInit = cpf
+            ? {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ cpf }),
+                cache: "no-store"
+              }
+            : {
+                method: "GET",
+                cache: "no-store"
+              };
+
+          fetch(hierarquiaEndpoint, requestInit)
             .then(r => { if (!r.ok) throw new Error("Falha na consulta"); return r.json(); })
             .then(data => {
               normalizarHierarquiaCadastro(data).forEach(adicionarRegistroHierarquia);
