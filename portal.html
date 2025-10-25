@@ -244,7 +244,10 @@
   </head>
   <body>
     <!-- Campos ocultos (carregados junto à carta) -->
-    <input type="hidden" id="cpf" value="{{ $json.cpf }}" />
+    <input type="hidden" id="cpf" value="{{ $json.data.dadosComuns.cpf }}" />
+    <script id="portal-template-data" type="application/json">
+      {{ JSON.stringify($json) }}
+    </script>
 
     <header class="site-header">
       <div class="container">
@@ -261,7 +264,7 @@
 
     <main class="container my-5">
       <p class="user-greeting">
-        Olá, <strong id="saudacao-nome" data-nome-completo="{{ $json.nome }}">servidor(a)</strong>! Este é o seu painel de mobilidade interna.
+        Olá, <strong>{{ $json.data.dadosComuns.nome }}</strong>! Este é o seu painel de mobilidade interna.
       </p>
 
       <!-- CARD: Mobilidade Interna -->
@@ -303,60 +306,60 @@
 
                   <div class="mt-3">
                     <label class="form-label" for="sel-matricula">Matrícula</label>
-                    <select class="form-select" id="sel-matricula" data-valor-atual="{{ $json.matricula }}" required></select>
+                    <select class="form-select" id="sel-matricula" data-valor-atual="{{ $json.data.vinculos[0].matricula }}" required></select>
                     <div class="form-text">Selecione o vínculo a atualizar.</div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="in-whatsapp">WhatsApp</label>
-                      <input class="form-control" type="tel" id="in-whatsapp" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.whatsapp }}" />
+                      <input class="form-control" type="tel" id="in-whatsapp" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.data.dadosComuns.whatsapp }}" />
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="in-telefone-alt">Telefone alternativo</label>
-                      <input class="form-control" type="tel" id="in-telefone-alt" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.tel_alternativo }}" />
+                      <input class="form-control" type="tel" id="in-telefone-alt" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.data.dadosComuns.tel_alternativo }}" />
                     </div>
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-email">E-mail</label>
-                    <input class="form-control" type="email" id="in-email" placeholder="nome@exemplo.com" autocomplete="email" value="{{ $json.email }}" />
+                    <input class="form-control" type="email" id="in-email" placeholder="nome@exemplo.com" autocomplete="email" value="{{ $json.data.dadosComuns.email }}" />
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-cep">CEP</label>
-                    <input class="form-control" type="text" id="in-cep" inputmode="numeric" maxlength="8" placeholder="00000000" value="{{ $json.cep }}" />
+                    <input class="form-control" type="text" id="in-cep" inputmode="numeric" maxlength="8" placeholder="00000000" value="{{ $json.data.dadosComuns.endereco.cep }}" />
                     <div class="form-text">Ao informar o CEP, os demais campos de endereço serão preenchidos automaticamente.</div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-8">
                       <label class="form-label" for="in-logradouro">Logradouro</label>
-                      <input class="form-control" type="text" id="in-logradouro" value="{{ $json.logradouro }}" />
+                      <input class="form-control" type="text" id="in-logradouro" value="{{ $json.data.dadosComuns.endereco.logradouro }}" />
                     </div>
                     <div class="col-md-4">
                       <label class="form-label" for="in-numero">Número</label>
-                      <input class="form-control" type="text" id="in-numero" value="{{ $json.numero }}" />
+                      <input class="form-control" type="text" id="in-numero" value="{{ $json.data.dadosComuns.endereco.numero }}" />
                     </div>
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-complemento">Complemento</label>
-                    <input class="form-control" type="text" id="in-complemento" value="{{ $json.complemento }}" />
+                    <input class="form-control" type="text" id="in-complemento" value="{{ $json.data.dadosComuns.endereco.complemento }}" />
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="in-bairro">Bairro</label>
-                      <input class="form-control" type="text" id="in-bairro" value="{{ $json.bairro }}" />
+                      <input class="form-control" type="text" id="in-bairro" value="{{ $json.data.dadosComuns.endereco.bairro }}" />
                     </div>
                     <div class="col-md-4">
                       <label class="form-label" for="in-cidade">Cidade</label>
-                      <input class="form-control" type="text" id="in-cidade" value="{{ $json.cidade }}" />
+                      <input class="form-control" type="text" id="in-cidade" value="{{ $json.data.dadosComuns.endereco.cidade }}" />
                     </div>
                     <div class="col-md-2">
                       <label class="form-label" for="in-uf">UF</label>
-                      <input class="form-control text-uppercase" type="text" id="in-uf" maxlength="2" value="{{ $json.uf }}" />
+                      <input class="form-control text-uppercase" type="text" id="in-uf" maxlength="2" value="{{ $json.data.dadosComuns.endereco.uf }}" />
                     </div>
                   </div>
 
@@ -365,22 +368,22 @@
                   <div class="row g-3">
                     <div class="col-md-6">
                       <label class="form-label" for="sel-ds">DS/Executiva atual</label>
-                      <select class="form-select" id="sel-ds" data-valor-atual="{{ $json.distrito }}"></select>
+                      <select class="form-select" id="sel-ds" data-valor-atual="{{ $json.data.vinculos[0].distrito }}"></select>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="sel-unidade">Unidade atual</label>
-                      <select class="form-select" id="sel-unidade" data-valor-atual="{{ $json.lotacao }}"></select>
+                      <select class="form-select" id="sel-unidade" data-valor-atual="{{ $json.data.vinculos[0].lotacao }}"></select>
                     </div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="sel-turno">Turno atual</label>
-                      <select class="form-select" id="sel-turno" data-valor-atual="{{ $json.turno }}"></select>
+                      <select class="form-select" id="sel-turno" data-valor-atual="{{ $json.data.vinculos[0].turno }}"></select>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="sel-regime">Regime atual</label>
-                      <select class="form-select" id="sel-regime" data-valor-atual="{{ $json.regime }}"></select>
+                      <select class="form-select" id="sel-regime" data-valor-atual="{{ $json.data.vinculos[0].regime }}"></select>
                     </div>
                   </div>
 
@@ -483,9 +486,6 @@
           regime: ""
         };
         let hierarquiaCarregada = false;
-        const saudacao = document.querySelector(".user-greeting");
-        const saudacaoNome = document.getElementById("saudacao-nome");
-
         const openModal = (title, html, actions = []) => {
           modalTitle.textContent = title || "Detalhes";
           modalMessage.innerHTML = html || "<p class='mb-0 text-muted'>Sem conteúdo.</p>";
@@ -554,20 +554,106 @@
           if (templatePlaceholderPattern.test(text)) return "";
           return text;
         };
-        const valorMatriculaPreferida = resolveTemplateValue(selMatricula?.dataset?.valorAtual);
-        const valorDistritoPreferido = resolveTemplateValue(selDistrito?.dataset?.valorAtual);
-        const valorUnidadePreferida = resolveTemplateValue(selUnidade?.dataset?.valorAtual);
-        const valorTurnoPreferido = resolveTemplateValue(selTurno?.dataset?.valorAtual);
-        const valorRegimePreferido = resolveTemplateValue(selRegime?.dataset?.valorAtual);
-        const saudacaoNomeTemplate = resolveTemplateValue(saudacaoNome?.dataset?.nomeCompleto);
-        const formatPrimeiroNome = (nome) => {
-          const texto = resolveTemplateValue(nome);
-          if (!texto) return "";
-          const [primeiro] = texto.split(/\s+/).filter(Boolean);
-          if (!primeiro) return "";
-          const base = primeiro.toLowerCase();
-          return base.charAt(0).toUpperCase() + base.slice(1);
+        const preferTemplateValue = (...values) => {
+          for (const valor of values) {
+            const resolved = resolveTemplateValue(valor);
+            if (resolved) return resolved;
+          }
+          return "";
         };
+        const valorMatriculaPreferidaAttr = resolveTemplateValue(selMatricula?.dataset?.valorAtual);
+        const valorDistritoPreferidoAttr = resolveTemplateValue(selDistrito?.dataset?.valorAtual);
+        const valorUnidadePreferidaAttr = resolveTemplateValue(selUnidade?.dataset?.valorAtual);
+        const valorTurnoPreferidoAttr = resolveTemplateValue(selTurno?.dataset?.valorAtual);
+        const valorRegimePreferidoAttr = resolveTemplateValue(selRegime?.dataset?.valorAtual);
+        if (selMatricula) {
+          if (valorMatriculaPreferidaAttr) selMatricula.dataset.valorAtual = valorMatriculaPreferidaAttr;
+          else delete selMatricula.dataset.valorAtual;
+        }
+        if (selDistrito) {
+          if (valorDistritoPreferidoAttr) selDistrito.dataset.valorAtual = valorDistritoPreferidoAttr;
+          else delete selDistrito.dataset.valorAtual;
+        }
+        if (selUnidade) {
+          if (valorUnidadePreferidaAttr) selUnidade.dataset.valorAtual = valorUnidadePreferidaAttr;
+          else delete selUnidade.dataset.valorAtual;
+        }
+        if (selTurno) {
+          if (valorTurnoPreferidoAttr) selTurno.dataset.valorAtual = valorTurnoPreferidoAttr;
+          else delete selTurno.dataset.valorAtual;
+        }
+        if (selRegime) {
+          if (valorRegimePreferidoAttr) selRegime.dataset.valorAtual = valorRegimePreferidoAttr;
+          else delete selRegime.dataset.valorAtual;
+        }
+        const obterTemplatePayload = () => {
+          if (typeof window !== "undefined" && window.portalTemplateData) {
+            return window.portalTemplateData;
+          }
+          const scriptTemplate = document.getElementById("portal-template-data");
+          if (scriptTemplate) {
+            const raw = scriptTemplate.textContent?.trim();
+            if (raw && !raw.includes("{{")) {
+              try {
+                return JSON.parse(raw);
+              } catch (err) {
+                console.warn("Não foi possível interpretar os dados do template", err);
+              }
+            }
+          }
+          return null;
+        };
+        const extrairTemplateContexto = (payload) => {
+          const vazio = { dadosComuns: {}, endereco: {}, vinculos: [] };
+          if (!payload) return vazio;
+          const lista = Array.isArray(payload) ? payload : [payload];
+          for (const item of lista) {
+            if (!item || typeof item !== "object") continue;
+            const dataNode = item.data && typeof item.data === "object" ? item.data : item;
+            const dadosComuns = dataNode.dadosComuns && typeof dataNode.dadosComuns === "object" ? dataNode.dadosComuns : {};
+            const enderecoDireto = dataNode.endereco && typeof dataNode.endereco === "object" ? dataNode.endereco : {};
+            const endereco = dadosComuns.endereco && typeof dadosComuns.endereco === "object" ? dadosComuns.endereco : enderecoDireto;
+            const vinculos = Array.isArray(dataNode.vinculos)
+              ? dataNode.vinculos.filter(reg => reg && typeof reg === "object")
+              : [];
+            return { dadosComuns, endereco, vinculos };
+          }
+          return vazio;
+        };
+        const templatePayload = obterTemplatePayload();
+        const templateContexto = extrairTemplateContexto(templatePayload);
+        const greetingStrong = document.querySelector(".user-greeting strong");
+        const primeiroVinculoTemplate = templateContexto.vinculos.length ? templateContexto.vinculos[0] : {};
+        const dadosServidorTemplate = {
+          matricula: preferTemplateValue(primeiroVinculoTemplate?.matricula, templateContexto.dadosComuns?.matricula, valorMatriculaPreferidaAttr),
+          nome: preferTemplateValue(templateContexto.dadosComuns?.nome, greetingStrong?.textContent),
+          cpf: preferTemplateValue(templateContexto.dadosComuns?.cpf, cpfInput?.value),
+          admissao: preferTemplateValue(primeiroVinculoTemplate?.admissao),
+          nascimento: preferTemplateValue(templateContexto.dadosComuns?.nascimento),
+          cargo: preferTemplateValue(primeiroVinculoTemplate?.cargo),
+          grupo: preferTemplateValue(primeiroVinculoTemplate?.grupo),
+          vinculo: preferTemplateValue(primeiroVinculoTemplate?.vinculo),
+          carga_horaria: preferTemplateValue(primeiroVinculoTemplate?.carga_horaria, primeiroVinculoTemplate?.cargaHoraria),
+          cep: preferTemplateValue(templateContexto.endereco?.cep),
+          logradouro: preferTemplateValue(templateContexto.endereco?.logradouro),
+          numero: preferTemplateValue(templateContexto.endereco?.numero),
+          complemento: preferTemplateValue(templateContexto.endereco?.complemento),
+          bairro: preferTemplateValue(templateContexto.endereco?.bairro),
+          cidade: preferTemplateValue(templateContexto.endereco?.cidade),
+          uf: preferTemplateValue(templateContexto.endereco?.uf),
+          whatsapp: preferTemplateValue(templateContexto.dadosComuns?.whatsapp),
+          tel_alternativo: preferTemplateValue(templateContexto.dadosComuns?.tel_alternativo, templateContexto.dadosComuns?.telAlternativo),
+          email: preferTemplateValue(templateContexto.dadosComuns?.email),
+          distrito: preferTemplateValue(primeiroVinculoTemplate?.distrito, valorDistritoPreferidoAttr),
+          lotacao: preferTemplateValue(primeiroVinculoTemplate?.lotacao, valorUnidadePreferidaAttr),
+          turno: preferTemplateValue(primeiroVinculoTemplate?.turno, valorTurnoPreferidoAttr),
+          regime: preferTemplateValue(primeiroVinculoTemplate?.regime, valorRegimePreferidoAttr)
+        };
+        const valorMatriculaPreferida = preferTemplateValue(valorMatriculaPreferidaAttr, dadosServidorTemplate.matricula);
+        const valorDistritoPreferido = preferTemplateValue(valorDistritoPreferidoAttr, dadosServidorTemplate.distrito);
+        const valorUnidadePreferida = preferTemplateValue(valorUnidadePreferidaAttr, dadosServidorTemplate.lotacao);
+        const valorTurnoPreferido = preferTemplateValue(valorTurnoPreferidoAttr, dadosServidorTemplate.turno);
+        const valorRegimePreferido = preferTemplateValue(valorRegimePreferidoAttr, dadosServidorTemplate.regime);
         const escapeHtml = (value) => normalizeText(value).replace(/[&<>"']/g, (match) => ({
           "&": "&amp;",
           "<": "&lt;",
@@ -578,32 +664,6 @@
         const slugify = (value) => {
           const base = normalizeText(value);
           return base.normalize ? base.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : base.toLowerCase();
-        };
-
-        const dadosServidorTemplate = {
-          matricula: resolveTemplateValue("{{ $json.matricula }}") || valorMatriculaPreferida,
-          nome: resolveTemplateValue("{{ $json.nome }}") || saudacaoNomeTemplate,
-          cpf: resolveTemplateValue("{{ $json.cpf }}"),
-          admissao: resolveTemplateValue("{{ $json.admissao }}"),
-          nascimento: resolveTemplateValue("{{ $json.nascimento }}"),
-          cargo: resolveTemplateValue("{{ $json.cargo }}"),
-          grupo: resolveTemplateValue("{{ $json.grupo }}"),
-          vinculo: resolveTemplateValue("{{ $json.vinculo }}"),
-          carga_horaria: resolveTemplateValue("{{ $json.carga_horaria }}"),
-          cep: resolveTemplateValue("{{ $json.cep }}"),
-          logradouro: resolveTemplateValue("{{ $json.logradouro }}"),
-          numero: resolveTemplateValue("{{ $json.numero }}"),
-          complemento: resolveTemplateValue("{{ $json.complemento }}"),
-          bairro: resolveTemplateValue("{{ $json.bairro }}"),
-          cidade: resolveTemplateValue("{{ $json.cidade }}"),
-          uf: resolveTemplateValue("{{ $json.uf }}"),
-          whatsapp: resolveTemplateValue("{{ $json.whatsapp }}"),
-          tel_alternativo: resolveTemplateValue("{{ $json.tel_alternativo }}"),
-          email: resolveTemplateValue("{{ $json.email }}"),
-          distrito: resolveTemplateValue("{{ $json.distrito }}") || valorDistritoPreferido,
-          lotacao: resolveTemplateValue("{{ $json.lotacao }}") || valorUnidadePreferida,
-          turno: resolveTemplateValue("{{ $json.turno }}") || valorTurnoPreferido,
-          regime: resolveTemplateValue("{{ $json.regime }}") || valorRegimePreferido
         };
         if (!valoresPreferidos.matricula && dadosServidorTemplate.matricula) {
           valoresPreferidos.matricula = dadosServidorTemplate.matricula;
@@ -623,9 +683,26 @@
         if (dadosServidorTemplate.cpf) {
           dadosServidorTemplate.cpf = onlyDigits(dadosServidorTemplate.cpf);
         }
-        const registrosServidorPreCarregados = Object.values(dadosServidorTemplate).some(valor => normalizeText(valor))
-          ? [dadosServidorTemplate]
+        const baseRegistroTemplate = {
+          nome: dadosServidorTemplate.nome,
+          cpf: dadosServidorTemplate.cpf,
+          whatsapp: dadosServidorTemplate.whatsapp,
+          tel_alternativo: dadosServidorTemplate.tel_alternativo,
+          email: dadosServidorTemplate.email,
+          cep: dadosServidorTemplate.cep,
+          logradouro: dadosServidorTemplate.logradouro,
+          numero: dadosServidorTemplate.numero,
+          complemento: dadosServidorTemplate.complemento,
+          bairro: dadosServidorTemplate.bairro,
+          cidade: dadosServidorTemplate.cidade,
+          uf: dadosServidorTemplate.uf
+        };
+        const vinculosTemplate = templateContexto.vinculos.length
+          ? templateContexto.vinculos.map(v => ({ ...baseRegistroTemplate, ...v }))
           : [];
+        const registrosServidorPreCarregados = vinculosTemplate.length
+          ? vinculosTemplate
+          : (Object.values(baseRegistroTemplate).some(valor => normalizeText(valor)) ? [baseRegistroTemplate] : []);
         if (!cpf) {
           const cpfTemplate = onlyDigits(dadosServidorTemplate.cpf);
           if (cpfTemplate) {
@@ -871,18 +948,6 @@
           return cadastro;
         };
 
-        const atualizarSaudacao = () => {
-          if (!saudacao || !saudacaoNome) return;
-          const nomeReferencia = dadosServidor?.nome || dadosServidorTemplate.nome || resolveTemplateValue(saudacaoNome.dataset.nomeCompleto);
-          const primeiroNome = formatPrimeiroNome(nomeReferencia);
-          if (primeiroNome) {
-            saudacaoNome.textContent = primeiroNome;
-            saudacaoNome.dataset.nomeCompleto = nomeReferencia;
-          } else {
-            saudacaoNome.textContent = "servidor(a)";
-          }
-        };
-
         const definirPreferenciasHierarquia = (dados) => {
           if (!dados) return;
           if (dados.matricula) valoresPreferidos.matricula = dados.matricula;
@@ -921,21 +986,31 @@
           validateUpdateForm();
         };
 
-        const aplicarDadosServidor = () => {
-          if (!dadosServidor) return;
-          if (inWhats && dadosServidor.whatsapp) inWhats.value = dadosServidor.whatsapp;
-          if (inTelAlt && dadosServidor.telAlternativo) inTelAlt.value = dadosServidor.telAlternativo;
-          if (inEmail && dadosServidor.email) inEmail.value = dadosServidor.email;
-          if (inCep && dadosServidor.cep) {
-            inCep.value = dadosServidor.cep;
-            lastCep = dadosServidor.cep;
+        const atribuirValorCampo = (input, valor, transform) => {
+          if (!input) return "";
+          const resolvido = resolveTemplateValue(valor);
+          if (!resolvido) {
+            input.value = "";
+            return "";
           }
-          if (inLogradouro && dadosServidor.logradouro) inLogradouro.value = dadosServidor.logradouro.toUpperCase();
-          if (inNumero && dadosServidor.numero) inNumero.value = dadosServidor.numero;
-          if (inComplemento && dadosServidor.complemento) inComplemento.value = dadosServidor.complemento.toUpperCase();
-          if (inBairro && dadosServidor.bairro) inBairro.value = dadosServidor.bairro.toUpperCase();
-          if (inCidade && dadosServidor.cidade) inCidade.value = dadosServidor.cidade.toUpperCase();
-          if (inUf && dadosServidor.uf) inUf.value = dadosServidor.uf.toUpperCase();
+          const final = transform ? transform(resolvido) : resolvido;
+          input.value = final;
+          return final;
+        };
+
+        const aplicarDadosServidor = () => {
+          const dados = dadosServidor || {};
+          atribuirValorCampo(inWhats, dados.whatsapp);
+          atribuirValorCampo(inTelAlt, dados.telAlternativo);
+          atribuirValorCampo(inEmail, dados.email);
+          const cepAplicado = atribuirValorCampo(inCep, dados.cep);
+          lastCep = onlyDigits(cepAplicado);
+          atribuirValorCampo(inLogradouro, dados.logradouro, (val) => val.toUpperCase());
+          atribuirValorCampo(inNumero, dados.numero);
+          atribuirValorCampo(inComplemento, dados.complemento, (val) => val.toUpperCase());
+          atribuirValorCampo(inBairro, dados.bairro, (val) => val.toUpperCase());
+          atribuirValorCampo(inCidade, dados.cidade, (val) => val.toUpperCase());
+          atribuirValorCampo(inUf, dados.uf, (val) => val.toUpperCase());
 
           aplicarSelecaoMatriculaPreferida();
           aplicarHierarquiaPreferida();
@@ -953,12 +1028,11 @@
             valoresPreferidos.unidade = "";
             valoresPreferidos.turno = "";
             valoresPreferidos.regime = "";
-            atualizarSaudacao();
+            aplicarDadosServidor();
             return;
           }
           dadosServidor = normalizado;
           definirPreferenciasHierarquia(normalizado);
-          atualizarSaudacao();
           aplicarDadosServidor();
         };
         function normalizeSolicitacoes(data) {
@@ -1180,6 +1254,7 @@
           const atual = sanitizeCpf(cpfInput?.value);
           if (atual) cpf = atual;
           if (emptyBox) emptyBox.textContent = emptyBoxDefaultMessage;
+          setMinhasState("loading");
 
           registrarDadosServidor(registrosServidorPreCarregados);
 
