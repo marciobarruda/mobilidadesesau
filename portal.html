@@ -448,7 +448,13 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        const cpf = (document.getElementById("cpf")?.value || "").replace(/\\D/g, "");
+        const cpfInput = document.getElementById("cpf");
+        const onlyDigits = (v) => (v || "").replace(/\\D/g, "");
+        const sanitizeCpf = (value) => {
+          const digits = onlyDigits(value).slice(0, 11);
+          return digits.length === 11 ? digits : "";
+        };
+        let cpf = sanitizeCpf(cpfInput?.value);
         const solicitacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/cbda8a38-3a07-4b85-9d63-7ebda0294f6a";
         const solicitacaoDetalheEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2";
         const novaSolicitacaoEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2";
@@ -527,6 +533,8 @@
 
         btnNovaSolicitacao?.addEventListener("click", (event) => {
           event.preventDefault();
+          const atual = sanitizeCpf(cpfInput?.value);
+          if (atual) cpf = atual;
           if (!cpf) {
             openModal("⚠️ CPF não localizado", "<p>Não foi possível identificar o CPF do servidor para iniciar a solicitação.</p>");
             return;
@@ -608,7 +616,6 @@
         const inBairro = document.getElementById("in-bairro");
         const inCidade = document.getElementById("in-cidade");
         const inUf = document.getElementById("in-uf");
-        const onlyDigits = (v) => (v || "").replace(/\\D/g, "");
         const brasilApiBase = "https://brasilapi.com.br/api/cep/v1/";
         let lastCep = "";
         let cepTimer = null;
@@ -722,6 +729,7 @@
         const grid = document.getElementById("minhas-solicitacoes-cards");
         const loadBox = document.getElementById("minhas-solicitacoes-loading");
         const emptyBox = document.getElementById("minhas-solicitacoes-empty");
+        const emptyBoxDefaultMessage = emptyBox?.textContent?.trim() || "Nenhuma solicitação encontrada.";
 
         function setMinhasState(state) {
           loadBox?.classList.toggle("d-none", state !== "loading");
@@ -1067,14 +1075,20 @@
             grid.appendChild(col);
           });
 
-          setMinhasState(solicitacoesAtuais.length ? "ready" : "empty");
           if (!solicitacoesAtuais.length) {
             setOptions(selMatricula, [], "Selecione a matrícula");
+            if (emptyBox) emptyBox.textContent = emptyBoxDefaultMessage;
+          } else if (emptyBox) {
+            emptyBox.textContent = emptyBoxDefaultMessage;
           }
+          setMinhasState(solicitacoesAtuais.length ? "ready" : "empty");
           validateUpdateForm();
         }
 
         function carregarMinhasSolicitacoes() {
+          const atual = sanitizeCpf(cpfInput?.value);
+          if (atual) cpf = atual;
+          if (emptyBox) emptyBox.textContent = emptyBoxDefaultMessage;
           if (!cpf) {
             solicitacoesAtuais = [];
             setOptions(selMatricula, [], "Selecione a matrícula");
@@ -1188,7 +1202,10 @@
           setOptions(selTurno, [], "Selecione o turno atual");
           setOptions(selRegime, [], "Selecione o regime atual");
 
-          if (!hierarquiaEndpoint) {
+          hierarquiaMapa.clear();
+          hierarquiaCarregada = false;
+
+          if (!hierarquiaEndpoint || !cpf) {
             validateUpdateForm();
             return;
           }
@@ -1200,7 +1217,6 @@
           })
             .then(r => { if (!r.ok) throw new Error("Falha na consulta"); return r.json(); })
             .then(data => {
-              hierarquiaMapa.clear();
               normalizarHierarquiaCadastro(data).forEach(adicionarRegistroHierarquia);
               const dsOptions = Array.from(hierarquiaMapa.values())
                 .map(item => ({ value: item.label, label: item.label }))
@@ -1265,6 +1281,8 @@
         });
 
         btnAtualizar?.addEventListener("click", function () {
+          const cpfAtual = sanitizeCpf(cpfInput?.value);
+          if (cpfAtual) cpf = cpfAtual;
           const payload = {
             cpf,
             matricula: selMatricula?.value || "",
@@ -1299,10 +1317,63 @@
             .catch(() => openModal("❌ Erro", "<p>Não foi possível enviar a atualização. Tente novamente.</p>"));
         });
 
-        // Inicializações
-        carregarDadosIniciais();
-        carregarMinhasSolicitacoes();
-        validateUpdateForm();
+        function iniciarFluxosCpf() {
+          carregarDadosIniciais();
+          if (cpf) {
+            carregarMinhasSolicitacoes();
+          } else {
+            solicitacoesAtuais = [];
+            setOptions(selMatricula, [], "Selecione a matrícula");
+            if (emptyBox) {
+              emptyBox.textContent = "Informe ou aguarde o CPF do servidor para carregar as solicitações.";
+            }
+            setMinhasState("empty");
+          }
+          validateUpdateForm();
+        }
+
+        const atualizarCpfAtual = () => {
+          const atual = sanitizeCpf(cpfInput?.value);
+          if (atual === cpf) return;
+          cpf = atual;
+          iniciarFluxosCpf();
+        };
+
+        iniciarFluxosCpf();
+
+        if (cpfInput) {
+          cpfInput.addEventListener("input", atualizarCpfAtual);
+          cpfInput.addEventListener("change", atualizarCpfAtual);
+
+          let cpfPoller = null;
+          const encerrarPollerSePossivel = () => {
+            if (cpf && cpfPoller) {
+              clearInterval(cpfPoller);
+              cpfPoller = null;
+            }
+          };
+
+          if (typeof MutationObserver !== "undefined") {
+            const observer = new MutationObserver(() => {
+              atualizarCpfAtual();
+              encerrarPollerSePossivel();
+            });
+            observer.observe(cpfInput, { attributes: true, attributeFilter: ["value"] });
+          }
+
+          if (!cpf) {
+            cpfPoller = setInterval(() => {
+              atualizarCpfAtual();
+              encerrarPollerSePossivel();
+            }, 250);
+            setTimeout(() => {
+              if (cpfPoller) {
+                clearInterval(cpfPoller);
+                cpfPoller = null;
+              }
+            }, 15000);
+          }
+        }
       });
     </script>
   </body>
