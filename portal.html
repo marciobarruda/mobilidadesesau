@@ -467,6 +467,16 @@
         const hierarquiaMapa = new Map();
         let resumoSolicitacaoAtual = null;
         let solicitacoesAtuais = [];
+        let dadosServidor = null;
+        const valoresPreferidos = {
+          matricula: "",
+          distrito: "",
+          unidade: "",
+          turno: "",
+          regime: ""
+        };
+        let hierarquiaCarregada = false;
+        const saudacao = document.querySelector(".user-greeting");
 
         const openModal = (title, html, actions = []) => {
           modalTitle.textContent = title || "Detalhes";
@@ -561,6 +571,20 @@
           } else {
             select.value = "";
           }
+        };
+
+        const tentarSelecionarValor = (select, valor) => {
+          if (!select || !valor) return false;
+          const alvo = normalizeText(valor).toLowerCase();
+          for (const option of Array.from(select.options)) {
+            const optValue = normalizeText(option.value).toLowerCase();
+            const optText = normalizeText(option.textContent).toLowerCase();
+            if (optValue === alvo || optText === alvo) {
+              select.value = option.value;
+              return true;
+            }
+          }
+          return false;
         };
 
         const formatarData = (valor) => {
@@ -705,6 +729,139 @@
           grid?.classList.toggle("d-none", state !== "ready");
         }
 
+        const coletarRegistros = (data) => {
+          if (Array.isArray(data)) return data;
+          if (Array.isArray(data?.items)) return data.items;
+          if (Array.isArray(data?.data)) return data.data;
+          if (Array.isArray(data?.result)) return data.result;
+          if (data && typeof data === "object") {
+            const valores = Object.values(data).filter(item => typeof item === "object");
+            const acumulado = [];
+            valores.forEach(item => {
+              if (Array.isArray(item)) acumulado.push(...item);
+              else acumulado.push(item);
+            });
+            if (!acumulado.length) acumulado.push(data);
+            return acumulado;
+          }
+          return [];
+        };
+
+        const normalizarDadosServidor = (item) => {
+          if (!item || typeof item !== "object") return null;
+          const cadastro = {
+            nome: normalizeText(item.nome || item.NOME || ""),
+            matricula: normalizeText(item.matricula || item.MATRICULA || ""),
+            cargo: normalizeText(item.cargo || item.CARGO || ""),
+            cpf: onlyDigits(item.cpf || item.CPF || cpf),
+            whatsapp: onlyDigits(item.whatsapp || item.WHATSAPP || item.telefone || item.TELEFONE || ""),
+            telAlternativo: onlyDigits(
+              item.tel_alternativo || item.telAlternativo || item.telefoneAlternativo || item.TEL_ALTERNATIVO || ""
+            ),
+            email: normalizeText(item.email || item.EMAIL || ""),
+            cep: onlyDigits(item.cep || item.CEP || ""),
+            logradouro: normalizeText(item.logradouro || item.LOGRADOURO || item.endereco || item.ENDERECO || ""),
+            numero: normalizeText(item.numero || item.NUMERO || ""),
+            complemento: normalizeText(item.complemento || item.COMPLEMENTO || ""),
+            bairro: normalizeText(item.bairro || item.BAIRRO || ""),
+            cidade: normalizeText(item.cidade || item.CIDADE || ""),
+            uf: normalizeText(item.uf || item.UF || ""),
+            distrito: normalizeText(item.distrito || item.DISTRITO || item.ds || item.executiva || item["ds/executiva"] || ""),
+            unidade: normalizeText(item.lotacao || item.LOTACAO || item.unidade || item.local || ""),
+            turno: normalizeText(item.turno || item.TURNO || ""),
+            regime: normalizeText(item.regime || item.REGIME || "")
+          };
+          return cadastro;
+        };
+
+        const atualizarSaudacao = () => {
+          if (!saudacao) return;
+          const nome = dadosServidor?.nome;
+          if (nome) {
+            saudacao.innerHTML = `Olá, <strong>${escapeHtml(nome)}</strong>! Este é o seu painel de mobilidade interna.`;
+          } else {
+            saudacao.textContent = "Olá, servidor(a)! Este é o seu painel de mobilidade interna.";
+          }
+        };
+
+        const definirPreferenciasHierarquia = (dados) => {
+          if (!dados) return;
+          if (dados.matricula) valoresPreferidos.matricula = dados.matricula;
+          if (dados.distrito) valoresPreferidos.distrito = dados.distrito;
+          if (dados.unidade) valoresPreferidos.unidade = dados.unidade;
+          if (dados.turno) valoresPreferidos.turno = dados.turno;
+          if (dados.regime) valoresPreferidos.regime = dados.regime;
+        };
+
+        const aplicarSelecaoMatriculaPreferida = () => {
+          if (!selMatricula || !valoresPreferidos.matricula) return;
+          const valorAntes = selMatricula.value;
+          if (tentarSelecionarValor(selMatricula, valoresPreferidos.matricula) && selMatricula.value !== valorAntes) {
+            selMatricula.dispatchEvent(new Event("change"));
+          }
+        };
+
+        const aplicarHierarquiaPreferida = () => {
+          if (!hierarquiaCarregada) return;
+          const valorDistritoAntes = selDistrito?.value ?? "";
+          const selecionouDistrito = tentarSelecionarValor(selDistrito, valoresPreferidos.distrito);
+          if (selecionouDistrito && selDistrito.value !== valorDistritoAntes) {
+            atualizarLotacoes();
+          }
+          const valorUnidadeAntes = selUnidade?.value ?? "";
+          const selecionouUnidade = tentarSelecionarValor(selUnidade, valoresPreferidos.unidade);
+          if (selecionouUnidade && selUnidade.value !== valorUnidadeAntes) {
+            atualizarTurnos();
+          }
+          const valorTurnoAntes = selTurno?.value ?? "";
+          const selecionouTurno = tentarSelecionarValor(selTurno, valoresPreferidos.turno);
+          if (selecionouTurno && selTurno.value !== valorTurnoAntes) {
+            atualizarRegimes();
+          }
+          tentarSelecionarValor(selRegime, valoresPreferidos.regime);
+          validateUpdateForm();
+        };
+
+        const aplicarDadosServidor = () => {
+          if (!dadosServidor) return;
+          if (inWhats && dadosServidor.whatsapp) inWhats.value = dadosServidor.whatsapp;
+          if (inTelAlt && dadosServidor.telAlternativo) inTelAlt.value = dadosServidor.telAlternativo;
+          if (inEmail && dadosServidor.email) inEmail.value = dadosServidor.email;
+          if (inCep && dadosServidor.cep) {
+            inCep.value = dadosServidor.cep;
+            lastCep = dadosServidor.cep;
+          }
+          if (inLogradouro && dadosServidor.logradouro) inLogradouro.value = dadosServidor.logradouro.toUpperCase();
+          if (inNumero && dadosServidor.numero) inNumero.value = dadosServidor.numero;
+          if (inComplemento && dadosServidor.complemento) inComplemento.value = dadosServidor.complemento.toUpperCase();
+          if (inBairro && dadosServidor.bairro) inBairro.value = dadosServidor.bairro.toUpperCase();
+          if (inCidade && dadosServidor.cidade) inCidade.value = dadosServidor.cidade.toUpperCase();
+          if (inUf && dadosServidor.uf) inUf.value = dadosServidor.uf.toUpperCase();
+
+          aplicarSelecaoMatriculaPreferida();
+          aplicarHierarquiaPreferida();
+          validateUpdateForm();
+        };
+
+        const registrarDadosServidor = (data) => {
+          const registros = coletarRegistros(data);
+          const encontrado = registros.find(item => item && typeof item === "object" && (item.cpf || item.CPF || item.matricula || item.MATRICULA));
+          const normalizado = normalizarDadosServidor(encontrado);
+          if (!normalizado) {
+            dadosServidor = null;
+            valoresPreferidos.matricula = "";
+            valoresPreferidos.distrito = "";
+            valoresPreferidos.unidade = "";
+            valoresPreferidos.turno = "";
+            valoresPreferidos.regime = "";
+            atualizarSaudacao();
+            return;
+          }
+          dadosServidor = normalizado;
+          definirPreferenciasHierarquia(normalizado);
+          atualizarSaudacao();
+          aplicarDadosServidor();
+        };
         function normalizeSolicitacoes(data) {
           let items = [];
           if (Array.isArray(data)) items = data;
@@ -871,6 +1028,7 @@
               .map(item => [item.matricula, { value: item.matricula, label: item.matricula }])
           ).values());
           setOptions(selMatricula, matriculaOptions, "Selecione a matrícula");
+          aplicarSelecaoMatriculaPreferida();
 
           solicitacoesAtuais.forEach(entry => {
             const col = document.createElement("div");
@@ -931,7 +1089,10 @@
             body: JSON.stringify({ cpf })
           })
             .then(r => { if (!r.ok) throw new Error("Falha na consulta"); return r.json(); })
-            .then(data => renderSolicitacoes(normalizeSolicitacoes(data)))
+            .then(data => {
+              registrarDadosServidor(data);
+              renderSolicitacoes(normalizeSolicitacoes(data));
+            })
             .catch(() => {
               solicitacoesAtuais = [];
               setOptions(selMatricula, [], "Selecione a matrícula");
@@ -1055,6 +1216,8 @@
               setOptions(selRegime, [], "Selecione o regime atual");
             })
             .finally(() => {
+              hierarquiaCarregada = true;
+              aplicarHierarquiaPreferida();
               validateUpdateForm();
             });
         }
