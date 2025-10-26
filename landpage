@@ -430,6 +430,7 @@
                     <div class="col-12">
                       <label for="matriculaSelect" class="form-label">Matrícula</label>
                       <select id="matriculaSelect" class="form-select" required></select>
+                      <input type="hidden" id="grupoHidden" value="{{ $json.data.vinculos[0].grupo }}" />
                       <div class="invalid-feedback">Selecione uma matrícula válida.</div>
                     </div>
 
@@ -632,6 +633,12 @@
         el.className = ok ? 'text-success ms-2' : 'text-danger ms-2';
       };
 
+      const sanitizeValue = (val) => {
+        if (val === null || val === undefined) return '';
+        const str = String(val).trim();
+        return str === 'undefined' || str === 'null' ? '' : str;
+      };
+
       const sanitizeUF = (val) => (val || '').toUpperCase().slice(0,2);
       const isUF = (val) => /^[A-Za-z]{2}$/.test(val || '');
       const isCEP = (val) => /^(\d{5}-?\d{3})$/.test(val || '');
@@ -639,23 +646,31 @@
 
       // Dados vindos do template (quando presentes)
       const DATA = {
-        nome: `{{ $json.data.dadosComuns.nome }}`,
+        nome: sanitizeValue(`{{ $json.data.dadosComuns.nome }}`),
         vinculos: [
-          { matricula: `{{ $json.data.vinculos[0].matricula }}`, cargo: `{{ $json.data.vinculos[0].cargo }}` },
-          { matricula: `{{ $json.data.vinculos[1].matricula }}`, cargo: `{{ $json.data.vinculos[1].cargo }}` }
+          {
+            matricula: sanitizeValue(`{{ $json.data.vinculos[0].matricula }}`),
+            cargo: sanitizeValue(`{{ $json.data.vinculos[0].cargo }}`),
+            grupo: sanitizeValue(`{{ $json.data.vinculos[0].grupo }}`)
+          },
+          {
+            matricula: sanitizeValue(`{{ $json.data.vinculos[1].matricula }}`),
+            cargo: sanitizeValue(`{{ $json.data.vinculos[1].cargo }}`),
+            grupo: sanitizeValue(`{{ $json.data.vinculos[1].grupo }}`)
+          }
         ],
         contatos: {
-          whatsapp: `{{ $json.data.dadosComuns.whatsapp }}`,
-          telalternativo: `{{ $json.data.dadosComuns.telalternativo }}`
+          whatsapp: sanitizeValue(`{{ $json.data.dadosComuns.whatsapp }}`),
+          telalternativo: sanitizeValue(`{{ $json.data.dadosComuns.telalternativo }}`)
         },
         endereco: {
-          cep: `{{ $json.data.dadosComuns.endereco.cep }}`,
-          logradouro: `{{ $json.data.dadosComuns.endereco.logradouro }}`,
-          numero: `{{ $json.data.dadosComuns.endereco.numero }}`,
-          complemento: `{{ $json.data.dadosComuns.endereco.complemento }}`,
-          bairro: `{{ $json.data.dadosComuns.endereco.bairro }}`,
-          cidade: `{{ $json.data.dadosComuns.endereco.cidade }}`,
-          uf: `{{ $json.data.dadosComuns.endereco.uf }}`
+          cep: sanitizeValue(`{{ $json.data.dadosComuns.endereco.cep }}`),
+          logradouro: sanitizeValue(`{{ $json.data.dadosComuns.endereco.logradouro }}`),
+          numero: sanitizeValue(`{{ $json.data.dadosComuns.endereco.numero }}`),
+          complemento: sanitizeValue(`{{ $json.data.dadosComuns.endereco.complemento }}`),
+          bairro: sanitizeValue(`{{ $json.data.dadosComuns.endereco.bairro }}`),
+          cidade: sanitizeValue(`{{ $json.data.dadosComuns.endereco.cidade }}`),
+          uf: sanitizeValue(`{{ $json.data.dadosComuns.endereco.uf }}`)
         }
       };
 
@@ -664,20 +679,38 @@
         const sel = document.getElementById('matriculaSelect');
         sel.innerHTML = '';
         const opts = [];
-        if (DATA.vinculos[0] && DATA.vinculos[0].matricula && DATA.vinculos[0].matricula !== 'undefined') {
-          opts.push({ value: DATA.vinculos[0].matricula, text: DATA.vinculos[0].matricula });
-        }
-        if (DATA.vinculos[1] && DATA.vinculos[1].matricula && DATA.vinculos[1].matricula !== 'undefined' && DATA.vinculos[1].matricula.trim() !== '') {
-          opts.push({ value: DATA.vinculos[1].matricula, text: DATA.vinculos[1].matricula });
-        }
+        const pushVinculoOption = (vinculo) => {
+          if (!vinculo) return;
+          const value = sanitizeValue(vinculo.matricula);
+          if (!value) return;
+          opts.push({
+            value,
+            text: value,
+            grupo: sanitizeValue(vinculo.grupo)
+          });
+        };
+        (DATA.vinculos || []).forEach(pushVinculoOption);
         if (opts.length === 0) {
           sel.innerHTML = '<option value="" disabled selected>Sem matrículas disponíveis</option>';
           sel.setAttribute('disabled', 'disabled');
         } else {
           sel.removeAttribute('disabled');
-          sel.insertAdjacentHTML('beforeend', '<option value="" disabled selected>Selecione...</option>');
-          opts.forEach(o => sel.insertAdjacentHTML('beforeend', `<option value="${o.value}">${o.text}</option>`));
+          const placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.textContent = 'Selecione...';
+          placeholder.disabled = true;
+          placeholder.selected = true;
+          sel.appendChild(placeholder);
+          opts.forEach((optionData) => {
+            const option = document.createElement('option');
+            option.value = optionData.value;
+            option.textContent = optionData.text;
+            if (optionData.grupo) option.dataset.grupo = optionData.grupo;
+            sel.appendChild(option);
+          });
         }
+        const hiddenGrupo = document.getElementById('grupoHidden');
+        if (hiddenGrupo) hiddenGrupo.value = sanitizeValue(hiddenGrupo.value);
       }
 
       function populateContatosEndereco() {
@@ -719,7 +752,7 @@
       }
 
       // ===== Encadeamento DS -> Unidade -> Turno/Regime =====
-      async function loadUnidades(ds) {
+      async function loadUnidades(ds, grupoFromParam) {
         const sel = document.getElementById('unidadeSelect');
         sel.innerHTML = '<option>Carregando...</option>';
         sel.setAttribute('disabled', 'disabled');
@@ -728,7 +761,10 @@
         document.getElementById('regimeSelect').innerHTML = '<option>Selecione a Unidade...</option>';
         document.getElementById('regimeSelect').setAttribute('disabled', 'disabled');
         try {
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/unidades', { ds });
+          const hiddenGrupoInput = document.getElementById('grupoHidden');
+          const resolvedGrupo = sanitizeValue(grupoFromParam ?? (hiddenGrupoInput ? hiddenGrupoInput.value : ''));
+          const payload = { ds, grupo: resolvedGrupo || null };
+          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/unidades', payload);
           sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
           (data || []).forEach(u => {
             if (u && u.unidade) sel.insertAdjacentHTML('beforeend', `<option value="${u.unidade}">${u.unidade}</option>`);
@@ -962,7 +998,19 @@
       // ===== Eventos =====
       document.getElementById('dsSelect').addEventListener('change', (e) => {
         const v = e.target.value;
-        if (v) loadUnidades(v);
+        if (v) {
+          const grupoAtual = sanitizeValue(document.getElementById('grupoHidden')?.value || '');
+          loadUnidades(v, grupoAtual);
+        }
+      });
+
+      document.getElementById('matriculaSelect').addEventListener('change', (e) => {
+        const selected = e.target.selectedOptions[0];
+        const grupoSelecionado = selected ? sanitizeValue(selected.dataset.grupo || '') : '';
+        const hiddenGrupo = document.getElementById('grupoHidden');
+        if (hiddenGrupo) hiddenGrupo.value = grupoSelecionado;
+        const dsAtual = document.getElementById('dsSelect').value;
+        if (dsAtual) loadUnidades(dsAtual, grupoSelecionado);
       });
 
       document.getElementById('unidadeSelect').addEventListener('change', (e) => {
@@ -977,6 +1025,7 @@
         e.preventDefault();
         if (!validarFormulario()) { setStatus('Revise os campos destacados.', false); return; }
         // Monte o payload final para envio (destino não especificado no briefing)
+        const grupoAtual = sanitizeValue(document.getElementById('grupoHidden')?.value || '');
         const payload = {
           matricula: document.getElementById('matriculaSelect').value || null,
           whatsapp: document.getElementById('whatsapp').value || null,
@@ -994,6 +1043,7 @@
           unidade: document.getElementById('unidadeSelect').value || null,
           turno: document.getElementById('turnoSelect').value || null,
           regime: document.getElementById('regimeSelect').value || null,
+          grupo: grupoAtual || null,
         };
         console.log('Payload atualização cadastral:', payload);
         setStatus('Dados preparados para envio.', true);
