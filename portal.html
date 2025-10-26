@@ -1614,6 +1614,12 @@
           const extrairColecao = (fonte) => {
             if (!fonte) return [];
             if (Array.isArray(fonte)) return fonte;
+            if (typeof fonte === "string") {
+              return fonte
+                .split(/[\n;,]+/)
+                .map(item => item.trim())
+                .filter(Boolean);
+            }
             if (Array.isArray(fonte?.items)) return fonte.items;
             if (Array.isArray(fonte?.data)) return fonte.data;
             if (Array.isArray(fonte?.result)) return fonte.result;
