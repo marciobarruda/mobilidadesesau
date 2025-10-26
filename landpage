@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Secretaria de Saúde — SESAU • Portal do Servidor — Mobilidade Interna</title>
+    <link
+      rel="icon"
+      href="https://statics.recife.pe.gov.br/images/dynamics/conecta/icons/favicon.png?w=32&h=32&fit=fill&border=2,transparent,shrink"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      :root {
+        --brand-primary: #0053a4;
+        --brand-secondary: #003a73;
+        --brand-highlight: #00a3ff;
+        --surface: #f4f7fb;
+        --surface-strong: #ffffff;
+        --border-color: #d0d7e2;
+        --text-strong: #1b263b;
+        --text-muted: #5b6c8c;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Public Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--surface);
+        color: var(--text-strong);
+        min-height: 100vh;
+      }
+
+      header.site-header {
+        background: url("https://statics.recife.pe.gov.br/images/dynamics/automacao/header.png?w=3000")
+          center/cover no-repeat;
+        color: #ffffff;
+        padding: 3.5rem 0 2.75rem;
+      }
+
+      header .lead {
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 100%;
+        font-size: 1rem;
+        line-height: 1.65;
+        text-align: justify;
+      }
+
+      .badge-open {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        padding: 0.45rem 0.9rem;
+        border-radius: 999px;
+        background-color: rgba(255, 255, 255, 0.14);
+      }
+
+      .user-greeting {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, rgba(0, 83, 164, 0.09), rgba(0, 163, 255, 0.12));
+        color: var(--text-strong);
+        box-shadow: 0 10px 30px rgba(0, 45, 98, 0.08);
+      }
+
+      .user-greeting::before {
+        content: "👋";
+        font-size: 1.4rem;
+      }
+
+      .card {
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .rounded-4 {
+        border-radius: 4px !important;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: 0.02em;
+        color: var(--text-strong);
+      }
+
+      .section-title::before {
+        content: "";
+        display: inline-block;
+        width: 32px;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--brand-highlight);
+      }
+
+      .card-programa {
+        border: 1px solid rgba(0, 83, 164, 0.08);
+        border-radius: 4px;
+        background: var(--surface-strong);
+        box-shadow: 0 16px 34px rgba(0, 45, 98, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        height: 100%;
+      }
+
+      .card-programa:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 38px rgba(0, 45, 98, 0.12);
+      }
+
+      .card-programa .card-header {
+        border-bottom: 1px solid rgba(0, 83, 164, 0.08);
+        background: linear-gradient(180deg, #ffffff 0%, #f5f8fc 100%);
+        padding: 1.5rem 1.6rem 1.1rem;
+        border-radius: 4px 4px 0 0;
+      }
+
+      .card-programa .card-body {
+        padding: 1.6rem 1.6rem 1.75rem;
+        border-radius: 0 0 4px 4px;
+      }
+
+      .downloads-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+      }
+
+      .download-card {
+        border: 1px solid var(--border-color);
+        background: var(--surface-strong);
+        border-radius: 4px;
+        padding: 1.35rem 1.4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-height: 170px;
+      }
+
+      .collapsible-form {
+        border: 1px solid rgba(0, 83, 164, 0.15);
+        border-radius: 4px;
+        background: rgba(0, 83, 164, 0.05);
+        padding: 1rem 1.25rem;
+      }
+
+      .collapsible-form summary {
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        list-style: none;
+      }
+
+      .collapsible-form summary::marker,
+      .collapsible-form summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .collapsible-form summary::before {
+        content: "➕";
+        font-size: 0.9rem;
+        transition: transform 0.2s ease;
+      }
+
+      .collapsible-form[open] summary::before {
+        transform: rotate(45deg);
+      }
+
+      .minhas-grid {
+        margin-top: 1rem;
+      }
+
+      .minha-card {
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        border: 1px solid rgba(0, 83, 164, 0.12);
+        border-radius: 4px;
+      }
+
+      .minha-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 45, 98, 0.12);
+      }
+
+      .minhas-placeholder {
+        padding: 1.25rem;
+        border-radius: 4px;
+        background: rgba(0, 83, 164, 0.05);
+        border: 1px dashed rgba(0, 83, 164, 0.2);
+        color: var(--text-muted);
+      }
+
+      .feedback-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(27, 38, 59, 0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        z-index: 1050;
+      }
+      .feedback-modal-backdrop.active { display: flex; }
+      .feedback-modal {
+        background: #ffffff;
+        border-radius: 1rem;
+        max-width: 860px;
+        width: 100%;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+        padding: 1.75rem;
+        margin: 0 auto;
+      }
+      .feedback-modal-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--text-strong); }
+      .feedback-modal-message { font-size: 0.95rem; line-height: 1.6; color: var(--text-strong); max-height: 60vh; overflow-y: auto; }
+
+      footer {
+        color: var(--text-muted);
+        padding: 2.5rem 0 2rem;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 768px) {
+        header.site-header { padding: 2.5rem 0 2rem; }
+        .badge-open { width: 100%; justify-content: center; }
+      }
+
+      /* Impressão apenas do conteúdo do modal */
+      @media print {
+        body * { visibility: hidden !important; }
+        .feedback-modal, .feedback-modal * { visibility: visible !important; }
+        .feedback-modal { position: absolute; inset: 0; box-shadow: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <span class="badge-open">Portal do Servidor • SESAU</span>
+            <h1 class="h3 mt-3 mb-2">Mobilidade Interna & Serviços</h1>
+            <p class="lead mb-0">Acompanhe solicitações, atualize seus dados e acesse orientações. Tudo em um só lugar, com a cara de Recife.</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container py-4">
+      <div class="user-greeting" id="saudacao">Bem-vindo(a), <strong>{{ $json.data.dadosComuns.nome }}</strong></div>
+
+      <div class="row g-3">
+        <!-- Card 1: Mobilidade Interna -->
+        <section class="col-12 col-lg-6">
+          <div class="card card-programa h-100">
+            <div class="card-header">
+              <div class="section-title">Mobilidade interna</div>
+            </div>
+            <div class="card-body">
+              <p class="mb-3">Solicite a sua participação nos processos de mobilidade interna. Revise as orientações e crie um novo protocolo quando estiver pronto.</p>
+              <ul class="mb-3 ps-3">
+                <li>Leia as orientações no card ao lado.</li>
+                <li>Tenha seus dados cadastrais atualizados.</li>
+                <li>Guarde o número de protocolo para consultas futuras.</li>
+              </ul>
+              <a class="btn btn-primary" target="_blank" rel="noopener" href="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2">Nova solicitação</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card 2: Atualização Cadastral -->
+        <section class="col-12 col-lg-6">
+          <div class="card card-programa h-100">
+            <div class="card-header">
+              <div class="section-title">Atualização cadastral</div>
+            </div>
+            <div class="card-body">
+              <details class="collapsible-form" open>
+                <summary>Mostrar/ocultar formulário</summary>
+                <form id="form-cadastro" class="mt-3" novalidate>
+                  <div class="row g-3">
+                    <!-- Matrícula -->
+                    <div class="col-12">
+                      <label for="matriculaSelect" class="form-label">Matrícula</label>
+                      <select id="matriculaSelect" class="form-select" required></select>
+                      <div class="invalid-feedback">Selecione uma matrícula válida.</div>
+                    </div>
+
+                    <!-- Contatos -->
+                    <div class="col-12 col-md-6">
+                      <label for="whatsapp" class="form-label">WhatsApp</label>
+                      <input id="whatsapp" class="form-control" placeholder="(81) 9 9999-9999" />
+                      <div class="invalid-feedback">Informe um WhatsApp válido.</div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label for="telefonealternativo" class="form-label">Telefone alternativo</label>
+                      <input id="telefonealternativo" class="form-control" placeholder="(81) 3333-3333" />
+                    </div>
+
+                    <!-- Endereço -->
+                    <div class="col-12 col-sm-4">
+                      <label for="cep" class="form-label">CEP</label>
+                      <input id="cep" class="form-control" placeholder="00000-000" />
+                      <div class="invalid-feedback">Informe um CEP válido.</div>
+                    </div>
+                    <div class="col-12 col-sm-8">
+                      <label for="logradouro" class="form-label">Logradouro</label>
+                      <input id="logradouro" class="form-control" />
+                    </div>
+                    <div class="col-12 col-sm-4">
+                      <label for="numero" class="form-label">Número</label>
+                      <input id="numero" class="form-control" />
+                    </div>
+                    <div class="col-12 col-sm-8">
+                      <label for="complemento" class="form-label">Complemento</label>
+                      <input id="complemento" class="form-control" />
+                    </div>
+                    <div class="col-12 col-sm-6">
+                      <label for="bairro" class="form-label">Bairro</label>
+                      <input id="bairro" class="form-control" />
+                    </div>
+                    <div class="col-12 col-sm-4">
+                      <label for="cidade" class="form-label">Cidade</label>
+                      <input id="cidade" class="form-control" />
+                    </div>
+                    <div class="col-12 col-sm-2">
+                      <label for="uf" class="form-label">UF</label>
+                      <input id="uf" class="form-control" maxlength="2" placeholder="PE" />
+                      <div class="invalid-feedback">UF deve ter 2 letras.</div>
+                    </div>
+
+                    <!-- DS/Executiva -->
+                    <div class="col-12 col-md-6">
+                      <label for="dsSelect" class="form-label">DS/Executiva atual</label>
+                      <select id="dsSelect" class="form-select" required>
+                        <option value="" selected disabled>Selecione...</option>
+                        <option>SEAA - JURIDICO</option>
+                        <option>SEAB</option>
+                        <option>DS II</option>
+                        <option>DS I</option>
+                        <option>DS IV</option>
+                        <option>SECOGE</option>
+                        <option>SEGTES</option>
+                        <option>SEAF</option>
+                        <option>SEINFRA</option>
+                        <option>SEVS</option>
+                        <option>DS III</option>
+                        <option>DS VII</option>
+                        <option>DS VI</option>
+                        <option>DS VIII</option>
+                        <option>DS V</option>
+                        <option>GABINETE SESAU</option>
+                        <option>SERMAC</option>
+                      </select>
+                      <div class="invalid-feedback">Selecione a DS/Executiva.</div>
+                    </div>
+
+                    <!-- Unidade/Turno/Regime (dinâmicos) -->
+                    <div class="col-12 col-md-6">
+                      <label for="unidadeSelect" class="form-label">Unidade atual</label>
+                      <select id="unidadeSelect" class="form-select" disabled>
+                        <option>Selecione a DS/Executiva...</option>
+                      </select>
+                      <div class="invalid-feedback">Selecione a Unidade.</div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label for="turnoSelect" class="form-label">Turno atual</label>
+                      <select id="turnoSelect" class="form-select" disabled>
+                        <option>Selecione a Unidade...</option>
+                      </select>
+                      <div class="invalid-feedback">Selecione o Turno.</div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label for="regimeSelect" class="form-label">Regime atual</label>
+                      <select id="regimeSelect" class="form-select" disabled>
+                        <option>Selecione a Unidade...</option>
+                      </select>
+                      <div class="invalid-feedback">Selecione o Regime.</div>
+                    </div>
+
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-primary">Enviar atualização</button>
+                      <span class="text-muted ms-2" id="formStatus" aria-live="polite"></span>
+                    </div>
+                  </div>
+                </form>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card 3: Minhas Solicitações -->
+        <section class="col-12">
+          <div class="card card-programa">
+            <div class="card-header">
+              <div class="section-title">Minhas solicitações</div>
+            </div>
+            <div class="card-body">
+              <div id="minhasSolicitacoes" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 minhas-grid">
+                <!-- Mini cards renderizados via JS -->
+              </div>
+              <div id="minhasPlaceholder" class="minhas-placeholder mt-3 d-none">Nenhum vínculo encontrado.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card 4: Orientações -->
+        <section class="col-12 col-lg-6">
+          <div class="card card-programa h-100">
+            <div class="card-header">
+              <div class="section-title">Orientações</div>
+            </div>
+            <div class="card-body">
+              <div id="orientacoesContainer" class="small text-justify"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card 5: Publicações -->
+        <section class="col-12 col-lg-6">
+          <div class="card card-programa h-100">
+            <div class="card-header">
+              <div class="section-title">Publicações</div>
+            </div>
+            <div class="card-body">
+              <div id="publicacoesLista" class="downloads-grid"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="container">
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div>© Prefeitura do Recife — Secretaria de Saúde</div>
+        <div class="text-end">Portal do Servidor • Automação e Serviços</div>
+      </div>
+    </footer>
+
+    <!-- Modal custom (feedback) -->
+    <div id="modalBackdrop" class="feedback-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="feedback-modal">
+        <div class="d-flex align-items-start justify-content-between mb-2">
+          <div class="feedback-modal-title">Revisão da Solicitação</div>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="btnFecharModal">Fechar</button>
+        </div>
+        <div id="modalBody" class="feedback-modal-message"></div>
+        <div class="mt-3 d-flex gap-2">
+          <button type="button" class="btn btn-outline-primary" id="btnSalvarPDF">Salvar em PDF</button>
+          <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ===== Helpers =====
+      const postJSON = async (url, body) => {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body || {})
+        });
+        if (!res.ok) throw new Error('Erro de rede');
+        return res.json();
+      };
+
+      const toBRDate = (iso) => {
+        if (!iso) return '';
+        const d = new Date(iso);
+        if (isNaN(d)) return '';
+        return d.toLocaleDateString('pt-BR');
+      };
+
+      const setStatus = (msg, ok = true) => {
+        const el = document.getElementById('formStatus');
+        el.textContent = msg || '';
+        el.className = ok ? 'text-success ms-2' : 'text-danger ms-2';
+      };
+
+      const sanitizeUF = (val) => (val || '').toUpperCase().slice(0,2);
+      const isUF = (val) => /^[A-Za-z]{2}$/.test(val || '');
+      const isCEP = (val) => /^(\d{5}-?\d{3})$/.test(val || '');
+      const isWhats = (val) => /^(\(\d{2}\)\s?)?(9)?\d{4}-?\d{4}$/.test((val || '').replace(/\s/g, ''));
+
+      // Dados vindos do template (quando presentes)
+      const DATA = {
+        nome: `{{ $json.data.dadosComuns.nome }}`,
+        vinculos: [
+          { matricula: `{{ $json.data.vinculos[0].matricula }}`, cargo: `{{ $json.data.vinculos[0].cargo }}` },
+          { matricula: `{{ $json.data.vinculos[1].matricula }}`, cargo: `{{ $json.data.vinculos[1].cargo }}` }
+        ],
+        contatos: {
+          whatsapp: `{{ $json.data.dadosComuns.whatsapp }}`,
+          telalternativo: `{{ $json.data.dadosComuns.telalternativo }}`
+        },
+        endereco: {
+          cep: `{{ $json.data.dadosComuns.endereco.cep }}`,
+          logradouro: `{{ $json.data.dadosComuns.endereco.logradouro }}`,
+          numero: `{{ $json.data.dadosComuns.endereco.numero }}`,
+          complemento: `{{ $json.data.dadosComuns.endereco.complemento }}`,
+          bairro: `{{ $json.data.dadosComuns.endereco.bairro }}`,
+          cidade: `{{ $json.data.dadosComuns.endereco.cidade }}`,
+          uf: `{{ $json.data.dadosComuns.endereco.uf }}`
+        }
+      };
+
+      // ===== Inicialização dos campos =====
+      function populateMatriculas() {
+        const sel = document.getElementById('matriculaSelect');
+        sel.innerHTML = '';
+        const opts = [];
+        if (DATA.vinculos[0] && DATA.vinculos[0].matricula && DATA.vinculos[0].matricula !== 'undefined') {
+          opts.push({ value: DATA.vinculos[0].matricula, text: DATA.vinculos[0].matricula });
+        }
+        if (DATA.vinculos[1] && DATA.vinculos[1].matricula && DATA.vinculos[1].matricula !== 'undefined' && DATA.vinculos[1].matricula.trim() !== '') {
+          opts.push({ value: DATA.vinculos[1].matricula, text: DATA.vinculos[1].matricula });
+        }
+        if (opts.length === 0) {
+          sel.innerHTML = '<option value="" disabled selected>Sem matrículas disponíveis</option>';
+          sel.setAttribute('disabled', 'disabled');
+        } else {
+          sel.removeAttribute('disabled');
+          sel.insertAdjacentHTML('beforeend', '<option value="" disabled selected>Selecione...</option>');
+          opts.forEach(o => sel.insertAdjacentHTML('beforeend', `<option value="${o.value}">${o.text}</option>`));
+        }
+      }
+
+      function populateContatosEndereco() {
+        const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = (v && v !== 'undefined' && v !== 'null') ? v : ''; };
+        setVal('whatsapp', DATA.contatos.whatsapp);
+        setVal('telefonealternativo', DATA.contatos.telalternativo);
+        setVal('cep', DATA.endereco.cep);
+        setVal('logradouro', DATA.endereco.logradouro);
+        setVal('numero', DATA.endereco.numero);
+        setVal('complemento', DATA.endereco.complemento);
+        setVal('bairro', DATA.endereco.bairro);
+        setVal('cidade', DATA.endereco.cidade);
+        setVal('uf', sanitizeUF(DATA.endereco.uf));
+      }
+
+      function renderMinhasSolicitacoesCards() {
+        const wrap = document.getElementById('minhasSolicitacoes');
+        const placeholder = document.getElementById('minhasPlaceholder');
+        wrap.innerHTML = '';
+        const entries = DATA.vinculos.filter(v => v && v.matricula && v.matricula !== 'undefined' && v.matricula.trim() !== '');
+        if (entries.length === 0) {
+          placeholder.classList.remove('d-none');
+          return;
+        }
+        placeholder.classList.add('d-none');
+        entries.forEach((v, idx) => {
+          const cargo = (v.cargo && v.cargo !== 'undefined') ? v.cargo : '';
+          const card = document.createElement('div');
+          card.className = 'col';
+          card.innerHTML = `
+            <div class="p-3 minha-card h-100">
+              <div class="fw-bold">${v.matricula}</div>
+              <div class="text-muted small">${cargo}</div>
+            </div>
+          `;
+          card.querySelector('.minha-card').addEventListener('click', () => abrirRevisaoSolicitacao(v.matricula));
+          wrap.appendChild(card);
+        });
+      }
+
+      // ===== Encadeamento DS -> Unidade -> Turno/Regime =====
+      async function loadUnidades(ds) {
+        const sel = document.getElementById('unidadeSelect');
+        sel.innerHTML = '<option>Carregando...</option>';
+        sel.setAttribute('disabled', 'disabled');
+        document.getElementById('turnoSelect').innerHTML = '<option>Selecione a Unidade...</option>';
+        document.getElementById('turnoSelect').setAttribute('disabled', 'disabled');
+        document.getElementById('regimeSelect').innerHTML = '<option>Selecione a Unidade...</option>';
+        document.getElementById('regimeSelect').setAttribute('disabled', 'disabled');
+        try {
+          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/unidades', { ds });
+          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+          (data || []).forEach(u => {
+            if (u && u.unidade) sel.insertAdjacentHTML('beforeend', `<option value="${u.unidade}">${u.unidade}</option>`);
+          });
+          sel.removeAttribute('disabled');
+        } catch (e) {
+          sel.innerHTML = '<option>Falha ao carregar</option>';
+        }
+      }
+
+      async function loadTurnos(unidade) {
+        const sel = document.getElementById('turnoSelect');
+        sel.innerHTML = '<option>Carregando...</option>';
+        sel.setAttribute('disabled', 'disabled');
+        try {
+          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/turnos', { unidade });
+          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+          (data || []).forEach(t => { if (t && t.turno) sel.insertAdjacentHTML('beforeend', `<option>${t.turno}</option>`); });
+          sel.removeAttribute('disabled');
+        } catch (e) {
+          sel.innerHTML = '<option>Falha ao carregar</option>';
+        }
+      }
+
+      async function loadRegimes(unidade) {
+        const sel = document.getElementById('regimeSelect');
+        sel.innerHTML = '<option>Carregando...</option>';
+        sel.setAttribute('disabled', 'disabled');
+        try {
+          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/regimes', { unidade });
+          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+          (data || []).forEach(r => { if (r && r.regime) sel.insertAdjacentHTML('beforeend', `<option>${r.regime}</option>`); });
+          sel.removeAttribute('disabled');
+        } catch (e) {
+          sel.innerHTML = '<option>Falha ao carregar</option>';
+        }
+      }
+
+      // ===== Minhas Solicitações -> Modal =====
+      async function abrirRevisaoSolicitacao(matricula) {
+        const backdrop = document.getElementById('modalBackdrop');
+        const modalBody = document.getElementById('modalBody');
+        modalBody.innerHTML = '<div class="text-muted">Carregando...</div>';
+        backdrop.classList.add('active');
+        backdrop.setAttribute('aria-hidden', 'false');
+        try {
+          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2', { matricula });
+          if (!Array.isArray(data) || data.length === 0) {
+            modalBody.innerHTML = '<div class="text-danger">Nenhum registro encontrado.</div>';
+            return;
+          }
+          const rows = data.map((it, i) => `
+            <tr>
+              <td class="text-center">${i+1}</td>
+              <td>${it.matricula || ''}</td>
+              <td>${it.cargo || ''}</td>
+              <td>${it.distrito || ''}</td>
+              <td>${it.lotacao || ''}</td>
+              <td class="text-center">${it.prioridade ?? ''}</td>
+              <td>${toBRDate(it.data_credenciamento)}</td>
+              <td>${toBRDate(it.data_solicitacao)}</td>
+              <td>${it.protocolo || ''}</td>
+            </tr>
+          `).join('');
+          modalBody.innerHTML = `
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Matrícula</th>
+                    <th>Cargo</th>
+                    <th>Distrito</th>
+                    <th>Lotação</th>
+                    <th>Prioridade</th>
+                    <th>Credenciamento</th>
+                    <th>Solicitação</th>
+                    <th>Protocolo</th>
+                  </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          `;
+        } catch (e) {
+          modalBody.innerHTML = '<div class="text-danger">Falha ao carregar dados da solicitação.</div>';
+        }
+      }
+
+      function fecharModal() {
+        const backdrop = document.getElementById('modalBackdrop');
+        const modalBody = document.getElementById('modalBody');
+        modalBody.innerHTML = '';
+        backdrop.classList.remove('active');
+        backdrop.setAttribute('aria-hidden', 'true');
+      }
+
+      // ===== Orientações (TXT) =====
+      function renderOrientacoes(texto) {
+        const el = document.getElementById('orientacoesContainer');
+        if (!texto) { el.textContent = 'Conteúdo indisponível.'; return; }
+        const parts = String(texto).split(/\n\n+/).map(p => `<p class="mb-2">${p.replace(/\n/g, '<br>')}</p>`);
+        el.innerHTML = parts.join('');
+      }
+
+      // ===== Publicações =====
+      function renderPublicacoes(list) {
+        const wrap = document.getElementById('publicacoesLista');
+        wrap.innerHTML = '';
+        (list || []).forEach((pub) => {
+          const titulo = pub.titulo || 'Sem título';
+          const descricao = pub.descricao || '';
+          const url = pub.url || '#';
+          const item = document.createElement('div');
+          item.className = 'download-card';
+          item.innerHTML = `
+            <div class="fw-semibold"><a href="${url}" target="_blank" rel="noopener">${titulo}</a></div>
+            <div class="text-muted small">${descricao}</div>
+          `;
+          wrap.appendChild(item);
+        });
+        if (!wrap.children.length) {
+          wrap.innerHTML = '<div class="text-muted">Nenhuma publicação disponível.</div>';
+        }
+      }
+
+      // ===== Validação simples do formulário =====
+      function validarFormulario() {
+        let ok = true;
+        const w = document.getElementById('whatsapp');
+        const c = document.getElementById('cep');
+        const uf = document.getElementById('uf');
+        // Whats
+        if (w.value && !isWhats(w.value)) { w.classList.add('is-invalid'); ok = false; } else { w.classList.remove('is-invalid'); w.classList.add('is-valid'); }
+        // CEP
+        if (c.value && !isCEP(c.value)) { c.classList.add('is-invalid'); ok = false; } else { c.classList.remove('is-invalid'); c.classList.add('is-valid'); }
+        // UF
+        uf.value = sanitizeUF(uf.value);
+        if (uf.value && !isUF(uf.value)) { uf.classList.add('is-invalid'); ok = false; } else { uf.classList.remove('is-invalid'); uf.classList.add('is-valid'); }
+        return ok;
+      }
+
+      // ===== Eventos =====
+      document.getElementById('dsSelect').addEventListener('change', (e) => {
+        const v = e.target.value;
+        if (v) loadUnidades(v);
+      });
+
+      document.getElementById('unidadeSelect').addEventListener('change', (e) => {
+        const unidade = e.target.value;
+        if (unidade) {
+          loadTurnos(unidade);
+          loadRegimes(unidade);
+        }
+      });
+
+      document.getElementById('form-cadastro').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!validarFormulario()) { setStatus('Revise os campos destacados.', false); return; }
+        // Monte o payload final para envio (destino não especificado no briefing)
+        const payload = {
+          matricula: document.getElementById('matriculaSelect').value || null,
+          whatsapp: document.getElementById('whatsapp').value || null,
+          telefonealternativo: document.getElementById('telefonealternativo').value || null,
+          endereco: {
+            cep: document.getElementById('cep').value || null,
+            logradouro: document.getElementById('logradouro').value || null,
+            numero: document.getElementById('numero').value || null,
+            complemento: document.getElementById('complemento').value || null,
+            bairro: document.getElementById('bairro').value || null,
+            cidade: document.getElementById('cidade').value || null,
+            uf: document.getElementById('uf').value || null,
+          },
+          ds: document.getElementById('dsSelect').value || null,
+          unidade: document.getElementById('unidadeSelect').value || null,
+          turno: document.getElementById('turnoSelect').value || null,
+          regime: document.getElementById('regimeSelect').value || null,
+        };
+        console.log('Payload atualização cadastral:', payload);
+        setStatus('Dados preparados para envio.', true);
+      });
+
+      document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
+      document.getElementById('btnImprimir').addEventListener('click', () => window.print());
+      document.getElementById('btnSalvarPDF').addEventListener('click', () => window.print());
+      document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
+
+      // ===== Bootstrap inicial =====
+      (function init() {
+        populateMatriculas();
+        populateContatosEndereco();
+        renderMinhasSolicitacoesCards();
+        // Orientações: use window.ORIENTACOES_TXT = '...'; em produção
+        if (window.ORIENTACOES_TXT) renderOrientacoes(window.ORIENTACOES_TXT);
+        else renderOrientacoes('Carregaremos aqui as orientações do processo.');
+        // Publicações: use window.PUBLICACOES = [{titulo, descricao, url}, ...]; em produção
+        renderPublicacoes(window.PUBLICACOES || []);
+      })();
+    </script>
+  </body>
+</html>
