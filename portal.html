@@ -264,7 +264,7 @@
 
     <main class="container my-5">
       <p class="user-greeting">
-        Olá, <strong id="saudacao-nome">{{ $json.data.dadosComuns.nome }}</strong>! Este é o seu painel de mobilidade interna.
+        Olá, <strong>{{ $json.data.dadosComuns.nome }}</strong>! Este é o seu painel de mobilidade interna.
       </p>
 
       <!-- CARD: Mobilidade Interna -->
@@ -466,7 +466,6 @@
         let cpf = sanitizeCpf(cpfInput?.value);
         const solicitacaoDetalheEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2";
         const novaSolicitacaoEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2";
-        const hierarquiaEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/d594b31c-8ca0-4cbe-a380-4e5112128402";
         const publicacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/7b3f9046-f11b-4cc3-b570-c3e586748f6c";
 
         const atualizarCadastroEndpoint = ""; // ex.: "https://.../webhook/atualizar-cadastro"
@@ -651,7 +650,7 @@
           return null;
         };
         const extrairTemplateContexto = (payload) => {
-          const vazio = { dadosComuns: {}, endereco: {}, vinculos: [] };
+          const vazio = { dadosComuns: {}, endereco: {}, vinculos: [], catalogos: {} };
           if (!payload) return vazio;
           const lista = Array.isArray(payload) ? payload : [payload];
           for (const item of lista) {
@@ -663,13 +662,15 @@
             const vinculos = Array.isArray(dataNode.vinculos)
               ? dataNode.vinculos.filter(reg => reg && typeof reg === "object")
               : [];
-            return { dadosComuns, endereco, vinculos };
+            const catalogos = dataNode.catalogos && typeof dataNode.catalogos === "object" ? dataNode.catalogos : {};
+            return { dadosComuns, endereco, vinculos, catalogos };
           }
           return vazio;
         };
         const templatePayload = obterTemplatePayload();
         const templateContexto = extrairTemplateContexto(templatePayload);
-        const greetingStrong = document.getElementById("saudacao-nome");
+        const catalogosTemplate = templateContexto.catalogos || {};
+        const greetingStrong = document.querySelector(".user-greeting strong");
         const primeiroVinculoTemplate = templateContexto.vinculos.length ? templateContexto.vinculos[0] : {};
         const dadosServidorTemplate = {
           matricula: preferTemplateValue(primeiroVinculoTemplate?.matricula, templateContexto.dadosComuns?.matricula, valorMatriculaPreferidaAttr),
@@ -732,8 +733,12 @@
           if (dadosServidorTemplate.nome) {
             greetingStrong.dataset.nomeCompleto = dadosServidorTemplate.nome;
           }
-          if (primeiroNomeSaudacao) {
-            greetingStrong.textContent = primeiroNomeSaudacao;
+          const nomeCompletoResolvido = resolveTemplateValue(dadosServidorTemplate.nome);
+          const saudacaoTexto = primeiroNomeSaudacao || nomeCompletoResolvido || resolveTemplateValue(greetingStrong.textContent);
+          if (saudacaoTexto) {
+            greetingStrong.textContent = saudacaoTexto.trim();
+          } else {
+            greetingStrong.textContent = "servidor(a)";
           }
         }
         if (dadosServidorTemplate.cpf) {
@@ -1483,61 +1488,17 @@
           }
         }
 
-        function normalizarHierarquiaCadastro(data) {
-          let items = [];
-          if (Array.isArray(data)) items = data;
-          else if (Array.isArray(data?.items)) items = data.items;
-          else if (Array.isArray(data?.data)) items = data.data;
-          else if (Array.isArray(data?.result)) items = data.result;
-          else if (data && typeof data === "object") {
-            items = [];
-            Object.values(data).forEach(value => {
-              if (Array.isArray(value)) items.push(...value);
-              else items.push(value);
-            });
-          }
-
-          return items
-            .map(item => {
-              if (!item || typeof item !== "object") return null;
-              const distrito = normalizeText(item.distrito || item.ds || item.executiva || item["ds/executiva"] || item.DISTRITO || "");
-              const lotacao = normalizeText(item.lotacao || item.unidade || item.local || item.LOTACAO || "");
-              const turno = normalizeText(item.turno || item.TURNO || "");
-              const regime = normalizeText(item.regime || item.REGIME || "");
-              if (!distrito || !lotacao) return null;
-              return { distrito, lotacao, turno, regime };
-            })
-            .filter(Boolean);
-        }
-
-        function adicionarRegistroHierarquia(registro) {
-          const dsKey = slugify(registro?.distrito);
-          if (!dsKey) return;
-          if (!hierarquiaMapa.has(dsKey)) {
-            hierarquiaMapa.set(dsKey, { label: registro.distrito, lotacoes: new Map() });
-          }
-          const dsItem = hierarquiaMapa.get(dsKey);
-          const lotKey = slugify(registro.lotacao);
-          if (!lotKey) return;
-          if (!dsItem.lotacoes.has(lotKey)) {
-            dsItem.lotacoes.set(lotKey, { label: registro.lotacao, turnos: new Map() });
-          }
-          const lotItem = dsItem.lotacoes.get(lotKey);
-          const turnoLabel = registro.turno || (registro.regime ? "Não informado" : "");
-          if (turnoLabel) {
-            const turnoKey = slugify(turnoLabel);
-            if (!lotItem.turnos.has(turnoKey)) {
-              lotItem.turnos.set(turnoKey, { label: turnoLabel, regimes: new Set() });
-            }
-            if (registro.regime) {
-              lotItem.turnos.get(turnoKey).regimes.add(registro.regime);
-            }
-          }
-        }
-
         function atualizarLotacoes() {
           const dsItem = hierarquiaMapa.get(slugify(selDistrito?.value));
-          const lotOptions = dsItem ? Array.from(dsItem.lotacoes.values()).map(lot => ({ value: lot.label, label: lot.label })) : [];
+          const lotOptions = dsItem
+            ? Array.from(dsItem.lotacoes.values())
+                .map(lot => ({
+                  value: lot.value || lot.label || "",
+                  label: lot.label || lot.value || ""
+                }))
+                .filter(opt => opt.value && opt.label)
+                .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"))
+            : [];
           setOptions(selUnidade, lotOptions, "Selecione a unidade atual");
           setOptions(selTurno, [], "Selecione o turno atual");
           setOptions(selRegime, [], "Selecione o regime atual");
@@ -1547,7 +1508,15 @@
         function atualizarTurnos() {
           const dsItem = hierarquiaMapa.get(slugify(selDistrito?.value));
           const lotItem = dsItem?.lotacoes.get(slugify(selUnidade?.value));
-          const turnoOptions = lotItem ? Array.from(lotItem.turnos.values()).map(turno => ({ value: turno.label, label: turno.label })) : [];
+          const turnoOptions = lotItem
+            ? Array.from(lotItem.turnos.values())
+                .map(turno => ({
+                  value: turno.value || turno.label || "",
+                  label: turno.label || turno.value || ""
+                }))
+                .filter(opt => opt.value && opt.label)
+                .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"))
+            : [];
           setOptions(selTurno, turnoOptions, "Selecione o turno atual");
           setOptions(selRegime, [], "Selecione o regime atual");
           validateUpdateForm();
@@ -1558,7 +1527,9 @@
           const lotItem = dsItem?.lotacoes.get(slugify(selUnidade?.value));
           const turnoItem = lotItem?.turnos.get(slugify(selTurno?.value));
           const regimes = turnoItem ? Array.from(turnoItem.regimes).filter(Boolean) : [];
-          const regimeOptions = regimes.map(reg => ({ value: reg, label: reg }));
+          const regimeOptions = regimes
+            .map(reg => ({ value: reg, label: reg }))
+            .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
           setOptions(selRegime, regimeOptions, "Selecione o regime atual");
           validateUpdateForm();
         }
@@ -1572,47 +1543,138 @@
           hierarquiaMapa.clear();
           hierarquiaCarregada = false;
 
-          if (!hierarquiaEndpoint) {
-            validateUpdateForm();
-            return;
-          }
+          const extrairColecao = (fonte) => {
+            if (!fonte) return [];
+            if (Array.isArray(fonte)) return fonte;
+            if (Array.isArray(fonte?.items)) return fonte.items;
+            if (Array.isArray(fonte?.data)) return fonte.data;
+            if (Array.isArray(fonte?.result)) return fonte.result;
+            if (typeof fonte === "object") return Object.values(fonte);
+            return [];
+          };
 
-          const requestInit = cpf
-            ? {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ cpf }),
-                cache: "no-store",
-                mode: "cors"
+          const extrairValorPreferido = (entrada, preferidos = [], fallback = []) => {
+            if (entrada == null) return "";
+            if (typeof entrada === "string" || typeof entrada === "number") {
+              return resolveTemplateValue(entrada);
+            }
+            if (typeof entrada !== "object") return "";
+            for (const chave of preferidos) {
+              if (Object.prototype.hasOwnProperty.call(entrada, chave)) {
+                const resolvido = resolveTemplateValue(entrada[chave]);
+                if (resolvido) return resolvido;
               }
-            : {
-                method: "GET",
-                cache: "no-store",
-                mode: "cors"
-              };
+            }
+            for (const chave of fallback) {
+              const resolvido = resolveTemplateValue(entrada[chave]);
+              if (resolvido) return resolvido;
+            }
+            return "";
+          };
 
-          fetch(hierarquiaEndpoint, requestInit)
-            .then(r => { if (!r.ok) throw new Error("Falha na consulta"); return r.json(); })
-            .then(data => {
-              normalizarHierarquiaCadastro(data).forEach(adicionarRegistroHierarquia);
-              const dsOptions = Array.from(hierarquiaMapa.values())
-                .map(item => ({ value: item.label, label: item.label }))
-                .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
-              setOptions(selDistrito, dsOptions, "Selecione a DS/Executiva atual");
-              atualizarLotacoes();
-            })
-            .catch(() => {
-              hierarquiaMapa.clear();
-              setOptions(selDistrito, [], "Selecione a DS/Executiva atual");
-              setOptions(selUnidade, [], "Selecione a unidade atual");
-              setOptions(selTurno, [], "Selecione o turno atual");
-              setOptions(selRegime, [], "Selecione o regime atual");
-            })
-            .finally(() => {
-              hierarquiaCarregada = true;
-              aplicarHierarquiaPreferida();
-              validateUpdateForm();
+          const distritosLista = extrairColecao(catalogosTemplate.distritos);
+          const distritosUnidadesLista = extrairColecao(catalogosTemplate.distritos_unidades);
+          const unidadesTurnosLista = extrairColecao(catalogosTemplate.unidades_turnos);
+          const turnosRegimesLista = extrairColecao(catalogosTemplate.turnos_regimes);
+
+          const lotacaoParaDistrito = new Map();
+          const turnoParaRegimes = new Map();
+
+          distritosLista.forEach(item => {
+            const label = extrairValorPreferido(item, ["label", "nome", "descricao", "distrito", "executiva", "ds"], ["value", "valor", "codigo", "id"]);
+            const value = extrairValorPreferido(item, ["value", "valor", "codigo", "id", "distrito", "executiva", "ds"], ["label", "nome", "descricao"]);
+            const finalLabel = label || value;
+            const finalValue = value || finalLabel;
+            const dsKey = slugify(finalValue || finalLabel);
+            if (!dsKey || !finalLabel) return;
+            if (!hierarquiaMapa.has(dsKey)) {
+              hierarquiaMapa.set(dsKey, { label: finalLabel, value: finalValue || finalLabel, lotacoes: new Map() });
+            } else {
+              const existente = hierarquiaMapa.get(dsKey);
+              if (finalLabel && !existente.label) existente.label = finalLabel;
+              if (finalValue && !existente.value) existente.value = finalValue;
+            }
+          });
+
+          distritosUnidadesLista.forEach(item => {
+            const distrito = extrairValorPreferido(item, ["distrito", "ds", "executiva", "dsExecutiva"], ["label_distrito", "distritoLabel", "nome_distrito", "descricao_distrito"]);
+            const unidade = extrairValorPreferido(item, ["unidade", "lotacao", "descricao", "nome"], ["label", "value"]);
+            const dsKey = slugify(distrito || "");
+            const lotKey = slugify(unidade || "");
+            if (!dsKey || !lotKey) return;
+            if (!hierarquiaMapa.has(dsKey)) {
+              hierarquiaMapa.set(dsKey, { label: distrito || unidade, value: distrito || unidade, lotacoes: new Map() });
+            }
+            const dsItem = hierarquiaMapa.get(dsKey);
+            if (distrito) {
+              if (!dsItem.label) dsItem.label = distrito;
+              if (!dsItem.value) dsItem.value = distrito;
+            }
+            if (!dsItem.lotacoes.has(lotKey)) {
+              dsItem.lotacoes.set(lotKey, { label: unidade || "", value: unidade || "", turnos: new Map() });
+            } else {
+              const existente = dsItem.lotacoes.get(lotKey);
+              if (unidade && !existente.label) existente.label = unidade;
+              if (unidade && !existente.value) existente.value = unidade;
+            }
+            lotacaoParaDistrito.set(lotKey, dsKey);
+          });
+
+          unidadesTurnosLista.forEach(item => {
+            const unidade = extrairValorPreferido(item, ["unidade", "lotacao", "descricao", "nome"], ["label", "value"]);
+            const turno = extrairValorPreferido(item, ["turno", "nome_turno", "descricao_turno"], ["label", "value", "nome"]);
+            const lotKey = slugify(unidade || "");
+            const turnoKey = slugify(turno || "");
+            if (!lotKey || !turnoKey) return;
+            const dsKey = lotacaoParaDistrito.get(lotKey);
+            if (!dsKey) return;
+            const dsItem = hierarquiaMapa.get(dsKey);
+            if (!dsItem) return;
+            if (!dsItem.lotacoes.has(lotKey)) {
+              dsItem.lotacoes.set(lotKey, { label: unidade || "", value: unidade || "", turnos: new Map() });
+            }
+            const lotItem = dsItem.lotacoes.get(lotKey);
+            if (unidade) {
+              if (!lotItem.label) lotItem.label = unidade;
+              if (!lotItem.value) lotItem.value = unidade;
+            }
+            if (!lotItem.turnos.has(turnoKey)) {
+              lotItem.turnos.set(turnoKey, { label: turno || "", value: turno || "", regimes: new Set() });
+            }
+          });
+
+          turnosRegimesLista.forEach(item => {
+            const turno = extrairValorPreferido(item, ["turno", "nome_turno", "descricao_turno"], ["label", "turnoLabel", "value"]);
+            const regime = extrairValorPreferido(item, ["regime", "nome_regime", "descricao_regime"], ["label", "value", "nome"]);
+            const turnoKey = slugify(turno || "");
+            if (!turnoKey || !regime) return;
+            if (!turnoParaRegimes.has(turnoKey)) {
+              turnoParaRegimes.set(turnoKey, new Set());
+            }
+            turnoParaRegimes.get(turnoKey).add(regime);
+          });
+
+          hierarquiaMapa.forEach(dsItem => {
+            dsItem.lotacoes.forEach(lotItem => {
+              lotItem.turnos.forEach(turnoItem => {
+                const regimes = turnoParaRegimes.get(slugify(turnoItem.label || turnoItem.value));
+                if (regimes) {
+                  regimes.forEach(reg => turnoItem.regimes.add(reg));
+                }
+              });
             });
+          });
+
+          const dsOptions = Array.from(hierarquiaMapa.values())
+            .map(item => ({ value: item.value || item.label, label: item.label || item.value || "" }))
+            .filter(opt => opt.value && opt.label)
+            .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
+
+          setOptions(selDistrito, dsOptions, "Selecione a DS/Executiva atual");
+
+          hierarquiaCarregada = true;
+          aplicarHierarquiaPreferida();
+          validateUpdateForm();
         }
 
         selDistrito?.addEventListener("change", atualizarLotacoes);
