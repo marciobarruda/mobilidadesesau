@@ -66,13 +66,14 @@
         align-items: center;
         gap: 0.75rem;
         font-size: 1.05rem;
-        font-weight: 600;
-        margin-bottom: 2rem;
-        padding: 1rem 1.5rem;
-        border-radius: 1rem;
-        background: linear-gradient(135deg, rgba(0, 83, 164, 0.09), rgba(0, 163, 255, 0.12));
+        font-weight: 500;
+        margin-bottom: 2.5rem;
+        padding: 1.2rem 1.6rem;
+        border-radius: 18px;
+        background: var(--surface-strong);
         color: var(--text-strong);
-        box-shadow: 0 10px 30px rgba(0, 45, 98, 0.08);
+        border: 1px solid rgba(0, 83, 164, 0.12);
+        box-shadow: 0 16px 34px rgba(0, 45, 98, 0.08);
       }
 
       .user-greeting::before {
@@ -80,13 +81,18 @@
         font-size: 1.4rem;
       }
 
+      .user-greeting strong {
+        color: var(--brand-secondary);
+      }
+
       .card {
-        border-radius: 4px;
+        border-radius: 18px;
         overflow: hidden;
+        border: none;
       }
 
       .rounded-4 {
-        border-radius: 4px !important;
+        border-radius: 18px !important;
       }
 
       .section-title {
@@ -110,28 +116,28 @@
 
       .card-programa {
         border: 1px solid rgba(0, 83, 164, 0.08);
-        border-radius: 4px;
+        border-radius: 18px;
         background: var(--surface-strong);
-        box-shadow: 0 16px 34px rgba(0, 45, 98, 0.08);
+        box-shadow: 0 18px 42px rgba(0, 45, 98, 0.12);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         height: 100%;
       }
 
       .card-programa:hover {
         transform: translateY(-6px);
-        box-shadow: 0 20px 38px rgba(0, 45, 98, 0.12);
+        box-shadow: 0 26px 48px rgba(0, 45, 98, 0.16);
       }
 
       .card-programa .card-header {
-        border-bottom: 1px solid rgba(0, 83, 164, 0.08);
-        background: linear-gradient(180deg, #ffffff 0%, #f5f8fc 100%);
-        padding: 1.5rem 1.6rem 1.1rem;
-        border-radius: 4px 4px 0 0;
+        border-bottom: 1px solid rgba(0, 83, 164, 0.12);
+        background: linear-gradient(180deg, #ffffff 0%, #f3f7fd 100%);
+        padding: 1.6rem 1.75rem 1.2rem;
+        border-radius: 18px 18px 0 0;
       }
 
       .card-programa .card-body {
-        padding: 1.6rem 1.6rem 1.75rem;
-        border-radius: 0 0 4px 4px;
+        padding: 1.75rem 1.75rem 1.9rem;
+        border-radius: 0 0 18px 18px;
       }
 
       .downloads-grid {
@@ -152,10 +158,11 @@
       }
 
       .collapsible-form {
-        border: 1px solid rgba(0, 83, 164, 0.15);
-        border-radius: 4px;
-        background: rgba(0, 83, 164, 0.05);
-        padding: 1rem 1.25rem;
+        border: 1px solid rgba(0, 83, 164, 0.18);
+        border-radius: 16px;
+        background: rgba(0, 83, 164, 0.06);
+        padding: 1.25rem 1.5rem 0;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
       }
 
       .collapsible-form summary {
@@ -163,8 +170,12 @@
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        justify-content: space-between;
         list-style: none;
+        font-size: 1.05rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(0, 83, 164, 0.18);
+        color: var(--brand-secondary);
       }
 
       .collapsible-form summary::marker,
@@ -172,14 +183,29 @@
         display: none;
       }
 
-      .collapsible-form summary::before {
-        content: "➕";
-        font-size: 0.9rem;
+      .collapsible-form summary::after {
+        content: "";
+        width: 12px;
+        height: 12px;
+        border-right: 2px solid currentColor;
+        border-bottom: 2px solid currentColor;
+        transform: rotate(45deg);
         transition: transform 0.2s ease;
+        margin-left: 1rem;
       }
 
-      .collapsible-form[open] summary::before {
-        transform: rotate(45deg);
+      .collapsible-form[open] summary::after {
+        transform: rotate(225deg);
+      }
+
+      .collapsible-form[open] {
+        background: rgba(0, 83, 164, 0.08);
+        padding-bottom: 1.5rem;
+      }
+
+      .collapsible-form[open] summary {
+        margin-bottom: 1rem;
+        border-bottom-color: rgba(0, 83, 164, 0.25);
       }
 
       .minhas-grid {
@@ -188,14 +214,31 @@
 
       .minha-card {
         cursor: pointer;
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
-        border: 1px solid rgba(0, 83, 164, 0.12);
-        border-radius: 4px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid rgba(0, 83, 164, 0.18);
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 10px 24px rgba(0, 45, 98, 0.12);
+        position: relative;
+        padding: 1.1rem 1.25rem;
+      }
+
+      .minha-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 14px;
+        border: 2px solid transparent;
+        transition: border-color 0.2s ease;
       }
 
       .minha-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 30px rgba(0, 45, 98, 0.12);
+        transform: translateY(-4px);
+        box-shadow: 0 18px 34px rgba(0, 45, 98, 0.16);
+      }
+
+      .minha-card:hover::after {
+        border-color: rgba(0, 163, 255, 0.5);
       }
 
       .minhas-placeholder {
@@ -219,15 +262,89 @@
       .feedback-modal-backdrop.active { display: flex; }
       .feedback-modal {
         background: #ffffff;
-        border-radius: 1rem;
-        max-width: 860px;
+        border-radius: 1.25rem;
+        max-width: 980px;
         width: 100%;
-        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
-        padding: 1.75rem;
+        max-height: 88vh;
+        box-shadow: 0 32px 68px rgba(0, 0, 0, 0.2);
+        padding: 2rem;
         margin: 0 auto;
+        display: flex;
+        flex-direction: column;
       }
-      .feedback-modal-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--text-strong); }
-      .feedback-modal-message { font-size: 0.95rem; line-height: 1.6; color: var(--text-strong); max-height: 60vh; overflow-y: auto; }
+
+      .feedback-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .feedback-modal-title {
+        font-weight: 700;
+        font-size: 1.35rem;
+        margin-bottom: 0.35rem;
+        color: var(--text-strong);
+      }
+
+      .feedback-modal-subtitle {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+
+      .modal-meta {
+        background: rgba(0, 83, 164, 0.08);
+        border-radius: 14px;
+        padding: 0.75rem 1.2rem;
+        min-width: 220px;
+        text-align: right;
+      }
+
+      .modal-meta-label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--brand-secondary);
+        font-weight: 700;
+      }
+
+      .modal-meta-value {
+        display: block;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--brand-primary);
+        margin-top: 0.25rem;
+      }
+
+      .feedback-modal-message {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--text-strong);
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      .modal-table-wrapper {
+        border-radius: 14px;
+        border: 1px solid rgba(0, 83, 164, 0.12);
+        background: #f8fbff;
+        padding: 1rem;
+      }
+
+      .modal-table-wrapper table td:first-child {
+        font-weight: 700;
+        color: var(--brand-secondary);
+      }
+
+      .modal-actions {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.75rem;
+      }
 
       footer {
         color: var(--text-muted);
@@ -238,6 +355,17 @@
       @media (max-width: 768px) {
         header.site-header { padding: 2.5rem 0 2rem; }
         .badge-open { width: 100%; justify-content: center; }
+        .feedback-modal {
+          padding: 1.5rem;
+          max-height: 90vh;
+        }
+        .feedback-modal-header {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .modal-meta {
+          text-align: left;
+        }
       }
 
       /* Impressão apenas do conteúdo do modal */
@@ -262,23 +390,26 @@
     </header>
 
     <main class="container py-4">
-      <div class="user-greeting" id="saudacao">Bem-vindo(a), <strong>{{ $json.data.dadosComuns.nome }}</strong></div>
+      <div class="user-greeting" id="saudacao">Olá, <strong>{{ $json.data.dadosComuns.nome }}</strong>! Este é o seu painel de mobilidade interna.</div>
 
-      <div class="row g-3">
+      <div class="row g-4">
         <!-- Card 1: Mobilidade Interna -->
         <section class="col-12 col-lg-6">
           <div class="card card-programa h-100">
             <div class="card-header">
-              <div class="section-title">Mobilidade interna</div>
+              <div class="section-title">Solicitação de Mobilidade (SESAU)</div>
             </div>
             <div class="card-body">
-              <p class="mb-3">Solicite a sua participação nos processos de mobilidade interna. Revise as orientações e crie um novo protocolo quando estiver pronto.</p>
-              <ul class="mb-3 ps-3">
-                <li>Leia as orientações no card ao lado.</li>
-                <li>Tenha seus dados cadastrais atualizados.</li>
-                <li>Guarde o número de protocolo para consultas futuras.</li>
+              <p class="mb-3">Fluxo eletrônico para cadastrar e acompanhar pedidos de mobilidade interna. Siga as orientações abaixo para garantir o correto preenchimento.</p>
+              <ul class="mb-4 ps-3">
+                <li>Cadastre seu pedido exclusivamente pelo sistema oficial.</li>
+                <li>Mantenha os dados do seu lotação e contato atualizados.</li>
+                <li>Após a prioridade, há prazo de 12 meses de credenciamento.</li>
               </ul>
-              <a class="btn btn-primary" target="_blank" rel="noopener" href="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2">Nova solicitação</a>
+              <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-primary" target="_blank" rel="noopener" href="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2">Nova solicitação</a>
+                <a class="btn btn-outline-primary" href="#orientacoesContainer">Orientações</a>
+              </div>
             </div>
           </div>
         </section>
@@ -287,12 +418,13 @@
         <section class="col-12 col-lg-6">
           <div class="card card-programa h-100">
             <div class="card-header">
-              <div class="section-title">Atualização cadastral</div>
+              <div class="section-title">Dados para contato e lotação</div>
             </div>
             <div class="card-body">
-              <details class="collapsible-form" open>
-                <summary>Mostrar/ocultar formulário</summary>
-                <form id="form-cadastro" class="mt-3" novalidate>
+              <p class="text-muted mb-3">Atualize seus dados cadastrais para manter o acompanhamento da solicitação em dia.</p>
+              <details class="collapsible-form">
+                <summary>Formulário de atualização</summary>
+                <form id="form-cadastro" class="pt-3" novalidate>
                   <div class="row g-3">
                     <!-- Matrícula -->
                     <div class="col-12">
@@ -455,18 +587,26 @@
     <!-- Modal custom (feedback) -->
     <div id="modalBackdrop" class="feedback-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
       <div class="feedback-modal">
-        <div class="d-flex align-items-start justify-content-between mb-2">
-          <div class="feedback-modal-title">Revisão da Solicitação</div>
-          <button type="button" class="btn btn-sm btn-outline-secondary" id="btnFecharModal">Fechar</button>
+        <div class="feedback-modal-header">
+          <div>
+            <div class="feedback-modal-title">Revisão da Solicitação</div>
+            <div class="feedback-modal-subtitle">Confira os dados cadastrados antes de prosseguir.</div>
+          </div>
+          <div class="modal-meta">
+            <span class="modal-meta-label">Número da Solicitação</span>
+            <span class="modal-meta-value" id="modalNumeroSolicitacao">—</span>
+          </div>
         </div>
         <div id="modalBody" class="feedback-modal-message"></div>
-        <div class="mt-3 d-flex gap-2">
-          <button type="button" class="btn btn-outline-primary" id="btnSalvarPDF">Salvar em PDF</button>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-success" id="btnSalvarPDF">Salvar em PDF</button>
           <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
+          <button type="button" class="btn btn-danger" id="btnFecharModal">Fechar</button>
         </div>
       </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
       // ===== Helpers =====
       const postJSON = async (url, body) => {
@@ -568,8 +708,8 @@
           const card = document.createElement('div');
           card.className = 'col';
           card.innerHTML = `
-            <div class="p-3 minha-card h-100">
-              <div class="fw-bold">${v.matricula}</div>
+            <div class="minha-card h-100">
+              <div class="fw-bold mb-1">${v.matricula}</div>
               <div class="text-muted small">${cargo}</div>
             </div>
           `;
@@ -619,11 +759,30 @@
         sel.setAttribute('disabled', 'disabled');
         try {
           const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/regimes', { unidade });
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
-          (data || []).forEach(r => { if (r && r.regime) sel.insertAdjacentHTML('beforeend', `<option>${r.regime}</option>`); });
-          sel.removeAttribute('disabled');
+          const regimes = [];
+          const pushRegime = (value) => {
+            if (!value || value === 'undefined') return;
+            regimes.push(value);
+          };
+          if (Array.isArray(data)) {
+            data.forEach(item => {
+              if (typeof item === 'string') pushRegime(item);
+              else if (item && typeof item === 'object') pushRegime(item.regime || item.nome || item.Regime);
+            });
+          } else if (data && typeof data === 'object') {
+            if (Array.isArray(data.regimes)) data.regimes.forEach(pushRegime);
+            if (Array.isArray(data.Regimes)) data.Regimes.forEach(pushRegime);
+            if (Array.isArray(data.data)) data.data.forEach(pushRegime);
+          }
+          if (regimes.length) {
+            sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+            regimes.forEach(reg => sel.insertAdjacentHTML('beforeend', `<option>${reg}</option>`));
+            sel.removeAttribute('disabled');
+          } else {
+            sel.innerHTML = '<option>Nenhum regime disponível</option>';
+          }
         } catch (e) {
-          sel.innerHTML = '<option>Falha ao carregar</option>';
+          sel.innerHTML = '<option>Não foi possível carregar os regimes</option>';
         }
       }
 
@@ -631,6 +790,7 @@
       async function abrirRevisaoSolicitacao(matricula) {
         const backdrop = document.getElementById('modalBackdrop');
         const modalBody = document.getElementById('modalBody');
+        document.getElementById('modalNumeroSolicitacao').textContent = '—';
         modalBody.innerHTML = '<div class="text-muted">Carregando...</div>';
         backdrop.classList.add('active');
         backdrop.setAttribute('aria-hidden', 'false');
@@ -640,33 +800,31 @@
             modalBody.innerHTML = '<div class="text-danger">Nenhum registro encontrado.</div>';
             return;
           }
-          const rows = data.map((it, i) => `
+          const numeroSolicitacao = data[0]?.protocolo || '';
+          document.getElementById('modalNumeroSolicitacao').textContent = numeroSolicitacao || '—';
+          const rows = data.map((it) => `
             <tr>
-              <td class="text-center">${i+1}</td>
+              <td class="text-center fw-semibold">${it.prioridade ?? ''}</td>
               <td>${it.matricula || ''}</td>
               <td>${it.cargo || ''}</td>
               <td>${it.distrito || ''}</td>
               <td>${it.lotacao || ''}</td>
-              <td class="text-center">${it.prioridade ?? ''}</td>
               <td>${toBRDate(it.data_credenciamento)}</td>
               <td>${toBRDate(it.data_solicitacao)}</td>
-              <td>${it.protocolo || ''}</td>
             </tr>
           `).join('');
           modalBody.innerHTML = `
-            <div class="table-responsive">
-              <table class="table table-sm align-middle">
+            <div class="table-responsive modal-table-wrapper">
+              <table class="table table-sm table-hover align-middle">
                 <thead>
                   <tr>
-                    <th>#</th>
+                    <th class="text-center">Prioridade</th>
                     <th>Matrícula</th>
                     <th>Cargo</th>
                     <th>Distrito</th>
                     <th>Lotação</th>
-                    <th>Prioridade</th>
                     <th>Credenciamento</th>
                     <th>Solicitação</th>
-                    <th>Protocolo</th>
                   </tr>
                 </thead>
                 <tbody>${rows}</tbody>
@@ -674,8 +832,77 @@
             </div>
           `;
         } catch (e) {
+          document.getElementById('modalNumeroSolicitacao').textContent = '—';
           modalBody.innerHTML = '<div class="text-danger">Falha ao carregar dados da solicitação.</div>';
         }
+      }
+
+      function gerarPdfModal() {
+        const modalBody = document.getElementById('modalBody');
+        const { jsPDF } = window.jspdf || {};
+        if (!jsPDF) {
+          alert('Não foi possível gerar o PDF no momento. Tente novamente mais tarde.');
+          return;
+        }
+        const numero = (document.getElementById('modalNumeroSolicitacao').textContent || '').trim();
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+        const marginX = 48;
+        const headerMargin = 60;
+        let cursorY = headerMargin;
+
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.text('Revisão da Solicitação', marginX, cursorY);
+        cursorY += 28;
+
+        if (numero && numero !== '—') {
+          doc.setFont('Helvetica', 'normal');
+          doc.setFontSize(12);
+          doc.text(`Número da Solicitação: ${numero}`, marginX, cursorY);
+          cursorY += 24;
+        }
+
+        const table = modalBody.querySelector('table');
+        if (!table) {
+          doc.setFontSize(12);
+          doc.text('Não há dados para exportar.', marginX, cursorY);
+          const safeNome = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
+          doc.save(`solicitacao-${safeNome}.pdf`);
+          return;
+        }
+
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+        const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => Array.from(tr.children).map(td => td.textContent.trim()));
+
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(11);
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const maxLineWidth = pageWidth - marginX * 2;
+
+        const headerLine = doc.splitTextToSize(headers.join('  |  '), maxLineWidth);
+        headerLine.forEach(line => {
+          doc.text(line, marginX, cursorY);
+          cursorY += 16;
+        });
+
+        doc.setFont('Helvetica', 'normal');
+        rows.forEach(cols => {
+          const line = cols.join('  |  ');
+          const wrapped = doc.splitTextToSize(line, maxLineWidth);
+          wrapped.forEach(segment => {
+            if (cursorY > pageHeight - 60) {
+              doc.addPage('a4', 'landscape');
+              cursorY = headerMargin;
+            }
+            doc.text(segment, marginX, cursorY);
+            cursorY += 16;
+          });
+          cursorY += 6;
+        });
+
+        const safeNumero = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
+        doc.save(`solicitacao-${safeNumero}.pdf`);
       }
 
       function fecharModal() {
@@ -684,6 +911,7 @@
         modalBody.innerHTML = '';
         backdrop.classList.remove('active');
         backdrop.setAttribute('aria-hidden', 'true');
+        document.getElementById('modalNumeroSolicitacao').textContent = '—';
       }
 
       // ===== Orientações (TXT) =====
@@ -773,7 +1001,7 @@
 
       document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
       document.getElementById('btnImprimir').addEventListener('click', () => window.print());
-      document.getElementById('btnSalvarPDF').addEventListener('click', () => window.print());
+      document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
       document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
 
       // ===== Bootstrap inicial =====
