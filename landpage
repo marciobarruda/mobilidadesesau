@@ -324,6 +324,18 @@
         margin-bottom: 1.5rem;
       }
 
+      .modal-header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .modal-logo {
+        max-height: 52px;
+        width: auto;
+        flex-shrink: 0;
+      }
+
       .feedback-modal-title {
         font-weight: 700;
         font-size: 1.35rem;
@@ -448,6 +460,14 @@
           flex-direction: column;
           align-items: stretch;
         }
+        .modal-header-left {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.75rem;
+        }
+        .modal-logo {
+          max-height: 42px;
+        }
         .modal-meta {
           text-align: left;
         }
@@ -501,6 +521,7 @@
                   <input type="hidden" name="ds" id="novaSolicitacaoDs" />
                   <input type="hidden" name="grupo" id="novaSolicitacaoGrupo" />
                   <input type="hidden" name="cpf" id="novaSolicitacaoCpf" />
+                  <input type="hidden" name="matricula" id="novaSolicitacaoMatricula" value="{{ $json.data.vinculos[0].matricula }}" />
                   <button type="button" class="btn btn-primary" id="btnNovaSolicitacao">Nova solicitação</button>
                 </form>
                 <a class="btn btn-outline-primary" href="#orientacoesContainer">Orientações</a>
@@ -516,7 +537,7 @@
               <span class="card-tag">ATUALIZAÇÃO CADASTRAL</span>
               <h2 class="card-title">Dados para contato e lotação</h2>
               <p class="card-subtitle">Mantenha seus dados atualizados para agilizar análises de mobilidade.</p>
-              <details class="collapsible-form">
+              <details class="collapsible-form" data-default-collapsed="true">
                 <summary>Atualizar cadastro</summary>
                 <form id="form-cadastro" class="pt-3" novalidate>
                   <div class="row g-3">
@@ -526,6 +547,7 @@
                       <select id="matriculaSelect" class="form-select" required></select>
                       <input type="hidden" id="grupoHidden" value="{{ $json.data.vinculos[0].grupo }}" />
                       <input type="hidden" id="cpfHidden" value="{{ $json.data.dadosComuns.cpf }}" />
+                      <input type="hidden" id="dsHidden" value="{{ $json.data.vinculos[0].ds }}" />
                       <div class="invalid-feedback">Selecione uma matrícula válida.</div>
                     </div>
 
@@ -684,9 +706,16 @@
     <div id="modalBackdrop" class="feedback-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
       <div class="feedback-modal">
         <div class="feedback-modal-header">
-          <div>
-            <div class="feedback-modal-title">Comprovante de solicitação</div>
-            <div class="feedback-modal-subtitle">Solicitação registrada em banco de dados para a matrícula <strong>{{ $json.data.vinculos[0].matricula }}</strong></div>
+          <div class="modal-header-left">
+            <img
+              src="https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200"
+              alt="Logo Gestão PCR"
+              class="modal-logo"
+            />
+            <div>
+              <div class="feedback-modal-title">Comprovante de solicitação</div>
+              <div class="feedback-modal-subtitle">Solicitação registrada em banco de dados para a matrícula <strong>{{ $json.data.vinculos[0].matricula }}</strong></div>
+            </div>
           </div>
           <div class="modal-meta">
             <span class="modal-meta-label">Número da Solicitação</span>
@@ -747,12 +776,14 @@
           {
             matricula: sanitizeValue(`{{ $json.data.vinculos[0].matricula }}`),
             cargo: sanitizeValue(`{{ $json.data.vinculos[0].cargo }}`),
-            grupo: sanitizeValue(`{{ $json.data.vinculos[0].grupo }}`)
+            grupo: sanitizeValue(`{{ $json.data.vinculos[0].grupo }}`),
+            ds: sanitizeValue(`{{ $json.data.vinculos[0].ds }}`)
           },
           {
             matricula: sanitizeValue(`{{ $json.data.vinculos[1].matricula }}`),
             cargo: sanitizeValue(`{{ $json.data.vinculos[1].cargo }}`),
-            grupo: sanitizeValue(`{{ $json.data.vinculos[1].grupo }}`)
+            grupo: sanitizeValue(`{{ $json.data.vinculos[1].grupo }}`),
+            ds: sanitizeValue(`{{ $json.data.vinculos[1].ds }}`)
           }
         ],
         contatos: {
@@ -782,7 +813,8 @@
           opts.push({
             value,
             text: value,
-            grupo: sanitizeValue(vinculo.grupo)
+            grupo: sanitizeValue(vinculo.grupo),
+            ds: sanitizeValue(vinculo.ds)
           });
         };
         (DATA.vinculos || []).forEach(pushVinculoOption);
@@ -802,13 +834,27 @@
             option.value = optionData.value;
             option.textContent = optionData.text;
             if (optionData.grupo) option.dataset.grupo = optionData.grupo;
+            if (optionData.ds) option.dataset.ds = optionData.ds;
             sel.appendChild(option);
           });
         }
         const hiddenGrupo = document.getElementById('grupoHidden');
-        if (hiddenGrupo) hiddenGrupo.value = sanitizeValue(hiddenGrupo.value);
+        if (hiddenGrupo) {
+          const normalizedGrupo = sanitizeValue(hiddenGrupo.value) || (opts[0]?.grupo || '');
+          hiddenGrupo.value = normalizedGrupo;
+        }
         const hiddenCpf = document.getElementById('cpfHidden');
         if (hiddenCpf) hiddenCpf.value = DATA.cpf;
+        const hiddenDs = document.getElementById('dsHidden');
+        if (hiddenDs) {
+          const normalizedDs = sanitizeValue(hiddenDs.value) || (opts[0]?.ds || '');
+          hiddenDs.value = normalizedDs;
+        }
+        const hiddenMatricula = document.getElementById('novaSolicitacaoMatricula');
+        if (hiddenMatricula) {
+          const normalizedMatricula = sanitizeValue(hiddenMatricula.value) || (opts[0]?.value || '');
+          hiddenMatricula.value = normalizedMatricula;
+        }
       }
 
       function populateContatosEndereco() {
@@ -1100,6 +1146,8 @@
           const grupoAtual = sanitizeValue(document.getElementById('grupoHidden')?.value || '');
           loadUnidades(v, grupoAtual);
         }
+        const hiddenDs = document.getElementById('dsHidden');
+        if (hiddenDs) hiddenDs.value = sanitizeValue(v);
       });
 
       document.getElementById('matriculaSelect').addEventListener('change', (e) => {
@@ -1107,6 +1155,10 @@
         const grupoSelecionado = selected ? sanitizeValue(selected.dataset.grupo || '') : '';
         const hiddenGrupo = document.getElementById('grupoHidden');
         if (hiddenGrupo) hiddenGrupo.value = grupoSelecionado;
+        const hiddenDs = document.getElementById('dsHidden');
+        if (hiddenDs && selected) hiddenDs.value = sanitizeValue(selected.dataset.ds || hiddenDs.value || '');
+        const hiddenMatricula = document.getElementById('novaSolicitacaoMatricula');
+        if (hiddenMatricula && selected) hiddenMatricula.value = sanitizeValue(selected.value || hiddenMatricula.value || '');
         const dsAtual = document.getElementById('dsSelect').value;
         if (dsAtual) loadUnidades(dsAtual, grupoSelecionado);
       });
@@ -1148,23 +1200,27 @@
       });
 
       document.getElementById('btnNovaSolicitacao').addEventListener('click', () => {
-        const dsValue = sanitizeValue(document.getElementById('dsSelect')?.value || '');
-        const matriculaValue = sanitizeValue(document.getElementById('matriculaSelect')?.value || '');
-        if (!matriculaValue) {
-          alert('Selecione uma matrícula para continuar.');
-          return;
-        }
-        if (!dsValue) {
-          alert('Selecione a DS/Executiva atual para continuar.');
-          return;
-        }
-        const grupoValue = sanitizeValue(document.getElementById('grupoHidden')?.value || '');
+        const matriculaSelect = document.getElementById('matriculaSelect');
+        const selected = matriculaSelect?.selectedOptions?.[0];
+        const fallbackMatricula = sanitizeValue(document.getElementById('novaSolicitacaoMatricula')?.value || '');
+        const matriculaValue = sanitizeValue(selected?.value || fallbackMatricula);
+        const grupoValue = sanitizeValue(selected?.dataset?.grupo || document.getElementById('grupoHidden')?.value || '');
+        const dsSelectValue = sanitizeValue(document.getElementById('dsSelect')?.value || '');
+        const hiddenDsValue = sanitizeValue(document.getElementById('dsHidden')?.value || '');
         const cpfValue = sanitizeValue(document.getElementById('cpfHidden')?.value || '');
-        document.getElementById('novaSolicitacaoDs').value = dsValue;
-        document.getElementById('novaSolicitacaoGrupo').value = grupoValue;
-        document.getElementById('novaSolicitacaoCpf').value = cpfValue;
+        const dsValue = dsSelectValue || hiddenDsValue;
         const form = document.getElementById('novaSolicitacaoForm');
-        if (form) form.submit();
+        if (!form) return;
+        const dsField = document.getElementById('novaSolicitacaoDs');
+        const grupoField = document.getElementById('novaSolicitacaoGrupo');
+        const cpfField = document.getElementById('novaSolicitacaoCpf');
+        const matriculaField = document.getElementById('novaSolicitacaoMatricula');
+        if (dsField) dsField.value = dsValue;
+        if (grupoField) grupoField.value = grupoValue;
+        if (cpfField) cpfField.value = cpfValue;
+        if (matriculaField) matriculaField.value = matriculaValue;
+        if (document.getElementById('grupoHidden')) document.getElementById('grupoHidden').value = grupoValue;
+        form.submit();
       });
 
       document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
@@ -1177,6 +1233,9 @@
         populateMatriculas();
         populateContatosEndereco();
         renderMinhasSolicitacoesCards();
+        document.querySelectorAll('.collapsible-form').forEach((details) => {
+          details.open = false;
+        });
         // Orientações: use window.ORIENTACOES_TXT = '...'; em produção
         if (window.ORIENTACOES_TXT) renderOrientacoes(window.ORIENTACOES_TXT);
         else renderOrientacoes('Carregaremos aqui as orientações do processo.');
