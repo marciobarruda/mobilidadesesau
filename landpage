@@ -105,6 +105,10 @@
         color: var(--text-strong);
       }
 
+      .card-programa .section-title {
+        color: var(--brand-primary);
+      }
+
       .section-title::before {
         content: "";
         display: inline-block;
@@ -394,7 +398,7 @@
 
       <div class="row g-4">
         <!-- Card 1: Mobilidade Interna -->
-        <section class="col-12 col-lg-6">
+        <section class="col-12 col-lg-5 col-xl-4">
           <div class="card card-programa h-100">
             <div class="card-header">
               <div class="section-title">Solicitação de Mobilidade (SESAU)</div>
@@ -415,7 +419,7 @@
         </section>
 
         <!-- Card 2: Atualização Cadastral -->
-        <section class="col-12 col-lg-6">
+        <section class="col-12 col-lg-7 col-xl-8">
           <div class="card card-programa h-100">
             <div class="card-header">
               <div class="section-title">Dados para contato e lotação</div>
