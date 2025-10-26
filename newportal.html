@@ -449,6 +449,7 @@
         const solicitacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/cbda8a38-3a07-4b85-9d63-7ebda0294f6a";
         const publicacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/7b3f9046-f11b-4cc3-b570-c3e586748f6c";
         const distritosEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/distritos";
+        const unidadesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/unidades";
 
         // Endpoints de dados iniciais (preencher selects). Ajuste conforme sua API.
         const initialDataEndpoint = ""; // ex.: "https://.../webhook/dados-iniciais"
@@ -667,9 +668,21 @@
           const selRegime = document.getElementById("sel-regime");
 
           const dsPlaceholder = "Selecione DS/Executiva";
+          const unidadePlaceholder = "Selecione a unidade";
+          const turnoPlaceholder = "Selecione o turno";
+          const regimePlaceholder = "Selecione o regime";
 
-          function setOptions(select, list, placeholder) {
+          const fallbackMatriculas = [
+            { id: "20201234", label: "20201234" },
+            { id: "20194567", label: "20194567" }
+          ];
+          const fallbackUnidades = ["UPA Ibura", "PA Imaging", "Policlínica Centro"];
+          const fallbackTurnos = ["Manhã", "Tarde", "Noite", "12x36"];
+          const fallbackRegimes = ["20h", "30h", "40h", "Plantão"];
+
+          function setOptions(select, list, placeholder, opts = {}) {
             if (!select) return;
+            const { disable } = opts;
             select.innerHTML = "";
             const opt0 = document.createElement("option");
             opt0.value = "";
@@ -677,88 +690,204 @@
             select.appendChild(opt0);
             (list || []).forEach(item => {
               const opt = document.createElement("option");
-              if (typeof item === "string") {
-                opt.value = item;
-                opt.textContent = item;
+              if (typeof item === "string" || typeof item === "number") {
+                opt.value = String(item);
+                opt.textContent = String(item);
               } else {
-                opt.value = item.value ?? item.id ?? item.codigo ?? item.nome ?? "";
-                opt.textContent = item.label ?? item.nome ?? item.descricao ?? String(opt.value);
+                const value = item.value ?? item.id ?? item.codigo ?? item.nome ?? "";
+                opt.value = value;
+                opt.textContent = item.label ?? item.nome ?? item.descricao ?? String(value);
               }
               select.appendChild(opt);
             });
+            if (typeof disable === "boolean") {
+              select.disabled = disable;
+            }
           }
 
-          function carregarDistritos() {
-            if (!selDs) return;
+          function resetSelect(select, placeholder) {
+            setOptions(select, [], placeholder, { disable: true });
+          }
 
-            const carregandoLabel = "Carregando DS/Executiva...";
-            setOptions(selDs, [], carregandoLabel);
+          function normalizeOptions(list, valueKeys = [], labelKeys = []) {
+            const normalized = [];
+            const seen = new Set();
+            (list || []).forEach(item => {
+              let value = "";
+              let label = "";
 
-            fetch(distritosEndpoint, { headers: { "Accept": "application/json" } })
-              .then(r => {
-                if (!r.ok) throw new Error("Falha na consulta");
-                return r.json();
-              })
-              .then(data => {
-                const candidatos = [];
-                const possiveisListas = Array.isArray(data) ? [data] : [];
-                const obj = (data && typeof data === "object") ? data : {};
-                ["distritos", "items", "data", "records", "result", "values", "lista"].forEach(key => {
-                  if (Array.isArray(obj[key])) possiveisListas.push(obj[key]);
-                });
-                if (!possiveisListas.length && obj && typeof obj === "object") {
-                  const values = Object.values(obj);
-                  if (values.length && values.every(v => typeof v === "string" || typeof v === "number" || (v && typeof v === "object"))) {
-                    possiveisListas.push(values);
+              if (typeof item === "string" || typeof item === "number") {
+                value = String(item).trim();
+                label = value;
+              } else if (item && typeof item === "object") {
+                const valueCandidates = valueKeys.length ? valueKeys : ["value", "id", "codigo", "sigla", "nome"];
+                const labelCandidates = labelKeys.length ? labelKeys : ["label", "nome", "descricao"];
+
+                for (const key of valueCandidates) {
+                  if (item[key] !== undefined && item[key] !== null && String(item[key]).trim() !== "") {
+                    value = String(item[key]).trim();
+                    break;
                   }
                 }
 
-                possiveisListas.forEach(lista => {
-                  if (!Array.isArray(lista)) return;
-                  lista.forEach(item => candidatos.push(item));
-                });
-
-                const vistos = new Set();
-                const normalizados = candidatos.map(item => {
-                  let value = "";
-                  let label = "";
-
-                  if (typeof item === "string" || typeof item === "number") {
-                    value = String(item).trim();
-                    label = value;
-                  } else if (item && typeof item === "object") {
-                    value = item.value ?? item.id ?? item.codigo ?? item.sigla ?? item.nome ?? item.descricao ?? item.distrito ?? item.ds ?? item.nomeDistrito ?? item.nome_distrito ?? item.dsExecutiva ?? item.ds_executiva ?? "";
-                    if (value !== undefined && value !== null) value = String(value).trim();
-                    label = item.label ?? item.nome ?? item.descricao ?? item.distrito ?? item.ds ?? item.nomeDistrito ?? item.nome_distrito ?? item.dsExecutiva ?? item.ds_executiva ?? value;
-                    if (label !== undefined && label !== null) label = String(label).trim();
+                for (const key of labelCandidates) {
+                  if (item[key] !== undefined && item[key] !== null && String(item[key]).trim() !== "") {
+                    label = String(item[key]).trim();
+                    break;
                   }
+                }
 
-                  if (!value) return null;
-                  if (!label) label = value;
-                  if (vistos.has(value)) return null;
-                  vistos.add(value);
-                  return { value, label };
-                }).filter(Boolean);
+                if (!label && value) {
+                  const fallbackLabelKeys = ["distrito", "ds", "nomeDistrito", "nome_distrito", "dsExecutiva", "ds_executiva", "unidade", "nomeUnidade", "nome_unidade"];
+                  for (const key of fallbackLabelKeys) {
+                    if (item[key] !== undefined && item[key] !== null && String(item[key]).trim() !== "") {
+                      label = String(item[key]).trim();
+                      break;
+                    }
+                  }
+                }
+              }
 
-                if (!normalizados.length) throw new Error("Lista vazia");
-
-                setOptions(selDs, normalizados, dsPlaceholder);
-                validateUpdateForm();
-              })
-              .catch(() => {
-                setOptions(selDs, ["DS I", "DS II", "Executiva"], dsPlaceholder);
-                validateUpdateForm();
-              });
+              if (!value) return;
+              if (!label) label = value;
+              if (seen.has(value)) return;
+              seen.add(value);
+              normalized.push({ value, label });
+            });
+            return normalized;
           }
+
+          async function carregarDistritos() {
+            if (!selDs) return;
+
+            setOptions(selDs, [], "Carregando DS/Executiva...", { disable: true });
+            resetSelect(selUn, unidadePlaceholder);
+
+            const payload = {};
+            if (cpf) payload.cpf = cpf;
+
+            let distritos = [];
+            try {
+              const res = await fetch(distritosEndpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+                cache: "no-store"
+              });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const data = await res.json();
+              const lista = Array.isArray(data)
+                ? data
+                : (Array.isArray(data?.distritos) && data.distritos)
+                  || (Array.isArray(data?.items) && data.items)
+                  || (Array.isArray(data?.itens) && data.itens)
+                  || (Array.isArray(data?.lista) && data.lista)
+                  || (Array.isArray(data?.data) && data.data)
+                  || (Array.isArray(data?.values) && data.values)
+                  || (Array.isArray(data?.records) && data.records)
+                  || (Array.isArray(data?.result) && data.result)
+                  || [];
+              distritos = Array.isArray(lista) ? lista : [];
+            } catch (e) {
+              console.warn("Falha ao carregar distritos:", e);
+              distritos = [];
+            }
+
+            let options = normalizeOptions(
+              distritos,
+              ["value", "id", "codigo", "sigla", "distrito", "ds", "nomeDistrito", "nome_distrito", "dsExecutiva", "ds_executiva", "nome", "descricao"],
+              ["label", "nome", "descricao", "distrito", "ds", "nomeDistrito", "nome_distrito", "dsExecutiva", "ds_executiva"]
+            );
+
+            if (!options.length) {
+              console.warn("Lista de distritos vazia, utilizando fallback padrão.");
+              options = normalizeOptions(["DS I", "DS II", "Executiva"]);
+            }
+
+            setOptions(selDs, options, dsPlaceholder, { disable: false });
+            validateUpdateForm();
+          }
+
+          async function carregarUnidades(distritoValor) {
+            if (!selUn) return;
+
+            resetSelect(selUn, unidadePlaceholder);
+
+            if (!distritoValor) {
+              validateUpdateForm();
+              return;
+            }
+
+            const payload = {
+              distrito: distritoValor,
+              ds: distritoValor,
+              dsExecutiva: distritoValor,
+              ds_executiva: distritoValor,
+              value: distritoValor
+            };
+            if (cpf) payload.cpf = cpf;
+
+            let unidades = [];
+            try {
+              const res = await fetch(unidadesEndpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+                cache: "no-store"
+              });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const data = await res.json();
+              const lista = Array.isArray(data)
+                ? data
+                : (Array.isArray(data?.unidades) && data.unidades)
+                  || (Array.isArray(data?.items) && data.items)
+                  || (Array.isArray(data?.itens) && data.itens)
+                  || (Array.isArray(data?.lista) && data.lista)
+                  || (Array.isArray(data?.data) && data.data)
+                  || (Array.isArray(data?.values) && data.values)
+                  || (Array.isArray(data?.records) && data.records)
+                  || (Array.isArray(data?.result) && data.result)
+                  || [];
+              unidades = Array.isArray(lista) ? lista : [];
+            } catch (e) {
+              console.warn("Falha ao carregar unidades:", e);
+              unidades = [];
+            }
+
+            let options = normalizeOptions(
+              unidades,
+              ["value", "id", "codigo", "sigla", "unidade", "nomeUnidade", "nome_unidade", "nome", "descricao"],
+              ["label", "nome", "descricao", "unidade", "nomeUnidade", "nome_unidade"]
+            );
+
+            if (!options.length) {
+              console.warn("Lista de unidades vazia, utilizando fallback padrão.");
+              options = normalizeOptions(fallbackUnidades);
+            }
+
+            setOptions(selUn, options, unidadePlaceholder, { disable: false });
+            validateUpdateForm();
+          }
+
+          if (selDs) {
+            resetSelect(selDs, dsPlaceholder);
+            selDs.addEventListener("change", () => {
+              const valorDistrito = selDs.value;
+              resetSelect(selUn, unidadePlaceholder);
+              carregarUnidades(valorDistrito);
+              validateUpdateForm();
+            });
+          }
+
+          resetSelect(selUn, unidadePlaceholder);
 
           carregarDistritos();
 
           if (!initialDataEndpoint) {
             // Placeholders
-            setOptions(selMat, [{id:"20201234",label:"20201234"},{id:"20194567",label:"20194567"}], "Selecione a matrícula");
-            setOptions(selUn, ["UPA Ibura", "PA Imaging", "Policlínica Centro"], "Selecione a unidade");
-            setOptions(selTurno, ["Manhã", "Tarde", "Noite", "12x36"], "Selecione o turno");
-            setOptions(selRegime, ["20h", "30h", "40h", "Plantão"], "Selecione o regime");
+            setOptions(selMat, fallbackMatriculas, "Selecione a matrícula");
+            setOptions(selTurno, fallbackTurnos, turnoPlaceholder);
+            setOptions(selRegime, fallbackRegimes, regimePlaceholder);
             return;
           }
 
@@ -766,16 +895,14 @@
             .then(r => r.json())
             .then(data => {
               setOptions(selMat, data?.matriculas, "Selecione a matrícula");
-              setOptions(selUn, data?.unidades, "Selecione a unidade");
-              setOptions(selTurno, data?.turnos, "Selecione o turno");
-              setOptions(selRegime, data?.regimes, "Selecione o regime");
+              setOptions(selTurno, data?.turnos, turnoPlaceholder);
+              setOptions(selRegime, data?.regimes, regimePlaceholder);
             })
             .catch(() => {
               // Fallback em caso de erro
-              setOptions(selMat, [{id:"20201234",label:"20201234"}], "Selecione a matrícula");
-              setOptions(selUn, ["UPA Ibura"], "Selecione a unidade");
-              setOptions(selTurno, ["Manhã","Tarde"], "Selecione o turno");
-              setOptions(selRegime, ["30h","40h"], "Selecione o regime");
+              setOptions(selMat, [fallbackMatriculas[0]], "Selecione a matrícula");
+              setOptions(selTurno, [fallbackTurnos[0], fallbackTurnos[1]], turnoPlaceholder);
+              setOptions(selRegime, [fallbackRegimes[0], fallbackRegimes[1]], regimePlaceholder);
             });
         }
 
