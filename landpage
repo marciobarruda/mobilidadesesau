@@ -732,6 +732,11 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <script>
       // ===== Helpers =====
       const postJSON = async (url, body) => {
@@ -767,6 +772,27 @@
       const isUF = (val) => /^[A-Za-z]{2}$/.test(val || '');
       const isCEP = (val) => /^(\d{5}-?\d{3})$/.test(val || '');
       const isWhats = (val) => /^(\(\d{2}\)\s?)?(9)?\d{4}-?\d{4}$/.test((val || '').replace(/\s/g, ''));
+
+      const COMPROVANTE_LOGO_URL = 'https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200';
+      let comprovanteLogoDataUrlPromise = null;
+
+      const getComprovanteLogoDataUrl = async () => {
+        if (!comprovanteLogoDataUrlPromise) {
+          comprovanteLogoDataUrlPromise = fetch(COMPROVANTE_LOGO_URL)
+            .then((response) => {
+              if (!response.ok) throw new Error('Erro ao carregar logotipo');
+              return response.blob();
+            })
+            .then((blob) => new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result);
+              reader.onerror = () => reject(new Error('Falha ao converter logotipo'));
+              reader.readAsDataURL(blob);
+            }))
+            .catch(() => null);
+        }
+        return comprovanteLogoDataUrlPromise;
+      };
 
       // Dados vindos do template (quando presentes)
       const DATA = {
@@ -1017,72 +1043,162 @@
         }
       }
 
-      function gerarPdfModal() {
+      async function gerarPdfModal() {
+        const triggerButton = document.getElementById('btnSalvarPDF');
         const modalBody = document.getElementById('modalBody');
         const { jsPDF } = window.jspdf || {};
         if (!jsPDF) {
           alert('Não foi possível gerar o PDF no momento. Tente novamente mais tarde.');
           return;
         }
-        const numero = (document.getElementById('modalNumeroSolicitacao').textContent || '').trim();
-        const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
-        const marginX = 48;
-        const headerMargin = 60;
-        let cursorY = headerMargin;
 
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(18);
-        doc.text('Comprovante de solicitação', marginX, cursorY);
-        cursorY += 28;
+        try {
+          if (triggerButton) triggerButton.setAttribute('aria-busy', 'true');
 
-        if (numero && numero !== '—') {
-          doc.setFont('Helvetica', 'normal');
-          doc.setFontSize(12);
-          doc.text(`Número da Solicitação: ${numero}`, marginX, cursorY);
-          cursorY += 24;
-        }
+          const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+          if (typeof doc.autoTable !== 'function') {
+            alert('Recurso de tabela indisponível para gerar o PDF.');
+            return;
+          }
 
-        const table = modalBody.querySelector('table');
-        if (!table) {
-          doc.setFontSize(12);
-          doc.text('Não há dados para exportar.', marginX, cursorY);
-          const safeNome = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
-          doc.save(`solicitacao-${safeNome}.pdf`);
-          return;
-        }
+          const numero = (document.getElementById('modalNumeroSolicitacao').textContent || '').trim();
+          const table = modalBody.querySelector('table');
 
-        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
-        const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => Array.from(tr.children).map(td => td.textContent.trim()));
+          const headers = table
+            ? Array.from(table.querySelectorAll('thead th')).map((th) => th.textContent.trim())
+            : [];
+          const rows = table
+            ? Array.from(table.querySelectorAll('tbody tr')).map((tr) =>
+                Array.from(tr.children).map((td) => td.textContent.trim())
+              )
+            : [];
 
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(11);
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageHeight = doc.internal.pageSize.getHeight();
-        const maxLineWidth = pageWidth - marginX * 2;
+          const matriculaHidden = document.getElementById('novaSolicitacaoMatricula');
+          const matriculaFromHidden = sanitizeValue(matriculaHidden ? matriculaHidden.value : '');
+          const matriculaFromTable = rows.length ? sanitizeValue(rows[0][1]) : '';
+          const matricula = matriculaFromTable || matriculaFromHidden;
+          const subtitleText = matricula
+            ? `Solicitação registrada em banco de dados para a matrícula ${matricula}`
+            : 'Solicitação registrada em banco de dados.';
 
-        const headerLine = doc.splitTextToSize(headers.join('  |  '), maxLineWidth);
-        headerLine.forEach(line => {
-          doc.text(line, marginX, cursorY);
-          cursorY += 16;
-        });
+          const logoDataUrl = await getComprovanteLogoDataUrl();
 
-        doc.setFont('Helvetica', 'normal');
-        rows.forEach(cols => {
-          const line = cols.join('  |  ');
-          const wrapped = doc.splitTextToSize(line, maxLineWidth);
-          wrapped.forEach(segment => {
-            if (cursorY > pageHeight - 60) {
-              doc.addPage('a4', 'landscape');
-              cursorY = headerMargin;
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const pageHeight = doc.internal.pageSize.getHeight();
+          const margin = 30;
+          const cardWidth = pageWidth - margin * 2;
+          const cardHeight = pageHeight - margin * 2;
+          const cardPaddingX = 32;
+          const cardPaddingY = 30;
+          const headerTintHeight = 170;
+          const badgeWidth = 220;
+          const badgeHeight = 78;
+
+          const drawPageLayout = () => {
+            doc.setDrawColor(214, 222, 234);
+            doc.setLineWidth(1.2);
+            doc.setFillColor(243, 247, 255);
+            doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18, 'F');
+            doc.setFillColor(255, 255, 255);
+            doc.rect(margin, margin + headerTintHeight, cardWidth, Math.max(cardHeight - headerTintHeight, 0), 'F');
+            doc.setDrawColor(214, 222, 234);
+            doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18);
+
+            const contentX = margin + cardPaddingX;
+            const contentY = margin + cardPaddingY;
+
+            if (logoDataUrl) {
+              const logoHeight = 34;
+              const logoWidth = 140;
+              doc.addImage(logoDataUrl, 'PNG', contentX, contentY, logoWidth, logoHeight);
             }
-            doc.text(segment, marginX, cursorY);
-            cursorY += 16;
-          });
-          cursorY += 6;
-        });
 
-        const safeNumero = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
-        doc.save(`solicitacao-${safeNumero}.pdf`);
+            let textCursorY = margin + cardPaddingY + (logoDataUrl ? 56 : 18);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(22);
+            doc.setTextColor(0, 74, 173);
+            doc.text('Comprovante de solicitação', contentX, textCursorY);
+            textCursorY += 28;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(13);
+            doc.setTextColor(55, 65, 81);
+            const availableWidth = cardWidth - cardPaddingX * 2 - badgeWidth - 16;
+            const subtitleLines = doc.splitTextToSize(subtitleText, Math.max(availableWidth, 160));
+            subtitleLines.forEach((line) => {
+              doc.text(line, contentX, textCursorY);
+              textCursorY += 18;
+            });
+
+            const badgeX = margin + cardWidth - cardPaddingX - badgeWidth;
+            const badgeY = margin + cardPaddingY;
+            doc.setFillColor(0, 74, 173);
+            doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 12, 12, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(11);
+            doc.text('NÚMERO DA SOLICITAÇÃO', badgeX + 18, badgeY + 26);
+            doc.setFontSize(26);
+            doc.text(numero || '—', badgeX + badgeWidth - 18, badgeY + 54, { align: 'right' });
+          };
+
+          const tableStartY = margin + headerTintHeight + 36;
+
+          if (headers.length && rows.length) {
+            doc.autoTable({
+              head: [headers],
+              body: rows,
+              startY: tableStartY,
+              theme: 'plain',
+              margin: { left: margin + cardPaddingX, right: margin + cardPaddingX },
+              tableWidth: cardWidth - cardPaddingX * 2,
+              willDrawPage: drawPageLayout,
+              styles: {
+                font: 'helvetica',
+                fontSize: 11,
+                textColor: [31, 41, 55],
+                cellPadding: { top: 10, right: 12, bottom: 10, left: 12 },
+                lineWidth: 0.6,
+                lineColor: [224, 232, 255],
+              },
+              headStyles: {
+                fontStyle: 'bold',
+                fontSize: 11,
+                fillColor: [226, 235, 255],
+                textColor: [0, 74, 173],
+                halign: 'left',
+                cellPadding: { top: 12, right: 12, bottom: 12, left: 12 },
+                lineWidth: 0,
+              },
+              alternateRowStyles: {
+                fillColor: [248, 250, 255],
+              },
+              columnStyles: {
+                0: { halign: 'center', cellWidth: 60 },
+                1: { halign: 'center', cellWidth: 80 },
+                2: { cellWidth: 135 },
+                3: { cellWidth: 95 },
+                4: { cellWidth: 160 },
+                5: { halign: 'center', cellWidth: 90 },
+                6: { halign: 'center', cellWidth: 90 },
+              },
+            });
+          } else {
+            drawPageLayout();
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            doc.setTextColor(107, 114, 128);
+            doc.text('Não há dados para exportar.', margin + cardPaddingX, tableStartY + 10);
+          }
+
+          const safeNumero = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
+          doc.save(`solicitacao-${safeNumero}.pdf`);
+        } catch (error) {
+          console.error('Erro ao gerar PDF:', error);
+          alert('Não foi possível gerar o PDF no momento. Tente novamente mais tarde.');
+        } finally {
+          if (triggerButton) triggerButton.removeAttribute('aria-busy');
+        }
       }
 
       function fecharModal() {
