@@ -491,13 +491,18 @@
                 <li>Validade de 12 meses, com necessidade de renovação antes do vencimento.</li>
               </ul>
               <div class="card-actions">
-                <a
-                  class="btn btn-primary"
+                <form
+                  id="novaSolicitacaoForm"
+                  action="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2"
+                  method="post"
                   target="_blank"
-                  rel="noopener"
-                  href="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2"
-                  >Nova solicitação</a
+                  class="d-inline"
                 >
+                  <input type="hidden" name="ds" id="novaSolicitacaoDs" />
+                  <input type="hidden" name="grupo" id="novaSolicitacaoGrupo" />
+                  <input type="hidden" name="cpf" id="novaSolicitacaoCpf" />
+                  <button type="button" class="btn btn-primary" id="btnNovaSolicitacao">Nova solicitação</button>
+                </form>
                 <a class="btn btn-outline-primary" href="#orientacoesContainer">Orientações</a>
               </div>
             </div>
@@ -512,7 +517,7 @@
               <h2 class="card-title">Dados para contato e lotação</h2>
               <p class="card-subtitle">Mantenha seus dados atualizados para agilizar análises de mobilidade.</p>
               <details class="collapsible-form">
-                <summary>Formulário de atualização</summary>
+                <summary>Atualizar cadastro</summary>
                 <form id="form-cadastro" class="pt-3" novalidate>
                   <div class="row g-3">
                     <!-- Matrícula -->
@@ -520,6 +525,7 @@
                       <label for="matriculaSelect" class="form-label">Matrícula</label>
                       <select id="matriculaSelect" class="form-select" required></select>
                       <input type="hidden" id="grupoHidden" value="{{ $json.data.vinculos[0].grupo }}" />
+                      <input type="hidden" id="cpfHidden" value="{{ $json.data.dadosComuns.cpf }}" />
                       <div class="invalid-feedback">Selecione uma matrícula válida.</div>
                     </div>
 
@@ -622,9 +628,6 @@
                   </div>
                 </form>
               </details>
-              <div class="card-actions">
-                <a class="btn btn-soft" href="#form-cadastro">Atualizar cadastro</a>
-              </div>
             </div>
           </div>
         </section>
@@ -682,8 +685,8 @@
       <div class="feedback-modal">
         <div class="feedback-modal-header">
           <div>
-            <div class="feedback-modal-title">Revisão da Solicitação</div>
-            <div class="feedback-modal-subtitle">Confira os dados cadastrados antes de prosseguir.</div>
+            <div class="feedback-modal-title">Comprovante de solicitação</div>
+            <div class="feedback-modal-subtitle">Solicitação registrada em banco de dados para a matrícula <strong>{{ $json.data.vinculos[0].matricula }}</strong></div>
           </div>
           <div class="modal-meta">
             <span class="modal-meta-label">Número da Solicitação</span>
@@ -739,6 +742,7 @@
       // Dados vindos do template (quando presentes)
       const DATA = {
         nome: sanitizeValue(`{{ $json.data.dadosComuns.nome }}`),
+        cpf: sanitizeValue(`{{ $json.data.dadosComuns.cpf }}`),
         vinculos: [
           {
             matricula: sanitizeValue(`{{ $json.data.vinculos[0].matricula }}`),
@@ -803,6 +807,8 @@
         }
         const hiddenGrupo = document.getElementById('grupoHidden');
         if (hiddenGrupo) hiddenGrupo.value = sanitizeValue(hiddenGrupo.value);
+        const hiddenCpf = document.getElementById('cpfHidden');
+        if (hiddenCpf) hiddenCpf.value = DATA.cpf;
       }
 
       function populateContatosEndereco() {
@@ -980,7 +986,7 @@
 
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(18);
-        doc.text('Revisão da Solicitação', marginX, cursorY);
+        doc.text('Comprovante de solicitação', marginX, cursorY);
         cursorY += 28;
 
         if (numero && numero !== '—') {
@@ -1139,6 +1145,26 @@
         };
         console.log('Payload atualização cadastral:', payload);
         setStatus('Dados preparados para envio.', true);
+      });
+
+      document.getElementById('btnNovaSolicitacao').addEventListener('click', () => {
+        const dsValue = sanitizeValue(document.getElementById('dsSelect')?.value || '');
+        const matriculaValue = sanitizeValue(document.getElementById('matriculaSelect')?.value || '');
+        if (!matriculaValue) {
+          alert('Selecione uma matrícula para continuar.');
+          return;
+        }
+        if (!dsValue) {
+          alert('Selecione a DS/Executiva atual para continuar.');
+          return;
+        }
+        const grupoValue = sanitizeValue(document.getElementById('grupoHidden')?.value || '');
+        const cpfValue = sanitizeValue(document.getElementById('cpfHidden')?.value || '');
+        document.getElementById('novaSolicitacaoDs').value = dsValue;
+        document.getElementById('novaSolicitacaoGrupo').value = grupoValue;
+        document.getElementById('novaSolicitacaoCpf').value = cpfValue;
+        const form = document.getElementById('novaSolicitacaoForm');
+        if (form) form.submit();
       });
 
       document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
