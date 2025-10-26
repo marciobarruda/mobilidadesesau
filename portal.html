@@ -244,10 +244,12 @@
   </head>
   <body>
     <!-- Campos ocultos (carregados junto à carta) -->
-    <input type="hidden" id="cpf" value="{{ $json.data.dadosComuns.cpf || '' }}" />
-    <script id="portal-template-data" type="application/json">
-      {{ JSON.stringify($json) }}
+    <input type="hidden" id="cpf" value="{{ $json.data.dadosComuns.cpf }}" />
+    <!-- BEGIN: mobilidade-seed (não remover) -->
+    <script type="application/json" id="seed-json">
+      {{ $json | toJSON }}
     </script>
+    <!-- END: mobilidade-seed -->
 
     <header class="site-header">
       <div class="container">
@@ -306,10 +308,8 @@
 
                   <div class="mt-3">
                     <label class="form-label" for="sel-matricula">Matrícula</label>
-                    <select class="form-select" id="sel-matricula" data-valor-atual="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].matricula || '' : '' }}" required>
+                    <select class="form-select" id="sel-matricula" data-valor-atual="{{ $json.data.vinculos[0].matricula }}" required>
                       <option value="">Selecione a matrícula</option>
-                      <option value="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].matricula || '' : '' }}">{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].matricula || '' : '' }}</option>
-                      <option value="{{ $json.data.vinculos && $json.data.vinculos[1] ? $json.data.vinculos[1].matricula || '' : '' }}">{{ $json.data.vinculos && $json.data.vinculos[1] ? $json.data.vinculos[1].matricula || '' : '' }}</option>
                     </select>
                     <div class="form-text">Selecione o vínculo a atualizar.</div>
                   </div>
@@ -317,53 +317,53 @@
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="in-whatsapp">WhatsApp</label>
-                      <input class="form-control" type="tel" id="in-whatsapp" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.data.dadosComuns.whatsapp || '' }}" />
+                      <input class="form-control" type="tel" id="in-whatsapp" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.data.dadosComuns.whatsapp }}" />
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="in-telefone-alt">Telefone alternativo</label>
-                      <input class="form-control" type="tel" id="in-telefone-alt" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.data.dadosComuns.tel_alternativo || '' }}" />
+                      <input class="form-control" type="tel" id="in-telefone-alt" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.data.dadosComuns.tel_alternativo }}" />
                     </div>
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-email">E-mail</label>
-                    <input class="form-control" type="email" id="in-email" placeholder="nome@exemplo.com" autocomplete="email" value="{{ $json.data.dadosComuns.email || '' }}" />
+                    <input class="form-control" type="email" id="in-email" placeholder="nome@exemplo.com" autocomplete="email" value="{{ $json.data.dadosComuns.email }}" />
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-cep">CEP</label>
-                    <input class="form-control" type="text" id="in-cep" inputmode="numeric" maxlength="8" placeholder="00000000" value="{{ $json.data.dadosComuns.endereco.cep || '' }}" />
+                    <input class="form-control" type="text" id="in-cep" inputmode="numeric" maxlength="8" placeholder="00000000" value="{{ $json.data.dadosComuns.endereco.cep }}" />
                     <div class="form-text">Ao informar o CEP, os demais campos de endereço serão preenchidos automaticamente.</div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-8">
                       <label class="form-label" for="in-logradouro">Logradouro</label>
-                      <input class="form-control" type="text" id="in-logradouro" value="{{ $json.data.dadosComuns.endereco.logradouro || '' }}" />
+                      <input class="form-control" type="text" id="in-logradouro" value="{{ $json.data.dadosComuns.endereco.logradouro }}" />
                     </div>
                     <div class="col-md-4">
                       <label class="form-label" for="in-numero">Número</label>
-                      <input class="form-control" type="text" id="in-numero" value="{{ $json.data.dadosComuns.endereco.numero || '' }}" />
+                      <input class="form-control" type="text" id="in-numero" value="{{ $json.data.dadosComuns.endereco.numero }}" />
                     </div>
                   </div>
 
                   <div class="mt-3">
                     <label class="form-label" for="in-complemento">Complemento</label>
-                    <input class="form-control" type="text" id="in-complemento" value="{{ $json.data.dadosComuns.endereco.complemento || '' }}" />
+                    <input class="form-control" type="text" id="in-complemento" value="{{ $json.data.dadosComuns.endereco.complemento }}" />
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="in-bairro">Bairro</label>
-                      <input class="form-control" type="text" id="in-bairro" value="{{ $json.data.dadosComuns.endereco.bairro || '' }}" />
+                      <input class="form-control" type="text" id="in-bairro" value="{{ $json.data.dadosComuns.endereco.bairro }}" />
                     </div>
                     <div class="col-md-4">
                       <label class="form-label" for="in-cidade">Cidade</label>
-                      <input class="form-control" type="text" id="in-cidade" value="{{ $json.data.dadosComuns.endereco.cidade || '' }}" />
+                      <input class="form-control" type="text" id="in-cidade" value="{{ $json.data.dadosComuns.endereco.cidade }}" />
                     </div>
                     <div class="col-md-2">
                       <label class="form-label" for="in-uf">UF</label>
-                      <input class="form-control text-uppercase" type="text" id="in-uf" maxlength="2" value="{{ $json.data.dadosComuns.endereco.uf || '' }}" />
+                      <input class="form-control text-uppercase" type="text" id="in-uf" maxlength="2" value="{{ $json.data.dadosComuns.endereco.uf }}" />
                     </div>
                   </div>
 
@@ -372,22 +372,22 @@
                   <div class="row g-3">
                     <div class="col-md-6">
                       <label class="form-label" for="sel-ds">DS/Executiva atual</label>
-                      <select class="form-select" id="sel-ds" data-valor-atual="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].distrito || '' : '' }}"></select>
+                      <select class="form-select" id="sel-ds" data-valor-atual="{{ $json.data.vinculos[0].distrito }}"></select>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="sel-unidade">Unidade atual</label>
-                      <select class="form-select" id="sel-unidade" data-valor-atual="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].lotacao || '' : '' }}"></select>
+                      <select class="form-select" id="sel-unidade" data-valor-atual="{{ $json.data.vinculos[0].lotacao }}"></select>
                     </div>
                   </div>
 
                   <div class="row g-3 mt-1">
                     <div class="col-md-6">
                       <label class="form-label" for="sel-turno">Turno atual</label>
-                      <select class="form-select" id="sel-turno" data-valor-atual="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].turno || '' : '' }}"></select>
+                      <select class="form-select" id="sel-turno" data-valor-atual="{{ $json.data.vinculos[0].turno }}"></select>
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="sel-regime">Regime atual</label>
-                      <select class="form-select" id="sel-regime" data-valor-atual="{{ $json.data.vinculos && $json.data.vinculos[0] ? $json.data.vinculos[0].regime || '' : '' }}"></select>
+                      <select class="form-select" id="sel-regime" data-valor-atual="{{ $json.data.vinculos[0].regime }}"></select>
                     </div>
                   </div>
 
@@ -446,7 +446,7 @@
 
     <!-- Modal -->
     <div class="feedback-modal-backdrop" id="feedback-modal" role="dialog" aria-modal="true" aria-hidden="true">
-      <div class="feedback-modal">
+      <div class="feedback-modal" id="modalPedidos">
         <h4 class="feedback-modal-title" id="feedback-modal-title">Detalhes</h4>
         <div class="feedback-modal-message" id="feedback-modal-message"></div>
         <div class="feedback-modal-actions" id="feedback-modal-actions">
@@ -455,8 +455,49 @@
       </div>
     </div>
 
+    <!-- BEGIN: mobilidade-print (não remover) -->
+    <style>
+      @media print {
+        body * { visibility: hidden !important; }
+        #modalPedidos, #modalPedidos * { visibility: visible !important; }
+        .modal { position: static !important; display: block !important; }
+        .modal-backdrop { display: none !important; }
+      }
+    </style>
+    <!-- END: mobilidade-print -->
+
+    <!-- BEGIN: mobilidade-pedidos (não remover) -->
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
+(function () {
+  if (window.__mobilidadeInit) return;
+  window.__mobilidadeInit = true;
+
+  let seed = null;
+  const seedTag = document.getElementById("seed-json");
+  if (seedTag && seedTag.textContent.trim()) {
+    try {
+      seed = JSON.parse(seedTag.textContent);
+    } catch (e) {
+      seed = null;
+    }
+  }
+
+  const get = (obj, path, fallback = null) => {
+    if (!obj || !path) return fallback;
+    const parts = path.split(".");
+    let cursor = obj;
+    for (const key of parts) {
+      if (cursor && Object.prototype.hasOwnProperty.call(cursor, key)) {
+        cursor = cursor[key];
+      } else {
+        cursor = null;
+        break;
+      }
+    }
+    return cursor ?? fallback;
+  };
+
+  const init = () => {
         const cpfInput = document.getElementById("cpf");
         const onlyDigits = (v) => (v || "").replace(/\\D/g, "");
         const sanitizeCpf = (value) => {
@@ -466,6 +507,7 @@
         let cpf = sanitizeCpf(cpfInput?.value);
         const solicitacaoDetalheEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2";
         const novaSolicitacaoEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2";
+        const minhasSolicitacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/cbda8a38-3a07-4b85-9d63-7ebda0294f6a";
         const publicacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/7b3f9046-f11b-4cc3-b570-c3e586748f6c";
 
         const atualizarCadastroEndpoint = ""; // ex.: "https://.../webhook/atualizar-cadastro"
@@ -633,23 +675,6 @@
           if (valorRegimePreferidoAttr) selRegime.dataset.valorAtual = valorRegimePreferidoAttr;
           else delete selRegime.dataset.valorAtual;
         }
-        const obterTemplatePayload = () => {
-          if (typeof window !== "undefined" && window.portalTemplateData) {
-            return window.portalTemplateData;
-          }
-          const scriptTemplate = document.getElementById("portal-template-data");
-          if (scriptTemplate) {
-            const raw = scriptTemplate.textContent?.trim();
-            if (raw && !raw.includes("{{")) {
-              try {
-                return JSON.parse(raw);
-              } catch (err) {
-                console.warn("Não foi possível interpretar os dados do template", err);
-              }
-            }
-          }
-          return null;
-        };
         const extrairTemplateContexto = (payload) => {
           const vazio = { dadosComuns: {}, endereco: {}, vinculos: [], catalogos: {} };
           if (!payload) return vazio;
@@ -668,7 +693,7 @@
           }
           return vazio;
         };
-        const templatePayload = obterTemplatePayload();
+        const templatePayload = seed ?? (typeof window !== "undefined" ? window.portalTemplateData : null);
         const templateContexto = extrairTemplateContexto(templatePayload);
         const catalogosTemplate = templateContexto.catalogos || {};
         const greetingStrong = document.querySelector(".user-greeting strong");
@@ -1480,14 +1505,55 @@
             return;
           }
 
+          let fallbackUtilizado = false;
           if (registrosServidorPreCarregados.length) {
             renderSolicitacoes(normalizeSolicitacoes(registrosServidorPreCarregados));
-          } else {
-            solicitacoesAtuais = [];
-            setOptions(selMatricula, [], "Selecione a matrícula");
-            setMinhasState("empty");
-            validateUpdateForm();
+            fallbackUtilizado = true;
           }
+
+          fetch(minhasSolicitacoesEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cpf })
+          })
+            .then(r => { if (!r.ok) throw new Error("Falha ao carregar"); return r.json(); })
+            .then(data => {
+              const registros = coletarRegistros(data);
+              if (registros.length) {
+                registrarDadosServidor(registros);
+              }
+              const normalizados = normalizeSolicitacoes(registros);
+              if (!normalizados.length) {
+                if (fallbackUtilizado) {
+                  setMinhasState("ready");
+                  validateUpdateForm();
+                  return;
+                }
+                solicitacoesAtuais = [];
+                setOptions(selMatricula, [], "Selecione a matrícula");
+                if (emptyBox) {
+                  emptyBox.textContent = "Nenhuma solicitação encontrada para o CPF informado.";
+                }
+                setMinhasState("empty");
+                validateUpdateForm();
+                return;
+              }
+              renderSolicitacoes(normalizados);
+            })
+            .catch(() => {
+              if (fallbackUtilizado) {
+                setMinhasState("ready");
+                validateUpdateForm();
+                return;
+              }
+              solicitacoesAtuais = [];
+              setOptions(selMatricula, [], "Selecione a matrícula");
+              if (emptyBox) {
+                emptyBox.textContent = "Não foi possível carregar as solicitações. Tente novamente mais tarde.";
+              }
+              setMinhasState("empty");
+              validateUpdateForm();
+            });
         }
 
         function atualizarLotacoes() {
@@ -1835,7 +1901,15 @@
             }, 15000);
           }
         }
-      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
     </script>
+    <!-- END: mobilidade-pedidos -->
   </body>
 </html>
