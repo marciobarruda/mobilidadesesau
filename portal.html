@@ -582,7 +582,7 @@
               selecionadas.push(segundoNome);
             }
           }
-          return selecionadas
+          const nomeFormatado = selecionadas
             .map(parte => parte.toLocaleLowerCase("pt-BR"))
             .map(parte =>
               parte
@@ -599,6 +599,7 @@
                 .join("")
             )
             .join(" ");
+          return nomeFormatado.replace(/\s+/g, " ").trim();
         };
         const preferTemplateValue = (...values) => {
           for (const valor of values) {
@@ -735,8 +736,9 @@
           }
           const nomeCompletoResolvido = resolveTemplateValue(dadosServidorTemplate.nome);
           const saudacaoTexto = primeiroNomeSaudacao || nomeCompletoResolvido || resolveTemplateValue(greetingStrong.textContent);
-          if (saudacaoTexto) {
-            greetingStrong.textContent = saudacaoTexto.trim();
+          const saudacaoNormalizada = saudacaoTexto ? saudacaoTexto.replace(/\s+/g, " ").trim() : "";
+          if (saudacaoNormalizada) {
+            greetingStrong.textContent = saudacaoNormalizada;
           } else {
             greetingStrong.textContent = "servidor(a)";
           }
