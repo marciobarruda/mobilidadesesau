@@ -598,7 +598,22 @@
           const lower = text.toLowerCase();
           if (lower === "null" || lower === "undefined") return "";
           if (templatePlaceholderPattern.test(text)) return "";
-          return text;
+          let cleaned = text;
+          if ((cleaned.startsWith("[") && cleaned.endsWith("]")) || (cleaned.startsWith("{") && cleaned.endsWith("}"))) {
+            try {
+              const parsed = JSON.parse(cleaned);
+              if (typeof parsed === "string") {
+                return normalizeText(parsed);
+              }
+            } catch (err) {
+              /* ignora parse inválido */
+            }
+          }
+          cleaned = cleaned.replace(/^[\s"'`]+/, "");
+          cleaned = cleaned.replace(/[\s"'`]+$/, "");
+          cleaned = cleaned.replace(/^\[+/, "");
+          cleaned = cleaned.replace(/\]+$/, "");
+          return cleaned.trim();
         };
         const formatarPrimeiroNome = (nome) => {
           const texto = resolveTemplateValue(nome);
@@ -1611,13 +1626,41 @@
           hierarquiaMapa.clear();
           hierarquiaCarregada = false;
 
+          const tentarParseEstrutura = (valor) => {
+            if (typeof valor !== "string") return null;
+            const texto = valor.trim();
+            if (!texto) return null;
+            if ((texto.startsWith("[") && texto.endsWith("]")) || (texto.startsWith("{") && texto.endsWith("}"))) {
+              try {
+                return JSON.parse(texto);
+              } catch (err) {
+                return null;
+              }
+            }
+            return null;
+          };
+
+          const limparStringCatalogo = (texto) => {
+            let resultado = normalizeText(texto);
+            if (!resultado) return "";
+            resultado = resultado.replace(/^["'`\s]+/, "");
+            resultado = resultado.replace(/["'`\s]+$/, "");
+            resultado = resultado.replace(/^\[+/, "");
+            resultado = resultado.replace(/\]+$/, "");
+            return resultado.trim();
+          };
+
           const extrairColecao = (fonte) => {
             if (!fonte) return [];
             if (Array.isArray(fonte)) return fonte;
             if (typeof fonte === "string") {
+              const parsed = tentarParseEstrutura(fonte);
+              if (Array.isArray(parsed)) return parsed;
+              if (parsed && typeof parsed === "object") return [parsed];
+              if (parsed != null) return [parsed];
               return fonte
                 .split(/[\n;,]+/)
-                .map(item => item.trim())
+                .map(limparStringCatalogo)
                 .filter(Boolean);
             }
             if (Array.isArray(fonte?.items)) return fonte.items;
