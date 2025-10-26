@@ -448,6 +448,7 @@
         const cpf = (document.getElementById("cpf")?.value || "").replace(/\\D/g, "");
         const solicitacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/cbda8a38-3a07-4b85-9d63-7ebda0294f6a";
         const publicacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/7b3f9046-f11b-4cc3-b570-c3e586748f6c";
+        const distritosEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/distritos";
 
         // Endpoints de dados iniciais (preencher selects). Ajuste conforme sua API.
         const initialDataEndpoint = ""; // ex.: "https://.../webhook/dados-iniciais"
@@ -665,6 +666,8 @@
           const selTurno = document.getElementById("sel-turno");
           const selRegime = document.getElementById("sel-regime");
 
+          const dsPlaceholder = "Selecione DS/Executiva";
+
           function setOptions(select, list, placeholder) {
             if (!select) return;
             select.innerHTML = "";
@@ -685,10 +688,74 @@
             });
           }
 
+          function carregarDistritos() {
+            if (!selDs) return;
+
+            const carregandoLabel = "Carregando DS/Executiva...";
+            setOptions(selDs, [], carregandoLabel);
+
+            fetch(distritosEndpoint, { headers: { "Accept": "application/json" } })
+              .then(r => {
+                if (!r.ok) throw new Error("Falha na consulta");
+                return r.json();
+              })
+              .then(data => {
+                const candidatos = [];
+                const possiveisListas = Array.isArray(data) ? [data] : [];
+                const obj = (data && typeof data === "object") ? data : {};
+                ["distritos", "items", "data", "records", "result", "values", "lista"].forEach(key => {
+                  if (Array.isArray(obj[key])) possiveisListas.push(obj[key]);
+                });
+                if (!possiveisListas.length && obj && typeof obj === "object") {
+                  const values = Object.values(obj);
+                  if (values.length && values.every(v => typeof v === "string" || typeof v === "number" || (v && typeof v === "object"))) {
+                    possiveisListas.push(values);
+                  }
+                }
+
+                possiveisListas.forEach(lista => {
+                  if (!Array.isArray(lista)) return;
+                  lista.forEach(item => candidatos.push(item));
+                });
+
+                const vistos = new Set();
+                const normalizados = candidatos.map(item => {
+                  let value = "";
+                  let label = "";
+
+                  if (typeof item === "string" || typeof item === "number") {
+                    value = String(item).trim();
+                    label = value;
+                  } else if (item && typeof item === "object") {
+                    value = item.value ?? item.id ?? item.codigo ?? item.sigla ?? item.nome ?? item.descricao ?? item.distrito ?? item.ds ?? item.nomeDistrito ?? item.nome_distrito ?? item.dsExecutiva ?? item.ds_executiva ?? "";
+                    if (value !== undefined && value !== null) value = String(value).trim();
+                    label = item.label ?? item.nome ?? item.descricao ?? item.distrito ?? item.ds ?? item.nomeDistrito ?? item.nome_distrito ?? item.dsExecutiva ?? item.ds_executiva ?? value;
+                    if (label !== undefined && label !== null) label = String(label).trim();
+                  }
+
+                  if (!value) return null;
+                  if (!label) label = value;
+                  if (vistos.has(value)) return null;
+                  vistos.add(value);
+                  return { value, label };
+                }).filter(Boolean);
+
+                if (!normalizados.length) throw new Error("Lista vazia");
+
+                setOptions(selDs, normalizados, dsPlaceholder);
+                validateUpdateForm();
+              })
+              .catch(() => {
+                setOptions(selDs, ["DS I", "DS II", "Executiva"], dsPlaceholder);
+                validateUpdateForm();
+              });
+          }
+
+          carregarDistritos();
+
           if (!initialDataEndpoint) {
             // Placeholders
             setOptions(selMat, [{id:"20201234",label:"20201234"},{id:"20194567",label:"20194567"}], "Selecione a matrícula");
-            setOptions(selDs, ["DS I", "DS II", "Executiva"], "Selecione DS/Executiva");
             setOptions(selUn, ["UPA Ibura", "PA Imaging", "Policlínica Centro"], "Selecione a unidade");
             setOptions(selTurno, ["Manhã", "Tarde", "Noite", "12x36"], "Selecione o turno");
             setOptions(selRegime, ["20h", "30h", "40h", "Plantão"], "Selecione o regime");
@@ -699,7 +766,6 @@
             .then(r => r.json())
             .then(data => {
               setOptions(selMat, data?.matriculas, "Selecione a matrícula");
-              setOptions(selDs, data?.dsExecutiva, "Selecione DS/Executiva");
               setOptions(selUn, data?.unidades, "Selecione a unidade");
               setOptions(selTurno, data?.turnos, "Selecione o turno");
               setOptions(selRegime, data?.regimes, "Selecione o regime");
@@ -707,7 +773,6 @@
             .catch(() => {
               // Fallback em caso de erro
               setOptions(selMat, [{id:"20201234",label:"20201234"}], "Selecione a matrícula");
-              setOptions(selDs, ["DS I", "DS II", "Executiva"], "Selecione DS/Executiva");
               setOptions(selUn, ["UPA Ibura"], "Selecione a unidade");
               setOptions(selTurno, ["Manhã","Tarde"], "Selecione o turno");
               setOptions(selRegime, ["30h","40h"], "Selecione o regime");
