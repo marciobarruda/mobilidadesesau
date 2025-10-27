@@ -570,7 +570,7 @@
     <main class="container py-4">
       <div class="user-greeting" id="saudacao">Olá, <strong>{{ $json.data.dadosComuns.nome }}!</strong> Este é o seu painel de mobilidade interna.</div>
 
-      <div class="row g-4">
+      <div class="row g-4" id="heroCardsRow">
         <!-- Card 1: Mobilidade Interna -->
         <section class="col-12 col-lg-5 col-xl-4">
           <div class="card card-programa card-hero h-100">
@@ -687,7 +687,7 @@
                     </div>
 
                     <!-- DS/Executiva -->
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-4 col-lg-3">
                       <label for="dsSelect" class="form-label">DS/Executiva atual</label>
                       <select id="dsSelect" class="form-select" required>
                         <option value="" selected disabled>Selecione...</option>
@@ -713,21 +713,21 @@
                     </div>
 
                     <!-- Unidade/Turno/Regime (dinâmicos) -->
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-8 col-lg-9">
                       <label for="unidadeSelect" class="form-label">Unidade atual</label>
                       <select id="unidadeSelect" class="form-select" disabled>
                         <option>Selecione a DS/Executiva...</option>
                       </select>
                       <div class="invalid-feedback">Selecione a Unidade.</div>
                     </div>
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-8 col-lg-9">
                       <label for="turnoSelect" class="form-label">Turno atual</label>
                       <select id="turnoSelect" class="form-select" disabled>
                         <option>Selecione a Unidade...</option>
                       </select>
                       <div class="invalid-feedback">Selecione o Turno.</div>
                     </div>
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-4 col-lg-3">
                       <label for="regimeSelect" class="form-label">Regime atual</label>
                       <select id="regimeSelect" class="form-select" disabled>
                         <option>Selecione a Unidade...</option>
@@ -1714,6 +1714,23 @@
       });
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') closeFormFeedback();
+      });
+
+      const scrollHeroIntoView = () => {
+        if (window.location.hash) return;
+        if (window.scrollY > 16) return;
+        if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const heroRow = document.getElementById('heroCardsRow');
+        if (!heroRow) return;
+        const rect = heroRow.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+        const midpoint = window.scrollY + rect.top + rect.height / 2;
+        const target = Math.max(midpoint - viewportHeight / 2, 0);
+        window.scrollTo({ top: target, behavior: 'smooth' });
+      };
+
+      window.addEventListener('load', () => {
+        setTimeout(scrollHeroIntoView, 350);
       });
 
       // ===== Bootstrap inicial =====
