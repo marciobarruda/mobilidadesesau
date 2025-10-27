@@ -118,35 +118,156 @@
       .alert-list {
         padding-left: 1.1rem;
       }
+      .modal-branding {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .modal-branding img {
+        height: 48px;
+        width: auto;
+      }
+      .resumo-card {
+        border: 1px solid rgba(0, 83, 164, 0.12);
+        border-radius: 12px;
+        background: linear-gradient(180deg, #ffffff 0%, rgba(244, 247, 251, 0.8) 100%);
+        box-shadow: 0 18px 46px rgba(0, 35, 79, 0.15);
+      }
+      .resumo-card .meta-label {
+        display: block;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+      .resumo-card .meta-value {
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: var(--text-strong);
+      }
+      .resumo-table thead {
+        background: #0053a4;
+        color: #fff;
+      }
+      .resumo-table th {
+        font-weight: 600;
+      }
       #printComprovante {
         background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 20px 60px rgba(0, 37, 84, 0.15);
-        padding: 2rem;
-        max-width: 940px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 83, 164, 0.12);
+        box-shadow: 0 24px 80px rgba(0, 37, 84, 0.18);
+        overflow: hidden;
+        max-width: 960px;
         margin: 0 auto;
+        color: var(--text-strong);
       }
-      #printComprovante .header {
+      #printComprovante .receipt-header {
+        background: linear-gradient(135deg, #0053a4, #003a73);
+        color: #fff;
         display: flex;
         justify-content: space-between;
+        gap: 2rem;
+        padding: 1.75rem 2rem;
         align-items: flex-start;
-        gap: 1.5rem;
-        margin-bottom: 1.75rem;
       }
-      #printComprovante .header .left strong {
+      #printComprovante .receipt-header .brand {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      #printComprovante .receipt-header .brand img {
+        height: 60px;
+        width: auto;
+      }
+      #printComprovante .receipt-header .brand strong {
         display: block;
-        font-size: 1.05rem;
+        font-size: 1.1rem;
+        letter-spacing: 0.02em;
       }
-      #printComprovante table {
-        width: 100%;
-      }
-      #printComprovante th,
-      #printComprovante td {
+      #printComprovante .receipt-header .brand span {
+        display: block;
         font-size: 0.9rem;
-        padding: 0.5rem 0.75rem;
+        opacity: 0.85;
       }
-      #printComprovante thead {
-        background: rgba(0, 83, 164, 0.08);
+      #printComprovante .receipt-header .protocol {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        text-align: right;
+        min-width: 180px;
+      }
+      #printComprovante .receipt-header .protocol .label {
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.85;
+      }
+      #printComprovante .receipt-header .protocol .value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+      #printComprovante .receipt-body {
+        padding: 2rem;
+      }
+      #printComprovante .receipt-body h5,
+      #printComprovante .receipt-body h4 {
+        font-weight: 700;
+        color: #003a73;
+      }
+      #printComprovante .receipt-intro p {
+        margin-bottom: 0;
+        color: var(--text-muted);
+      }
+      #printComprovante .receipt-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+      }
+      #printComprovante .receipt-info-item {
+        background: rgba(0, 83, 164, 0.06);
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+      }
+      #printComprovante .receipt-info-item .info-label {
+        font-size: 0.8rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #003a73;
+        font-weight: 600;
+      }
+      #printComprovante .receipt-info-item .info-value {
+        display: block;
+        margin-top: 0.35rem;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      #printComprovante .receipt-table {
+        width: 100%;
+        border-collapse: collapse;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+      }
+      #printComprovante .receipt-table thead {
+        background: #0053a4;
+        color: #fff;
+      }
+      #printComprovante .receipt-table th,
+      #printComprovante .receipt-table td {
+        font-size: 0.9rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid rgba(0, 83, 164, 0.12);
+      }
+      #printComprovante .receipt-table tbody tr:nth-child(even) {
+        background: rgba(0, 83, 164, 0.03);
+      }
+      #printComprovante .receipt-footer {
+        margin-top: 2rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-align: right;
       }
       @media print {
         body * {
@@ -196,7 +317,6 @@
             <div class="col-12 col-lg-3">
               <label class="form-label" for="matricula">Matrícula</label>
               <select id="matricula" class="form-select" required data-required="true" aria-required="true"></select>
-              <div class="text-muted small">Opções carregadas via CPF.</div>
             </div>
             <div class="col-12 col-lg-6">
               <label class="form-label" for="nome">Nome</label>
@@ -521,8 +641,17 @@
     <div class="modal fade" id="modalSucesso" tabindex="-1" aria-labelledby="modalSucessoTitulo" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalSucessoTitulo">Comprovante de solicitação</h5>
+          <div class="modal-header bg-light-subtle border-0 border-bottom">
+            <div class="modal-branding">
+              <img
+                src="https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200"
+                alt="Prefeitura do Recife"
+              />
+              <div>
+                <h5 class="modal-title mb-0" id="modalSucessoTitulo">Comprovante de solicitação</h5>
+                <small class="text-muted">Resumo da solicitação enviada</small>
+              </div>
+            </div>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
           </div>
           <div class="modal-body">
@@ -532,9 +661,9 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-primary" id="btnSalvarPdf">Salvar em PDF</button>
+            <button type="button" class="btn btn-success" id="btnSalvarPdf">Salvar em PDF</button>
             <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
           </div>
         </div>
       </div>
@@ -569,6 +698,7 @@
         dadosComuns: {
           nome: `{{ $json.data.dadosComuns.nome_servidor }}`,
           nascimento: `{{ $json.data.dadosComuns.nascimento }}`,
+          cpf: `{{ $json.data.dadosComuns.cpf }}`,
           whatsapp: `{{ $json.data.dadosComuns.whatsapp }}`,
           telalternativo: `{{ $json.data.dadosComuns.telalternativo }}`,
           endereco: {
@@ -611,7 +741,8 @@
         max: 10,
         modalMode: 'create',
         editingIndex: null,
-        protocolo: null
+        protocolo: null,
+        printMode: 'print'
       };
 
       const modalUnidade = new bootstrap.Modal(document.getElementById('modalUnidade'));
@@ -859,7 +990,8 @@
         set('whatsapp', dc.whatsapp);
         set('telalt', dc.telalternativo);
         set('email', dc.email);
-        set('email2', dc.email);
+        const email2 = document.getElementById('email2');
+        if (email2) email2.value = '';
       }
 
       function applyUppercaseBehaviour() {
@@ -965,11 +1097,11 @@
           .map(
             (p, index) => `
               <tr>
-                <td>${index + 1}</td>
-                <td>${payload.matricula || '-'}</td>
-                <td>${payload.dadosPessoais.cargo || '-'}</td>
+                <td>${p.prioridade || index + 1}</td>
                 <td>${p.distrito || '-'}</td>
                 <td>${p.unidade || '-'}</td>
+                <td>${p.turno || '-'}</td>
+                <td>${p.regime || '-'}</td>
                 <td>${toBRDate(p.data_credenciamento) || '-'}</td>
               </tr>
             `
@@ -977,38 +1109,62 @@
           .join('');
 
         resumoEl.innerHTML = `
-          <div class="bg-light border rounded p-3">
-            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
-              <div>
-                <h6 class="text-muted mb-1">Solicitação registrada</h6>
-                <h4 class="mb-0">${payload.dadosPessoais.nome || 'Servidor(a)'}</h4>
-                <div class="text-muted small mt-1">Matrícula ${payload.matricula || '-'}</div>
+          <div class="resumo-card p-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-4">
+              <div class="d-flex align-items-center gap-3">
+                <img
+                  src="https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200"
+                  alt="Prefeitura do Recife"
+                  class="d-none d-md-block"
+                  height="48"
+                />
+                <div>
+                  <span class="text-muted d-block mb-1">Solicitação registrada</span>
+                  <h4 class="mb-0">${payload.dadosPessoais.nome || 'Servidor(a)'}</h4>
+                  <span class="text-muted small">Matrícula ${payload.matricula || '-'}</span>
+                </div>
               </div>
               <div class="text-lg-end">
-                <span class="text-muted d-block">Número da solicitação</span>
-                <span class="fs-4 fw-semibold">${protocolo}</span>
+                <span class="meta-label">Número da solicitação</span>
+                <span class="meta-value">${protocolo}</span>
               </div>
             </div>
-            <hr />
-            <dl class="row mb-0">
-              <dt class="col-sm-3">Cargo</dt>
-              <dd class="col-sm-9">${payload.dadosPessoais.cargo || '-'}</dd>
-              <dt class="col-sm-3">Distrito atual</dt>
-              <dd class="col-sm-9">${payload.lotacaoAtual.ds || '-'}</dd>
-              <dt class="col-sm-3">Lotação atual</dt>
-              <dd class="col-sm-9">${payload.lotacaoAtual.unidade || '-'}</dd>
-              <dt class="col-sm-3">Última atualização</dt>
-              <dd class="col-sm-9">${todayBR()}</dd>
-            </dl>
-            <div class="table-responsive mt-3">
-              <table class="table table-sm">
+            <hr class="my-4" />
+            <div class="row g-4">
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Cargo</span>
+                <span class="meta-value">${payload.dadosPessoais.cargo || '-'}</span>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Grupo</span>
+                <span class="meta-value">${payload.dadosPessoais.grupo || '-'}</span>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Distrito atual</span>
+                <span class="meta-value">${payload.lotacaoAtual.ds || '-'}</span>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Lotação atual</span>
+                <span class="meta-value">${payload.lotacaoAtual.unidade || '-'}</span>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Data de admissão</span>
+                <span class="meta-value">${payload.dadosPessoais.admissao || '-'}</span>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Última atualização</span>
+                <span class="meta-value">${todayBR()}</span>
+              </div>
+            </div>
+            <div class="table-responsive mt-4">
+              <table class="table table-sm align-middle resumo-table">
                 <thead>
                   <tr>
                     <th>Prioridade</th>
-                    <th>Matrícula</th>
-                    <th>Cargo</th>
                     <th>Distrito</th>
                     <th>Lotação</th>
+                    <th>Horário</th>
+                    <th>Regime</th>
                     <th>Credenciamento</th>
                   </tr>
                 </thead>
@@ -1019,73 +1175,77 @@
         `;
 
         printEl.innerHTML = `
-          <div class="header">
-            <div class="left">
-              <img src="https://statics.recife.pe.gov.br/images/dynamics/conecta/logo_prefeitura_recife.svg" alt="Prefeitura do Recife" height="56" />
-              <strong>PREFEITURA DO RECIFE</strong>
-              <span>Secretaria de Saúde (SESAU)</span>
-              <span>Portal do Servidor · Mobilidade Interna</span>
+          <div class="receipt-header">
+            <div class="brand">
+              <img
+                src="https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200"
+                alt="Prefeitura do Recife"
+              />
+              <div>
+                <strong>PREFEITURA DO RECIFE</strong>
+                <span>Secretaria de Saúde (SESAU)</span>
+                <span>Portal do Servidor · Mobilidade Interna</span>
+              </div>
             </div>
-            <div class="text-end">
-              <div class="text-muted">Número da solicitação</div>
-              <div class="fs-3 fw-bold">${protocolo}</div>
-            </div>
-          </div>
-          <div class="mb-4">
-            <h5>Comprovante de solicitação</h5>
-            <p class="mb-0">Solicitação registrada em banco de dados para a matrícula <strong>${payload.matricula || '-'}</strong>.</p>
-          </div>
-          <div class="row mb-4">
-            <div class="col-sm-6">
-              <div><strong>Nome do servidor</strong></div>
-              <div>${payload.dadosPessoais.nome || '-'}</div>
-            </div>
-            <div class="col-sm-6">
-              <div><strong>CPF</strong></div>
-              <div>---</div>
-            </div>
-            <div class="col-sm-6 mt-3">
-              <div><strong>Cargo</strong></div>
-              <div>${payload.dadosPessoais.cargo || '-'}</div>
-            </div>
-            <div class="col-sm-6 mt-3">
-              <div><strong>Grupo</strong></div>
-              <div>${payload.dadosPessoais.grupo || '-'}</div>
-            </div>
-            <div class="col-sm-6 mt-3">
-              <div><strong>Data de emissão</strong></div>
-              <div>${todayBR()}</div>
+            <div class="protocol">
+              <div class="label">Número da solicitação</div>
+              <div class="value">${protocolo}</div>
             </div>
           </div>
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th>Prioridade</th>
-                <th>Distrito</th>
-                <th>Lotação</th>
-                <th>Horário</th>
-                <th>Regime</th>
-                <th>Credenciamento</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${payload.preferencias
-                .map(
-                  (p, index) => `
-                    <tr>
-                      <td>${p.prioridade || index + 1}</td>
-                      <td>${p.distrito || '-'}</td>
-                      <td>${p.unidade || '-'}</td>
-                      <td>${p.turno || '-'}</td>
-                      <td>${p.regime || '-'}</td>
-                      <td>${toBRDate(p.data_credenciamento) || '-'}</td>
-                    </tr>
-                  `
-                )
-                .join('')}
-            </tbody>
-          </table>
-          <div class="mt-3 text-muted small">Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.</div>
+          <div class="receipt-body">
+            <div class="receipt-intro mb-4">
+              <h4 class="mb-1">Comprovante de solicitação</h4>
+              <p>Solicitação registrada em banco de dados para a matrícula <strong>${payload.matricula || '-'}</strong>.</p>
+            </div>
+            <div class="receipt-info-grid">
+              <div class="receipt-info-item">
+                <span class="info-label">Nome do servidor</span>
+                <span class="info-value">${payload.dadosPessoais.nome || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">CPF</span>
+                <span class="info-value">${payload.dadosPessoais.cpf || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Matrícula</span>
+                <span class="info-value">${payload.matricula || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Cargo</span>
+                <span class="info-value">${payload.dadosPessoais.cargo || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Grupo</span>
+                <span class="info-value">${payload.dadosPessoais.grupo || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Distrito atual</span>
+                <span class="info-value">${payload.lotacaoAtual.ds || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Lotação atual</span>
+                <span class="info-value">${payload.lotacaoAtual.unidade || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Data de emissão</span>
+                <span class="info-value">${todayBR()}</span>
+              </div>
+            </div>
+            <table class="receipt-table">
+              <thead>
+                <tr>
+                  <th>Prioridade</th>
+                  <th>Distrito</th>
+                  <th>Lotação</th>
+                  <th>Horário</th>
+                  <th>Regime</th>
+                  <th>Credenciamento</th>
+                </tr>
+              </thead>
+              <tbody>${prefsRows}</tbody>
+            </table>
+            <div class="receipt-footer">Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.</div>
+          </div>
         `;
       }
 
@@ -1106,6 +1266,7 @@
       }
 
       function collectPayload() {
+        const cpf = safeValue(BIND?.dadosComuns?.cpf);
         return {
           matricula: document.getElementById('matricula').value || null,
           dadosPessoais: {
@@ -1115,7 +1276,8 @@
             cargo: document.getElementById('cargo').value || null,
             grupo: document.getElementById('grupo').value || null,
             vinculo: document.getElementById('vinculo').value || null,
-            carga: document.getElementById('carga').value || null
+            carga: document.getElementById('carga').value || null,
+            cpf: cpf || null
           },
           endereco: {
             cep: document.getElementById('cep').value || null,
@@ -1245,16 +1407,20 @@
         return true;
       }
 
-      function preparePrintArea() {
+      function preparePrintArea(mode = 'print') {
+        state.printMode = mode;
+        document.body.dataset.printMode = mode;
         const wrapper = document.getElementById('printWrapper');
         wrapper.classList.remove('d-none');
         setTimeout(() => {
           window.print();
-        }, 50);
+        }, mode === 'pdf' ? 200 : 100);
       }
 
       function afterPrintCleanup() {
         document.getElementById('printWrapper').classList.add('d-none');
+        delete document.body.dataset.printMode;
+        state.printMode = 'print';
       }
 
       function initEvents() {
@@ -1367,10 +1533,10 @@
         });
 
         document.getElementById('btnSalvarPdf').addEventListener('click', () => {
-          preparePrintArea();
+          preparePrintArea('pdf');
         });
         document.getElementById('btnImprimir').addEventListener('click', () => {
-          preparePrintArea();
+          preparePrintArea('print');
         });
 
         window.addEventListener('afterprint', afterPrintCleanup);
