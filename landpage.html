@@ -971,30 +971,14 @@
       // Dados vindos do template (quando presentes)
       const nomeServidorTemplate = sanitizeValue(`{{ $json.data.dadosComuns.servidor }}`);
       const nomeExibicaoTemplate = sanitizeValue(`{{ $json.data.dadosComuns.nome }}`);
-      const DATA = {
-        nome: nomeServidorTemplate || nomeExibicaoTemplate,
-        servidor: nomeServidorTemplate,
-        nomeExibicao: nomeExibicaoTemplate,
+      const dadosComunsTemplate = {
         cpf: sanitizeValue(`{{ $json.data.dadosComuns.cpf }}`),
-        vinculos: [
-          {
-            matricula: sanitizeValue(`{{ $json.data.vinculos[0].matricula }}`),
-            cargo: sanitizeValue(`{{ $json.data.vinculos[0].cargo }}`),
-            grupo: sanitizeValue(`{{ $json.data.vinculos[0].grupo }}`),
-            ds: sanitizeValue(`{{ $json.data.vinculos[0].ds }}`)
-          },
-          {
-            matricula: sanitizeValue(`{{ $json.data.vinculos[1].matricula }}`),
-            cargo: sanitizeValue(`{{ $json.data.vinculos[1].cargo }}`),
-            grupo: sanitizeValue(`{{ $json.data.vinculos[1].grupo }}`),
-            ds: sanitizeValue(`{{ $json.data.vinculos[1].ds }}`)
-          }
-        ],
-        contatos: {
-          email: sanitizeValue(`{{ $json.data.dadosComuns.email }}`).toLowerCase(),
-          whatsapp: sanitizeValue(`{{ $json.data.dadosComuns.whatsapp }}`),
-          telalternativo: sanitizeValue(`{{ $json.data.dadosComuns.telalternativo }}`)
-        },
+        nome: nomeExibicaoTemplate,
+        servidor: nomeServidorTemplate,
+        nascimento: sanitizeValue(`{{ $json.data.dadosComuns.nascimento }}`),
+        email: sanitizeValue(`{{ $json.data.dadosComuns.email }}`).toLowerCase(),
+        whatsapp: sanitizeValue(`{{ $json.data.dadosComuns.whatsapp }}`),
+        telalternativo: sanitizeValue(`{{ $json.data.dadosComuns.telalternativo }}`),
         endereco: {
           cep: sanitizeValue(`{{ $json.data.dadosComuns.endereco.cep }}`),
           logradouro: sanitizeValue(`{{ $json.data.dadosComuns.endereco.logradouro }}`),
@@ -1006,55 +990,94 @@
         }
       };
 
-      const NOVA_SOLICITACAO_PAYLOAD = Object.freeze([
-        {
+      const buildVinculoTemplate = (index) => ({
+        matricula: sanitizeValue(`{{ $json.data.vinculos[${index}].matricula }}`),
+        cargo: sanitizeValue(`{{ $json.data.vinculos[${index}].cargo }}`),
+        distrito: sanitizeValue(`{{ $json.data.vinculos[${index}].distrito }}`),
+        lotacao: sanitizeValue(`{{ $json.data.vinculos[${index}].lotacao }}`),
+        turno: sanitizeValue(`{{ $json.data.vinculos[${index}].turno }}`),
+        regime: sanitizeValue(`{{ $json.data.vinculos[${index}].regime }}`),
+        admissao: sanitizeValue(`{{ $json.data.vinculos[${index}].admissao }}`),
+        carga_horaria: sanitizeValue(`{{ $json.data.vinculos[${index}].carga_horaria }}`),
+        grupo: sanitizeValue(`{{ $json.data.vinculos[${index}].grupo }}`),
+        vinculo: sanitizeValue(`{{ $json.data.vinculos[${index}].vinculo }}`),
+        ds: sanitizeValue(`{{ $json.data.vinculos[${index}].ds }}`)
+      });
+
+      const rawVinculosTemplate = [buildVinculoTemplate(0), buildVinculoTemplate(1)];
+      const vinculosTemplate = rawVinculosTemplate.filter((vinculo) => {
+        const relevante = {
+          matricula: vinculo.matricula,
+          cargo: vinculo.cargo,
+          distrito: vinculo.distrito,
+          lotacao: vinculo.lotacao,
+          turno: vinculo.turno,
+          regime: vinculo.regime,
+          admissao: vinculo.admissao,
+          carga_horaria: vinculo.carga_horaria,
+          grupo: vinculo.grupo,
+          vinculo: vinculo.vinculo,
+          ds: vinculo.ds
+        };
+        return Object.values(relevante).some((value) => Boolean(value));
+      });
+
+      const DATA = {
+        nome: nomeServidorTemplate || nomeExibicaoTemplate,
+        servidor: nomeServidorTemplate,
+        nomeExibicao: nomeExibicaoTemplate,
+        cpf: dadosComunsTemplate.cpf,
+        nascimento: dadosComunsTemplate.nascimento,
+        dadosComuns: dadosComunsTemplate,
+        vinculos: vinculosTemplate,
+        contatos: {
+          email: dadosComunsTemplate.email,
+          whatsapp: dadosComunsTemplate.whatsapp,
+          telalternativo: dadosComunsTemplate.telalternativo
+        },
+        endereco: dadosComunsTemplate.endereco
+      };
+
+      const buildNovaSolicitacaoPayload = () => {
+        const endereco = dadosComunsTemplate.endereco || {};
+        const vinculos = (vinculosTemplate || [])
+          .map((v) => ({
+            matricula: v.matricula,
+            cargo: v.cargo,
+            distrito: v.distrito,
+            lotacao: v.lotacao,
+            turno: v.turno,
+            regime: v.regime,
+            admissao: v.admissao,
+            carga_horaria: v.carga_horaria,
+            grupo: v.grupo,
+            vinculo: v.vinculo
+          }))
+          .filter((vinculo) => Object.values(vinculo).some((value) => Boolean(value)));
+
+        return {
           data: {
             dadosComuns: {
-              cpf: '04022291427',
-              nome: 'Luiz Fernando',
-              servidor: 'LUIZ FERNANDO A SOARES FILHO',
-              nascimento: '1981-08-20',
-              email: 'luizodontoufpe@hotmail.com',
-              whatsapp: '81988133713',
+              cpf: dadosComunsTemplate.cpf || '',
+              nome: dadosComunsTemplate.nome || dadosComunsTemplate.servidor || '',
+              servidor: dadosComunsTemplate.servidor || dadosComunsTemplate.nome || '',
+              nascimento: dadosComunsTemplate.nascimento || '',
+              email: dadosComunsTemplate.email || '',
+              whatsapp: dadosComunsTemplate.whatsapp || '',
               endereco: {
-                cep: '52070230',
-                logradouro: 'DO ARRAIAL',
-                numero: '3491',
-                complemento: 'APT 1101',
-                bairro: 'CASA AMARELA',
-                cidade: 'RECIFE',
-                uf: 'PE'
+                cep: endereco.cep || '',
+                logradouro: endereco.logradouro || '',
+                numero: endereco.numero || '',
+                complemento: endereco.complemento || '',
+                bairro: endereco.bairro || '',
+                cidade: endereco.cidade || '',
+                uf: endereco.uf || ''
               }
             },
-            vinculos: [
-              {
-                matricula: '786870',
-                cargo: 'CIRURGIAO DENTISTA 40H',
-                distrito: 'DS III',
-                lotacao: 'USF - US 103 CS PROF MARIO RAMOS',
-                turno: 'DIURNO',
-                regime: 'DIARISTA',
-                admissao: '2008-04-04',
-                carga_horaria: '40',
-                grupo: '10',
-                vinculo: 'EST'
-              },
-              {
-                matricula: '886853',
-                cargo: 'CIRURGIAO DENTISTA 40H',
-                distrito: 'DS III',
-                lotacao: 'USF - US 133 CS OLINTO DE OLIVEIRA',
-                turno: 'DIURNO',
-                regime: 'DIARISTA',
-                admissao: '20;18-04-04',
-                carga_horaria: '40',
-                grupo: '10',
-                vinculo: 'EST'
-              }
-            ]
+            vinculos
           }
-        }
-      ]);
+        };
+      };
 
       // ===== Inicialização dos campos =====
       function populateMatriculas() {
@@ -1738,10 +1761,12 @@
         button.setAttribute('aria-busy', 'true');
         setStatus('Enviando nova solicitação...', true);
         try {
+          const payload = buildNovaSolicitacaoPayload();
+          console.log('Payload nova solicitação:', payload);
           const response = await fetch(form.action, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(NOVA_SOLICITACAO_PAYLOAD)
+            body: JSON.stringify(payload)
           });
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
