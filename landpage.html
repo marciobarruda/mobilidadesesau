@@ -1006,6 +1006,56 @@
         }
       };
 
+      const NOVA_SOLICITACAO_PAYLOAD = Object.freeze([
+        {
+          data: {
+            dadosComuns: {
+              cpf: '04022291427',
+              nome: 'Luiz Fernando',
+              servidor: 'LUIZ FERNANDO A SOARES FILHO',
+              nascimento: '1981-08-20',
+              email: 'luizodontoufpe@hotmail.com',
+              whatsapp: '81988133713',
+              endereco: {
+                cep: '52070230',
+                logradouro: 'DO ARRAIAL',
+                numero: '3491',
+                complemento: 'APT 1101',
+                bairro: 'CASA AMARELA',
+                cidade: 'RECIFE',
+                uf: 'PE'
+              }
+            },
+            vinculos: [
+              {
+                matricula: '786870',
+                cargo: 'CIRURGIAO DENTISTA 40H',
+                distrito: 'DS III',
+                lotacao: 'USF - US 103 CS PROF MARIO RAMOS',
+                turno: 'DIURNO',
+                regime: 'DIARISTA',
+                admissao: '2008-04-04',
+                carga_horaria: '40',
+                grupo: '10',
+                vinculo: 'EST'
+              },
+              {
+                matricula: '886853',
+                cargo: 'CIRURGIAO DENTISTA 40H',
+                distrito: 'DS III',
+                lotacao: 'USF - US 133 CS OLINTO DE OLIVEIRA',
+                turno: 'DIURNO',
+                regime: 'DIARISTA',
+                admissao: '20;18-04-04',
+                carga_horaria: '40',
+                grupo: '10',
+                vinculo: 'EST'
+              }
+            ]
+          }
+        }
+      ]);
+
       // ===== Inicialização dos campos =====
       function populateMatriculas() {
         const sel = document.getElementById('matriculaSelect');
@@ -1680,29 +1730,35 @@
         showFormFeedbackPopup('success');
       });
 
-      document.getElementById('btnNovaSolicitacao').addEventListener('click', () => {
-        const matriculaSelect = document.getElementById('matriculaSelect');
-        const selected = matriculaSelect?.selectedOptions?.[0];
-        const fallbackMatricula = sanitizeValue(document.getElementById('novaSolicitacaoMatricula')?.value || '');
-        const matriculaValue = sanitizeValue(selected?.value || fallbackMatricula);
-        const grupoValue = sanitizeValue(selected?.dataset?.grupo || document.getElementById('grupoHidden')?.value || '');
-        const dsSelectValue = sanitizeValue(document.getElementById('dsSelect')?.value || '');
-        const hiddenDsValue = sanitizeValue(document.getElementById('dsHidden')?.value || '');
-        const cpfValue = sanitizeValue(document.getElementById('cpfHidden')?.value || '');
-        const dsValue = dsSelectValue || hiddenDsValue;
+      async function enviarNovaSolicitacao() {
         const form = document.getElementById('novaSolicitacaoForm');
-        if (!form) return;
-        const dsField = document.getElementById('novaSolicitacaoDs');
-        const grupoField = document.getElementById('novaSolicitacaoGrupo');
-        const cpfField = document.getElementById('novaSolicitacaoCpf');
-        const matriculaField = document.getElementById('novaSolicitacaoMatricula');
-        if (dsField) dsField.value = dsValue;
-        if (grupoField) grupoField.value = grupoValue;
-        if (cpfField) cpfField.value = cpfValue;
-        if (matriculaField) matriculaField.value = matriculaValue;
-        if (document.getElementById('grupoHidden')) document.getElementById('grupoHidden').value = grupoValue;
-        form.submit();
-      });
+        const button = document.getElementById('btnNovaSolicitacao');
+        if (!form || !button) return;
+        button.setAttribute('disabled', 'disabled');
+        button.setAttribute('aria-busy', 'true');
+        setStatus('Enviando nova solicitação...', true);
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(NOVA_SOLICITACAO_PAYLOAD)
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          setStatus('Nova solicitação enviada com sucesso.', true);
+          const responseText = await response.text();
+          if (responseText) console.log('Resposta nova solicitação:', responseText);
+        } catch (error) {
+          console.error('Erro ao enviar nova solicitação:', error);
+          setStatus('Não foi possível enviar a nova solicitação.', false);
+        } finally {
+          button.removeAttribute('disabled');
+          button.removeAttribute('aria-busy');
+        }
+      }
+
+      document.getElementById('btnNovaSolicitacao').addEventListener('click', enviarNovaSolicitacao);
 
       document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
       document.getElementById('btnImprimir').addEventListener('click', () => window.print());
