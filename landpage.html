@@ -1038,46 +1038,11 @@
         endereco: dadosComunsTemplate.endereco
       };
 
-      const buildNovaSolicitacaoPayload = () => {
-        const endereco = dadosComunsTemplate.endereco || {};
-        const vinculos = (vinculosTemplate || [])
-          .map((v) => ({
-            matricula: v.matricula,
-            cargo: v.cargo,
-            distrito: v.distrito,
-            lotacao: v.lotacao,
-            turno: v.turno,
-            regime: v.regime,
-            admissao: v.admissao,
-            carga_horaria: v.carga_horaria,
-            grupo: v.grupo,
-            vinculo: v.vinculo
-          }))
-          .filter((vinculo) => Object.values(vinculo).some((value) => Boolean(value)));
-
-        return {
-          data: {
-            dadosComuns: {
-              cpf: dadosComunsTemplate.cpf || '',
-              nome: dadosComunsTemplate.nome || dadosComunsTemplate.servidor || '',
-              servidor: dadosComunsTemplate.servidor || dadosComunsTemplate.nome || '',
-              nascimento: dadosComunsTemplate.nascimento || '',
-              email: dadosComunsTemplate.email || '',
-              whatsapp: dadosComunsTemplate.whatsapp || '',
-              endereco: {
-                cep: endereco.cep || '',
-                logradouro: endereco.logradouro || '',
-                numero: endereco.numero || '',
-                complemento: endereco.complemento || '',
-                bairro: endereco.bairro || '',
-                cidade: endereco.cidade || '',
-                uf: endereco.uf || ''
-              }
-            },
-            vinculos
-          }
-        };
-      };
+      const buildNovaSolicitacaoPayload = () => ({
+        cpf: sanitizeValue(
+          dadosComunsTemplate.cpf || document.getElementById('cpfHidden')?.value || ''
+        )
+      });
 
       // ===== Inicialização dos campos =====
       function populateMatriculas() {
