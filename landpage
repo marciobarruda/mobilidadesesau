@@ -401,6 +401,79 @@
         gap: 0.75rem;
       }
 
+      .form-feedback {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.45);
+        padding: 1.5rem;
+        z-index: 1200;
+      }
+
+      .form-feedback.active {
+        display: flex;
+      }
+
+      .form-feedback-dialog {
+        position: relative;
+        max-width: 420px;
+        width: 100%;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 1.75rem;
+        box-shadow: 0 22px 50px rgba(15, 37, 78, 0.2);
+        border: 1px solid rgba(0, 74, 173, 0.08);
+      }
+
+      .form-feedback-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+      }
+
+      .form-feedback-title.alert {
+        color: #d92d20;
+      }
+
+      .form-feedback-title.success {
+        color: #047857;
+      }
+
+      .form-feedback-body {
+        color: var(--text-strong);
+        font-size: 0.98rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .form-feedback-body ul {
+        padding-left: 1.2rem;
+        margin: 0;
+      }
+
+      .form-feedback-body li {
+        margin-bottom: 0.35rem;
+      }
+
+      .form-feedback-close {
+        position: absolute;
+        top: 0.6rem;
+        right: 0.6rem;
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+
+      .form-feedback-close:focus {
+        outline: 2px solid var(--brand-primary);
+        outline-offset: 2px;
+      }
+
       footer {
         color: var(--text-muted);
         padding: 2.5rem 0 2rem;
@@ -731,6 +804,14 @@
       </div>
     </div>
 
+    <div id="formFeedback" class="form-feedback" aria-hidden="true">
+      <div class="form-feedback-dialog" role="alertdialog" aria-modal="true" aria-labelledby="formFeedbackTitle" aria-describedby="formFeedbackBody">
+        <button type="button" class="form-feedback-close" id="formFeedbackClose" aria-label="Fechar aviso">×</button>
+        <div id="formFeedbackTitle" class="form-feedback-title"></div>
+        <div id="formFeedbackBody" class="form-feedback-body"></div>
+      </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"
@@ -772,6 +853,77 @@
       const isUF = (val) => /^[A-Za-z]{2}$/.test(val || '');
       const isCEP = (val) => /^(\d{5}-?\d{3})$/.test(val || '');
       const isWhats = (val) => /^(\(\d{2}\)\s?)?(9)?\d{4}-?\d{4}$/.test((val || '').replace(/\s/g, ''));
+
+      const formatCPF = (value) => {
+        const digits = (value || '').replace(/\D+/g, '');
+        if (digits.length !== 11) return sanitizeValue(value);
+        return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      };
+
+      const markInvalid = (el) => {
+        if (!el) return;
+        el.classList.add('is-invalid');
+        el.classList.remove('is-valid');
+      };
+
+      const markValid = (el) => {
+        if (!el) return;
+        el.classList.remove('is-invalid');
+        el.classList.add('is-valid');
+      };
+
+      const closeFormFeedback = () => {
+        const overlay = document.getElementById('formFeedback');
+        if (!overlay) return;
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+      };
+
+      const showFormFeedbackPopup = (type, details = {}) => {
+        const overlay = document.getElementById('formFeedback');
+        const titleEl = document.getElementById('formFeedbackTitle');
+        const bodyEl = document.getElementById('formFeedbackBody');
+        const missing = Array.isArray(details.missing) ? details.missing : [];
+        const invalid = Array.isArray(details.invalid) ? details.invalid : [];
+        if (!overlay || !titleEl || !bodyEl) return;
+        overlay.classList.add('active');
+        overlay.setAttribute('aria-hidden', 'false');
+
+        titleEl.classList.remove('alert', 'success');
+        if (type === 'error') {
+          titleEl.classList.add('alert');
+          titleEl.textContent = '❗ Alerta';
+          let html = '';
+          if (missing.length) {
+            html += '<div>Preencha os campos a seguir:</div><ul>';
+            missing.forEach((field) => {
+              html += `<li>${field}</li>`;
+            });
+            html += '</ul>';
+          }
+          if (invalid.length) {
+            html += '<div>Corrija os campos com formato inválido:</div><ul>';
+            invalid.forEach((field) => {
+              html += `<li>${field}</li>`;
+            });
+            html += '</ul>';
+          }
+          if (!html) {
+            html = '<div>Revise os dados informados antes de enviar novamente.</div>';
+          }
+          bodyEl.innerHTML = html;
+        } else {
+          titleEl.classList.add('success');
+          titleEl.textContent = '✅ Sucesso';
+          bodyEl.innerHTML = `
+            <div>Os dados de atualização foram enviados com sucesso.</div>
+            <div>Este registro não configura um pedido de mobilidade: trata-se exclusivamente de uma atualização cadastral.</div>
+          `;
+        }
+
+        const closeBtn = document.getElementById('formFeedbackClose');
+        if (closeBtn) closeBtn.focus();
+      };
 
       const COMPROVANTE_LOGO_URL = 'https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200';
       let comprovanteLogoDataUrlPromise = null;
@@ -1055,7 +1207,7 @@
         try {
           if (triggerButton) triggerButton.setAttribute('aria-busy', 'true');
 
-          const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+          const doc = new jsPDF({ unit: 'pt', format: 'a4' });
           if (typeof doc.autoTable !== 'function') {
             alert('Recurso de tabela indisponível para gerar o PDF.');
             return;
@@ -1080,116 +1232,169 @@
           const subtitleText = matricula
             ? `Solicitação registrada em banco de dados para a matrícula ${matricula}`
             : 'Solicitação registrada em banco de dados.';
+          const nomeServidor = sanitizeValue(DATA.nome);
+          const cpfServidor = formatCPF(DATA.cpf);
+          const dataEmissao = new Date().toLocaleDateString('pt-BR');
 
           const logoDataUrl = await getComprovanteLogoDataUrl();
 
           const pageWidth = doc.internal.pageSize.getWidth();
           const pageHeight = doc.internal.pageSize.getHeight();
-          const margin = 30;
+          const margin = 36;
           const cardWidth = pageWidth - margin * 2;
           const cardHeight = pageHeight - margin * 2;
-          const cardPaddingX = 32;
+          const cardPaddingX = 36;
           const cardPaddingY = 30;
-          const headerTintHeight = 170;
-          const badgeWidth = 220;
-          const badgeHeight = 78;
+          const headerBandHeight = 120;
+          const badgeWidth = 200;
+          const badgeHeight = 64;
 
-          const drawPageLayout = () => {
+          const drawCardBase = () => {
             doc.setDrawColor(214, 222, 234);
             doc.setLineWidth(1.2);
-            doc.setFillColor(243, 247, 255);
+            doc.setFillColor(244, 247, 254);
             doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18, 'F');
             doc.setFillColor(255, 255, 255);
-            doc.rect(margin, margin + headerTintHeight, cardWidth, Math.max(cardHeight - headerTintHeight, 0), 'F');
-            doc.setDrawColor(214, 222, 234);
             doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18);
+            doc.rect(margin, margin + headerBandHeight, cardWidth, Math.max(cardHeight - headerBandHeight, 0), 'F');
+            doc.setFillColor(0, 74, 173);
+            doc.roundedRect(margin, margin, cardWidth, headerBandHeight, 18, 18, 'F');
 
             const contentX = margin + cardPaddingX;
             const contentY = margin + cardPaddingY;
 
             if (logoDataUrl) {
-              const logoHeight = 34;
-              const logoWidth = 140;
-              doc.addImage(logoDataUrl, 'PNG', contentX, contentY, logoWidth, logoHeight);
+              doc.addImage(logoDataUrl, 'PNG', contentX, contentY, 120, 38);
             }
 
-            let textCursorY = margin + cardPaddingY + (logoDataUrl ? 56 : 18);
+            const headerTextX = contentX + (logoDataUrl ? 136 : 0);
+            const headerTextY = contentY + 16;
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(22);
-            doc.setTextColor(0, 74, 173);
-            doc.text('Comprovante de solicitação', contentX, textCursorY);
-            textCursorY += 28;
-
-            doc.setFont('helvetica', 'normal');
             doc.setFontSize(13);
-            doc.setTextColor(55, 65, 81);
-            const availableWidth = cardWidth - cardPaddingX * 2 - badgeWidth - 16;
-            const subtitleLines = doc.splitTextToSize(subtitleText, Math.max(availableWidth, 160));
-            subtitleLines.forEach((line) => {
-              doc.text(line, contentX, textCursorY);
-              textCursorY += 18;
-            });
+            doc.setTextColor(255, 255, 255);
+            doc.text('PREFEITURA DO RECIFE', headerTextX, headerTextY);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(11);
+            doc.text('Secretaria de Saúde (SESAU)', headerTextX, headerTextY + 20);
+            doc.text('Portal do Servidor • Mobilidade Interna', headerTextX, headerTextY + 38);
 
             const badgeX = margin + cardWidth - cardPaddingX - badgeWidth;
             const badgeY = margin + cardPaddingY;
-            doc.setFillColor(0, 74, 173);
+            doc.setFillColor(255, 255, 255);
             doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 12, 12, 'F');
+            doc.setDrawColor(0, 74, 173);
+            doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 12, 12);
             doc.setFont('helvetica', 'bold');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(11);
-            doc.text('NÚMERO DA SOLICITAÇÃO', badgeX + 18, badgeY + 26);
-            doc.setFontSize(26);
-            doc.text(numero || '—', badgeX + badgeWidth - 18, badgeY + 54, { align: 'right' });
+            doc.setFontSize(10);
+            doc.setTextColor(0, 74, 173);
+            doc.text('NÚMERO DA SOLICITAÇÃO', badgeX + 18, badgeY + 24);
+            doc.setFontSize(22);
+            doc.setTextColor(17, 24, 39);
+            doc.text(numero || '—', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
           };
 
-          const tableStartY = margin + headerTintHeight + 36;
+          drawCardBase();
+
+          let currentY = margin + headerBandHeight + 38;
+          const contentX = margin + cardPaddingX;
+          const contentMaxX = margin + cardWidth - cardPaddingX;
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(20);
+          doc.setTextColor(0, 74, 173);
+          doc.text('Comprovante de solicitação', contentX, currentY);
+          currentY += 28;
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(12);
+          doc.setTextColor(55, 65, 81);
+          const subtitleLines = doc.splitTextToSize(subtitleText, contentMaxX - contentX);
+          subtitleLines.forEach((line) => {
+            doc.text(line, contentX, currentY);
+            currentY += 18;
+          });
+
+          currentY += 6;
+          const infoPairs = [
+            { label: 'Nome do servidor', value: nomeServidor || '—' },
+            { label: 'CPF', value: cpfServidor || '—' },
+            { label: 'Matrícula', value: matricula || '—' },
+            { label: 'Data de emissão', value: dataEmissao },
+          ];
+
+          const infoColumnWidth = (contentMaxX - contentX - 16) / 2;
+          infoPairs.forEach((item, index) => {
+            const column = index % 2;
+            const row = Math.floor(index / 2);
+            const x = contentX + column * (infoColumnWidth + 16);
+            const y = currentY + row * 36;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(0, 74, 173);
+            doc.text(item.label.toUpperCase(), x, y);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(11);
+            doc.setTextColor(31, 41, 55);
+            doc.text(item.value || '—', x, y + 16);
+          });
+
+          currentY += Math.ceil(infoPairs.length / 2) * 36 + 18;
+          doc.setDrawColor(226, 232, 240);
+          doc.setLineWidth(1);
+          doc.line(contentX, currentY, contentMaxX, currentY);
+          currentY += 24;
 
           if (headers.length && rows.length) {
             doc.autoTable({
               head: [headers],
               body: rows,
-              startY: tableStartY,
+              startY: currentY,
               theme: 'plain',
-              margin: { left: margin + cardPaddingX, right: margin + cardPaddingX },
-              tableWidth: cardWidth - cardPaddingX * 2,
-              willDrawPage: drawPageLayout,
+              margin: { left: contentX, right: pageWidth - contentMaxX },
+              tableWidth: contentMaxX - contentX,
               styles: {
                 font: 'helvetica',
-                fontSize: 11,
+                fontSize: 10,
                 textColor: [31, 41, 55],
-                cellPadding: { top: 10, right: 12, bottom: 10, left: 12 },
+                cellPadding: { top: 8, right: 10, bottom: 8, left: 10 },
                 lineWidth: 0.6,
-                lineColor: [224, 232, 255],
+                lineColor: [226, 232, 240],
               },
               headStyles: {
                 fontStyle: 'bold',
-                fontSize: 11,
+                fontSize: 10,
                 fillColor: [226, 235, 255],
                 textColor: [0, 74, 173],
                 halign: 'left',
-                cellPadding: { top: 12, right: 12, bottom: 12, left: 12 },
+                cellPadding: { top: 10, right: 10, bottom: 10, left: 10 },
                 lineWidth: 0,
               },
               alternateRowStyles: {
                 fillColor: [248, 250, 255],
               },
               columnStyles: {
-                0: { halign: 'center', cellWidth: 60 },
-                1: { halign: 'center', cellWidth: 80 },
-                2: { cellWidth: 135 },
-                3: { cellWidth: 95 },
-                4: { cellWidth: 160 },
+                0: { halign: 'center', cellWidth: 70 },
+                1: { halign: 'center', cellWidth: 90 },
+                2: { cellWidth: 150 },
+                3: { cellWidth: 110 },
+                4: { cellWidth: 150 },
                 5: { halign: 'center', cellWidth: 90 },
                 6: { halign: 'center', cellWidth: 90 },
               },
+              pageBreak: 'avoid',
+              rowPageBreak: 'avoid',
             });
           } else {
-            drawPageLayout();
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(12);
             doc.setTextColor(107, 114, 128);
-            doc.text('Não há dados para exportar.', margin + cardPaddingX, tableStartY + 10);
+            doc.text('Não há dados para exportar.', contentX, currentY + 12);
           }
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(107, 114, 128);
+          doc.text('Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.', contentX, pageHeight - margin);
 
           const safeNumero = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
           doc.save(`solicitacao-${safeNumero}.pdf`);
@@ -1241,18 +1446,66 @@
 
       // ===== Validação simples do formulário =====
       function validarFormulario() {
-        let ok = true;
-        const w = document.getElementById('whatsapp');
-        const c = document.getElementById('cep');
-        const uf = document.getElementById('uf');
-        // Whats
-        if (w.value && !isWhats(w.value)) { w.classList.add('is-invalid'); ok = false; } else { w.classList.remove('is-invalid'); w.classList.add('is-valid'); }
-        // CEP
-        if (c.value && !isCEP(c.value)) { c.classList.add('is-invalid'); ok = false; } else { c.classList.remove('is-invalid'); c.classList.add('is-valid'); }
-        // UF
-        uf.value = sanitizeUF(uf.value);
-        if (uf.value && !isUF(uf.value)) { uf.classList.add('is-invalid'); ok = false; } else { uf.classList.remove('is-invalid'); uf.classList.add('is-valid'); }
-        return ok;
+        const requiredFields = [
+          { id: 'matriculaSelect', label: 'Matrícula' },
+          { id: 'whatsapp', label: 'WhatsApp' },
+          { id: 'telefonealternativo', label: 'Telefone alternativo' },
+          { id: 'cep', label: 'CEP' },
+          { id: 'logradouro', label: 'Logradouro' },
+          { id: 'numero', label: 'Número' },
+          { id: 'complemento', label: 'Complemento' },
+          { id: 'bairro', label: 'Bairro' },
+          { id: 'cidade', label: 'Cidade' },
+          { id: 'uf', label: 'UF' },
+          { id: 'dsSelect', label: 'DS/Executiva atual' },
+          { id: 'unidadeSelect', label: 'Unidade atual' },
+          { id: 'turnoSelect', label: 'Turno atual' },
+          { id: 'regimeSelect', label: 'Regime atual' }
+        ];
+
+        const missing = [];
+        const invalid = [];
+
+        requiredFields.forEach((field) => {
+          const el = document.getElementById(field.id);
+          if (!el) return;
+          const rawValue = el.value != null ? String(el.value).trim() : '';
+          let hasValue = rawValue !== '';
+          if (el.tagName === 'SELECT') {
+            const selectedOption = el.selectedOptions[0];
+            hasValue = Boolean(selectedOption && !selectedOption.disabled && sanitizeValue(selectedOption.value));
+          }
+          if (!hasValue) {
+            missing.push(field.label);
+            markInvalid(el);
+          } else {
+            markValid(el);
+          }
+        });
+
+        const whatsappEl = document.getElementById('whatsapp');
+        if (whatsappEl && sanitizeValue(whatsappEl.value) && !isWhats(whatsappEl.value)) {
+          invalid.push('WhatsApp (formato inválido)');
+          markInvalid(whatsappEl);
+        }
+
+        const cepEl = document.getElementById('cep');
+        if (cepEl && sanitizeValue(cepEl.value) && !isCEP(cepEl.value)) {
+          invalid.push('CEP (formato inválido)');
+          markInvalid(cepEl);
+        }
+
+        const ufEl = document.getElementById('uf');
+        if (ufEl) {
+          ufEl.value = sanitizeUF(ufEl.value);
+          if (sanitizeValue(ufEl.value) && !isUF(ufEl.value)) {
+            invalid.push('UF (utilize duas letras)');
+            markInvalid(ufEl);
+          }
+        }
+
+        const ok = missing.length === 0 && invalid.length === 0;
+        return { ok, missing, invalid };
       }
 
       // ===== Eventos =====
@@ -1289,8 +1542,12 @@
 
       document.getElementById('form-cadastro').addEventListener('submit', (e) => {
         e.preventDefault();
-        if (!validarFormulario()) { setStatus('Revise os campos destacados.', false); return; }
-        // Monte o payload final para envio (destino não especificado no briefing)
+        const validation = validarFormulario();
+        if (!validation.ok) {
+          setStatus('Revise os campos destacados.', false);
+          showFormFeedbackPopup('error', validation);
+          return;
+        }
         const grupoAtual = sanitizeValue(document.getElementById('grupoHidden')?.value || '');
         const payload = {
           matricula: document.getElementById('matriculaSelect').value || null,
@@ -1312,7 +1569,8 @@
           grupo: grupoAtual || null,
         };
         console.log('Payload atualização cadastral:', payload);
-        setStatus('Dados preparados para envio.', true);
+        setStatus('Dados de atualização enviados.', true);
+        showFormFeedbackPopup('success');
       });
 
       document.getElementById('btnNovaSolicitacao').addEventListener('click', () => {
@@ -1343,6 +1601,13 @@
       document.getElementById('btnImprimir').addEventListener('click', () => window.print());
       document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
       document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
+      document.getElementById('formFeedbackClose').addEventListener('click', closeFormFeedback);
+      document.getElementById('formFeedback').addEventListener('click', (e) => {
+        if (e.target && e.target.id === 'formFeedback') closeFormFeedback();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeFormFeedback();
+      });
 
       // ===== Bootstrap inicial =====
       (function init() {
