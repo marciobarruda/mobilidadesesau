@@ -370,18 +370,20 @@
           background: var(--surface-strong);
           border: 1px solid rgba(0, 83, 164, 0.12);
           box-shadow: 0 18px 40px rgba(0, 35, 79, 0.12);
-          padding: 1rem 1.15rem;
-          margin-bottom: 1rem;
+          padding: 1.35rem 1.5rem;
+          margin-bottom: 1.15rem;
         }
         #tabelaPrefs tbody tr:last-child {
           margin-bottom: 0;
         }
         #tabelaPrefs tbody td {
           display: flex;
-          justify-content: space-between;
-          gap: 1rem;
-          padding: 0.35rem 0;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.4rem;
+          padding: 0.65rem 0;
           border-bottom: 1px solid rgba(0, 83, 164, 0.08);
+          text-align: left;
         }
         #tabelaPrefs tbody td:last-child {
           border-bottom: 0;
@@ -393,6 +395,7 @@
           letter-spacing: 0.08em;
           text-transform: uppercase;
           color: var(--text-muted);
+          margin-bottom: 0.1rem;
         }
         #tabelaPrefs tbody td.actions-cell {
           flex-direction: column;
@@ -400,12 +403,13 @@
           text-align: left;
         }
         #tabelaPrefs tbody td.actions-cell::before {
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.75rem;
         }
         #tabelaPrefs tbody td.actions-cell .actions-wrapper {
           flex-direction: column;
-          align-items: stretch;
-          gap: 0.65rem;
+          align-items: center;
+          gap: 0.75rem;
+          width: 100%;
         }
         #tabelaPrefs tbody td.actions-cell .actions-wrapper .btn {
           width: auto;
