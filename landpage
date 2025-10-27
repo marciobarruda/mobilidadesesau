@@ -621,6 +621,7 @@
                       <input type="hidden" id="grupoHidden" value="{{ $json.data.vinculos[0].grupo }}" />
                       <input type="hidden" id="cpfHidden" value="{{ $json.data.dadosComuns.cpf }}" />
                       <input type="hidden" id="dsHidden" value="{{ $json.data.vinculos[0].ds }}" />
+                      <input type="hidden" id="servidorHidden" value="{{ $json.data.dadosComuns.servidor }}" />
                       <div class="invalid-feedback">Selecione uma matrícula válida.</div>
                     </div>
 
@@ -968,8 +969,12 @@
       };
 
       // Dados vindos do template (quando presentes)
+      const nomeServidorTemplate = sanitizeValue(`{{ $json.data.dadosComuns.servidor }}`);
+      const nomeExibicaoTemplate = sanitizeValue(`{{ $json.data.dadosComuns.nome }}`);
       const DATA = {
-        nome: sanitizeValue(`{{ $json.data.dadosComuns.nome }}`),
+        nome: nomeServidorTemplate || nomeExibicaoTemplate,
+        servidor: nomeServidorTemplate,
+        nomeExibicao: nomeExibicaoTemplate,
         cpf: sanitizeValue(`{{ $json.data.dadosComuns.cpf }}`),
         vinculos: [
           {
@@ -1248,15 +1253,36 @@
               )
             : [];
 
+          const matriculaColIndex = headers.findIndex((label) => /matr[íi]cula/i.test(label));
+          const cargoColIndex = headers.findIndex((label) => /cargo/i.test(label));
+          const firstRow = rows[0] || [];
+          const rawMatriculaFromTable = matriculaColIndex >= 0 ? firstRow[matriculaColIndex] : '';
+          const rawCargoFromTable = cargoColIndex >= 0 ? firstRow[cargoColIndex] : '';
+
           const matriculaHidden = document.getElementById('novaSolicitacaoMatricula');
           const matriculaFromHidden = sanitizeValue(matriculaHidden ? matriculaHidden.value : '');
-          const matriculaFromTable = rows.length ? sanitizeValue(rows[0][1]) : '';
+          const matriculaFromTable = sanitizeValue(rawMatriculaFromTable);
           const matricula = matriculaFromTable || matriculaFromHidden;
           const subtitleText = matricula
             ? `Solicitação registrada em banco de dados para a matrícula ${matricula}`
             : 'Solicitação registrada em banco de dados.';
-          const nomeServidor = sanitizeValue(DATA.nome);
+          const nomeServidorHiddenEl = document.getElementById('servidorHidden');
+          const nomeServidor = sanitizeValue(
+            (nomeServidorHiddenEl && nomeServidorHiddenEl.value) || DATA.servidor || DATA.nome
+          );
           const cpfServidor = formatCPF(DATA.cpf);
+          const cargoFromTable = sanitizeValue(rawCargoFromTable);
+          const cargoFromVinculo = (() => {
+            const vinculos = Array.isArray(DATA.vinculos) ? DATA.vinculos : [];
+            if (matricula) {
+              const vinculoEncontrado = vinculos.find(
+                (item) => sanitizeValue(item.matricula) === matricula
+              );
+              if (vinculoEncontrado) return sanitizeValue(vinculoEncontrado.cargo);
+            }
+            return sanitizeValue(vinculos[0]?.cargo);
+          })();
+          const cargoServidor = cargoFromTable || cargoFromVinculo;
           const dataEmissao = new Date().toLocaleDateString('pt-BR');
 
           const logoDataUrl = await getComprovanteLogoDataUrl();
@@ -1338,39 +1364,70 @@
           });
 
           currentY += 6;
-          const infoPairs = [
-            { label: 'Nome do servidor', value: nomeServidor || '—' },
-            { label: 'CPF', value: cpfServidor || '—' },
-            { label: 'Matrícula', value: matricula || '—' },
-            { label: 'Data de emissão', value: dataEmissao },
+          const infoRows = [
+            [
+              { label: 'Nome do servidor', value: nomeServidor || '—' },
+              { label: 'CPF', value: cpfServidor || '—' }
+            ],
+            [
+              { label: 'Matrícula', value: matricula || '—' },
+              { label: 'Cargo', value: cargoServidor || '—' }
+            ],
+            [
+              { label: 'Data de emissão', value: dataEmissao },
+              null
+            ]
           ];
 
-          const infoColumnWidth = (contentMaxX - contentX - 16) / 2;
-          infoPairs.forEach((item, index) => {
-            const column = index % 2;
-            const row = Math.floor(index / 2);
-            const x = contentX + column * (infoColumnWidth + 16);
-            const y = currentY + row * 36;
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(11);
-            doc.setTextColor(0, 74, 173);
-            doc.text(item.label.toUpperCase(), x, y);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(11);
-            doc.setTextColor(31, 41, 55);
-            doc.text(item.value || '—', x, y + 16);
+          const columnGap = 16;
+          const infoRowHeight = 34;
+          const infoColumnWidth = (contentMaxX - contentX - columnGap) / 2;
+          infoRows.forEach((rowItems, rowIndex) => {
+            rowItems.forEach((item, columnIndex) => {
+              if (!item) return;
+              const x = contentX + columnIndex * (infoColumnWidth + columnGap);
+              const y = currentY + rowIndex * infoRowHeight;
+              doc.setFont('helvetica', 'bold');
+              doc.setFontSize(11);
+              doc.setTextColor(0, 74, 173);
+              doc.text(item.label.toUpperCase(), x, y);
+              doc.setFont('helvetica', 'normal');
+              doc.setFontSize(11);
+              doc.setTextColor(31, 41, 55);
+              doc.text(item.value || '—', x, y + 16);
+            });
           });
 
-          currentY += Math.ceil(infoPairs.length / 2) * 36 + 18;
+          currentY += infoRows.length * infoRowHeight + 18;
           doc.setDrawColor(226, 232, 240);
           doc.setLineWidth(1);
           doc.line(contentX, currentY, contentMaxX, currentY);
           currentY += 24;
 
-          if (headers.length && rows.length) {
+          const indicesToRemove = [matriculaColIndex, cargoColIndex].filter((idx) => idx >= 0);
+          const pdfHeaders = headers.filter((_, idx) => !indicesToRemove.includes(idx));
+          const pdfRows = rows.map((row) => row.filter((_, idx) => !indicesToRemove.includes(idx)));
+
+          let footerBaseY = currentY;
+          if (pdfHeaders.length && pdfRows.length) {
+            const columnStyles = {};
+            pdfHeaders.forEach((header, index) => {
+              const key = header.toLowerCase();
+              if (key.includes('prioridade')) {
+                columnStyles[index] = { halign: 'center', cellWidth: 55 };
+              } else if (key.includes('distrito')) {
+                columnStyles[index] = { cellWidth: 90 };
+              } else if (key.includes('lotação')) {
+                columnStyles[index] = { cellWidth: 150 };
+              } else if (key.includes('credenciamento')) {
+                columnStyles[index] = { halign: 'center', cellWidth: 75 };
+              } else if (key.includes('solicitação')) {
+                columnStyles[index] = { halign: 'center', cellWidth: 75 };
+              }
+            });
             doc.autoTable({
-              head: [headers],
-              body: rows,
+              head: [pdfHeaders],
+              body: pdfRows,
               startY: currentY,
               theme: 'plain',
               margin: { left: contentX, right: pageWidth - contentMaxX },
@@ -1379,9 +1436,10 @@
                 font: 'helvetica',
                 fontSize: 10,
                 textColor: [31, 41, 55],
-                cellPadding: { top: 8, right: 10, bottom: 8, left: 10 },
+                cellPadding: { top: 6, right: 8, bottom: 6, left: 8 },
                 lineWidth: 0.6,
                 lineColor: [226, 232, 240],
+                overflow: 'linebreak'
               },
               headStyles: {
                 fontStyle: 'bold',
@@ -1389,35 +1447,30 @@
                 fillColor: [226, 235, 255],
                 textColor: [0, 74, 173],
                 halign: 'left',
-                cellPadding: { top: 10, right: 10, bottom: 10, left: 10 },
+                cellPadding: { top: 8, right: 8, bottom: 8, left: 8 },
                 lineWidth: 0,
               },
               alternateRowStyles: {
                 fillColor: [248, 250, 255],
               },
-              columnStyles: {
-                0: { halign: 'center', cellWidth: 70 },
-                1: { halign: 'center', cellWidth: 90 },
-                2: { cellWidth: 150 },
-                3: { cellWidth: 110 },
-                4: { cellWidth: 150 },
-                5: { halign: 'center', cellWidth: 90 },
-                6: { halign: 'center', cellWidth: 90 },
-              },
+              columnStyles,
               pageBreak: 'avoid',
               rowPageBreak: 'avoid',
             });
+            footerBaseY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || currentY;
           } else {
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(12);
             doc.setTextColor(107, 114, 128);
             doc.text('Não há dados para exportar.', contentX, currentY + 12);
+            footerBaseY = currentY + 12;
           }
 
+          const footerY = Math.min(pageHeight - margin - 12, footerBaseY + 32);
           doc.setFont('helvetica', 'normal');
           doc.setFontSize(9);
           doc.setTextColor(107, 114, 128);
-          doc.text('Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.', contentX, pageHeight - margin);
+          doc.text('Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.', contentX, footerY);
 
           const safeNumero = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
           doc.save(`solicitacao-${safeNumero}.pdf`);
