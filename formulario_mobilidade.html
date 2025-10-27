@@ -10,8 +10,14 @@
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <style>
       :root {
         --brand-primary: #0053a4;
@@ -23,33 +29,149 @@
         --text-strong: #1b263b;
         --text-muted: #5b6c8c;
       }
-      *,*::before,*::after{box-sizing:border-box}
-      body{
-        font-family:"Public Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-        background:var(--surface);color:var(--text-strong);min-height:100vh
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
       }
-      header.site-header{
-        background:url("https://statics.recife.pe.gov.br/images/dynamics/automacao/header.png?w=3000") center/cover no-repeat;
-        color:#fff;padding:3rem 0 2.25rem
+      body {
+        font-family: "Public Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--surface);
+        color: var(--text-strong);
+        min-height: 100vh;
       }
-      header .lead{color:rgba(255,255,255,.9);font-size:1rem;line-height:1.65;max-width:100%}
-      .badge-open{display:inline-flex;align-items:center;gap:.5rem;font-size:.95rem;font-weight:600;padding:.45rem .9rem;border-radius:999px;background:rgba(255,255,255,.14)}
-      .section-title{display:flex;align-items:center;gap:.65rem;font-weight:700;font-size:1.2rem;color:var(--text-strong)}
-      .section-title::before{content:"";display:inline-block;width:32px;height:3px;border-radius:999px;background:var(--brand-highlight)}
-      .card{border-radius:4px;overflow:hidden}
-      .card-programa{border:1px solid rgba(0,83,164,.08);border-radius:4px;background:var(--surface-strong);box-shadow:0 16px 34px rgba(0,45,98,.08)}
-      .card-programa .card-header{border-bottom:1px solid rgba(0,83,164,.08);background:linear-gradient(180deg,#fff 0%,#f5f8fc 100%);padding:1.25rem 1.25rem 1rem}
-      .collapsible-form{border:1px solid rgba(0,83,164,.15);border-radius:4px;background:rgba(0,83,164,.05);padding:1rem 1.25rem}
-      .collapsible-form summary{font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.5rem}
-      .collapsible-form summary::marker,.collapsible-form summary::-webkit-details-marker{display:none}
-      .collapsible-form summary::before{content:"➕";font-size:.9rem;transition:transform .2s ease}
-      .collapsible-form[open] summary::before{transform:rotate(45deg)}
-      .table-editable input, .table-editable select{width:100%;border:1px solid var(--border-color);border-radius:.25rem;padding:.35rem .5rem}
-      .table thead th{white-space:nowrap}
-      .actions-cell button{min-width:38px}
-      .muted{color:var(--text-muted)}
-      footer{color:var(--text-muted);padding:2rem 0 1.5rem;font-size:.9rem}
-      @media (max-width: 768px){header.site-header{padding:2.25rem 0 1.75rem}.badge-open{width:100%;justify-content:center}}
+      header.site-header {
+        background: url("https://statics.recife.pe.gov.br/images/dynamics/automacao/header.png?w=3000") center/cover no-repeat;
+        color: #fff;
+        padding: 3rem 0 2.25rem;
+      }
+      header .lead {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        line-height: 1.65;
+        max-width: 100%;
+      }
+      .badge-open {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        padding: 0.45rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.14);
+      }
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--text-strong);
+      }
+      .section-title::before {
+        content: "";
+        display: inline-block;
+        width: 32px;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--brand-highlight);
+      }
+      .card {
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .card-programa {
+        border: 1px solid rgba(0, 83, 164, 0.08);
+        border-radius: 4px;
+        background: var(--surface-strong);
+        box-shadow: 0 16px 34px rgba(0, 45, 98, 0.08);
+      }
+      .card-programa .card-header {
+        border-bottom: 1px solid rgba(0, 83, 164, 0.08);
+        background: linear-gradient(180deg, #fff 0%, #f5f8fc 100%);
+        padding: 1.25rem 1.25rem 1rem;
+      }
+      .muted {
+        color: var(--text-muted);
+      }
+      .actions-cell {
+        white-space: nowrap;
+        gap: 0.35rem;
+      }
+      .uppercase {
+        text-transform: uppercase;
+      }
+      .small-note {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+      .table thead th {
+        white-space: nowrap;
+      }
+      .table-fixed {
+        table-layout: fixed;
+      }
+      .modal-alert-title {
+        color: #dc3545;
+      }
+      .alert-list {
+        padding-left: 1.1rem;
+      }
+      #printComprovante {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 20px 60px rgba(0, 37, 84, 0.15);
+        padding: 2rem;
+        max-width: 940px;
+        margin: 0 auto;
+      }
+      #printComprovante .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1.5rem;
+        margin-bottom: 1.75rem;
+      }
+      #printComprovante .header .left strong {
+        display: block;
+        font-size: 1.05rem;
+      }
+      #printComprovante table {
+        width: 100%;
+      }
+      #printComprovante th,
+      #printComprovante td {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+      }
+      #printComprovante thead {
+        background: rgba(0, 83, 164, 0.08);
+      }
+      @media print {
+        body * {
+          visibility: hidden !important;
+        }
+        #printComprovante,
+        #printComprovante * {
+          visibility: visible !important;
+        }
+        #printComprovante {
+          position: absolute;
+          inset: 0;
+          margin: 0 auto;
+          box-shadow: none;
+        }
+      }
+      @media (max-width: 768px) {
+        header.site-header {
+          padding: 2.25rem 0 1.75rem;
+        }
+        .badge-open {
+          width: 100%;
+          justify-content: center;
+        }
+      }
     </style>
   </head>
   <body>
@@ -57,118 +179,180 @@
       <div class="container">
         <span class="badge-open">Secretaria de Saúde — SESAU • Prefeitura do Recife</span>
         <h1 class="display-6 h1-title mt-3 mb-2">Formulário — Mobilidade Interna</h1>
-        <p class="lead mb-0">Preencha os dados para cadastrar ou atualizar sua solicitação de mobilidade.</p>
+        <p class="lead mb-0">
+          Preencha os dados para cadastrar ou atualizar sua solicitação de mobilidade.
+        </p>
       </div>
     </header>
 
     <main class="container py-4">
       <!-- Identificação -->
-      <section class="card card-programa mb-4">
-        <div class="card-header py-3"><div class="section-title">Identificação</div></div>
+      <section class="card card-programa mb-4" aria-labelledby="identificacaoTitulo">
+        <div class="card-header py-3">
+          <div class="section-title" id="identificacaoTitulo">Identificação</div>
+        </div>
         <div class="card-body">
-          <div class="row g-3">
-            <div class="col-12 col-md-4">
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-lg-3">
               <label class="form-label" for="matricula">Matrícula</label>
-              <select id="matricula" class="form-select" required></select>
+              <select id="matricula" class="form-select" required data-required="true" aria-required="true"></select>
               <div class="text-muted small">Opções carregadas via CPF.</div>
             </div>
-            <div class="col-12 col-md-4">
-              <label class="form-label" for="admissao">Data de admissão</label>
-              <input id="admissao" class="form-control" readonly />
-            </div>
-            <div class="col-12 col-md-4">
-              <label class="form-label" for="nascimento">Data de nascimento</label>
-              <input id="nascimento" class="form-control" readonly />
-            </div>
-
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-lg-6">
               <label class="form-label" for="nome">Nome</label>
-              <input id="nome" class="form-control" readonly />
+              <input id="nome" class="form-control" readonly aria-readonly="true" />
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-lg-3">
+              <label class="form-label" for="nascimento">Data de nascimento</label>
+              <input id="nascimento" class="form-control" readonly aria-readonly="true" />
+            </div>
+          </div>
+          <div class="row g-3 align-items-end mt-0">
+            <div class="col-12 col-xl-3 col-lg-4">
               <label class="form-label" for="cargo">Cargo</label>
-              <input id="cargo" class="form-control" readonly />
+              <input id="cargo" class="form-control" readonly aria-readonly="true" />
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-xl-2 col-lg-3">
               <label class="form-label" for="grupo">Grupo</label>
-              <input id="grupo" class="form-control" readonly />
+              <input id="grupo" class="form-control" readonly aria-readonly="true" />
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-xl-2 col-lg-3">
               <label class="form-label" for="vinculo">Vínculo</label>
-              <input id="vinculo" class="form-control" readonly />
+              <input id="vinculo" class="form-control" readonly aria-readonly="true" />
             </div>
-            <div class="col-12 col-md-6">
-              <label class="form-label" for="carga">Carga horária de atuação</label>
-              <input id="carga" class="form-control" readonly />
+            <div class="col-6 col-xl-2 col-lg-2">
+              <label class="form-label" for="admissao">Data de admissão</label>
+              <input id="admissao" class="form-control" readonly aria-readonly="true" />
+            </div>
+            <div class="col-6 col-xl-3 col-lg-3">
+              <label class="form-label" for="carga">CH</label>
+              <input id="carga" class="form-control" readonly aria-readonly="true" />
             </div>
           </div>
         </div>
-
       </section>
 
       <!-- Endereço e Contatos -->
-      <section class="card card-programa mb-4">
-        <div class="card-header py-3"><div class="section-title">Endereço e Contatos</div></div>
+      <section class="card card-programa mb-4" aria-labelledby="enderecoTitulo">
+        <div class="card-header py-3">
+          <div class="section-title" id="enderecoTitulo">Endereço e Contatos</div>
+        </div>
         <div class="card-body">
           <div class="row g-3">
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-sm-4 col-lg-3">
               <label class="form-label" for="cep">CEP</label>
-              <input id="cep" class="form-control" placeholder="00000-000" />
+              <input
+                id="cep"
+                class="form-control"
+                placeholder="00000000"
+                inputmode="numeric"
+                data-required="true"
+                data-numeric="true"
+                aria-required="true"
+              />
               <div class="small-note">Autopreenche via BrasilAPI.</div>
             </div>
-            <div class="col-12 col-md-5">
+            <div class="col-12 col-md-6 col-lg-5">
               <label class="form-label" for="logradouro">Logradouro</label>
-              <input id="logradouro" class="form-control" />
+              <input id="logradouro" class="form-control" data-required="true" aria-required="true" />
             </div>
-            <div class="col-6 col-md-2">
+            <div class="col-6 col-md-3 col-lg-2">
               <label class="form-label" for="numero">Número</label>
-              <input id="numero" class="form-control" />
+              <input
+                id="numero"
+                class="form-control"
+                data-required="true"
+                data-numeric="true"
+                inputmode="numeric"
+                aria-required="true"
+              />
             </div>
-            <div class="col-6 col-md-2">
+            <div class="col-6 col-md-3 col-lg-2">
               <label class="form-label" for="complemento">Complemento</label>
-              <input id="complemento" class="form-control" />
+              <input id="complemento" class="form-control" data-required="true" aria-required="true" />
             </div>
             <div class="col-12 col-md-4">
               <label class="form-label" for="bairro">Bairro</label>
-              <input id="bairro" class="form-control" />
+              <input id="bairro" class="form-control" data-required="true" aria-required="true" />
             </div>
             <div class="col-12 col-md-4">
               <label class="form-label" for="cidade">Cidade</label>
-              <input id="cidade" class="form-control" />
+              <input id="cidade" class="form-control" data-required="true" aria-required="true" />
             </div>
-            <div class="col-12 col-md-2">
+            <div class="col-12 col-md-2 col-lg-1">
               <label class="form-label" for="uf">UF</label>
-              <input id="uf" maxlength="2" class="form-control" placeholder="PE" />
+              <input
+                id="uf"
+                maxlength="2"
+                class="form-control"
+                placeholder="PE"
+                data-required="true"
+                aria-required="true"
+              />
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-lg-3 col-md-4">
               <label class="form-label" for="whatsapp">WhatsApp</label>
-              <input id="whatsapp" class="form-control" placeholder="DDD + número" />
+              <input
+                id="whatsapp"
+                class="form-control"
+                placeholder="DDD + número"
+                data-required="true"
+                data-numeric="true"
+                inputmode="numeric"
+                aria-required="true"
+              />
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-lg-3 col-md-4">
               <label class="form-label" for="telalt">Telefone alternativo</label>
-              <input id="telalt" class="form-control" placeholder="DDD + número" />
+              <input
+                id="telalt"
+                class="form-control"
+                placeholder="DDD + número"
+                data-numeric="true"
+                inputmode="numeric"
+                aria-describedby="telaltHelp"
+              />
+              <div id="telaltHelp" class="small-note">Campo opcional.</div>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-lg-3 col-md-4">
               <label class="form-label" for="email">E-mail</label>
-              <input id="email" class="form-control" type="email" />
+              <input
+                id="email"
+                class="form-control"
+                type="email"
+                autocomplete="email"
+                data-required="true"
+                aria-required="true"
+                data-uppercase="false"
+              />
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-lg-3 col-md-4">
               <label class="form-label" for="email2">Confirme o e-mail</label>
-              <input id="email2" class="form-control" type="email" />
+              <input
+                id="email2"
+                class="form-control"
+                type="email"
+                autocomplete="email"
+                data-required="true"
+                aria-required="true"
+                data-uppercase="false"
+              />
             </div>
           </div>
         </div>
       </section>
 
       <!-- Dados de Lotação Atual -->
-      <section class="card card-programa mb-4">
-        <div class="card-header py-3"><div class="section-title">Dados de Lotação Atual</div></div>
+      <section class="card card-programa mb-4" aria-labelledby="lotacaoAtualTitulo">
+        <div class="card-header py-3">
+          <div class="section-title" id="lotacaoAtualTitulo">Dados de Lotação Atual</div>
+        </div>
         <div class="card-body">
           <div class="mb-2 muted">Dependentes por seleção</div>
           <div class="row g-3">
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-lg-3 col-md-4">
               <label class="form-label" for="dsSelect">Distrito atual</label>
-              <select id="dsSelect" class="form-select">
+              <select id="dsSelect" class="form-select" data-required="true" aria-required="true">
                 <option value="" selected disabled>Selecione...</option>
                 <option>SEAA - JURIDICO</option>
                 <option>SEAB</option>
@@ -189,21 +373,21 @@
                 <option>SERMAC</option>
               </select>
             </div>
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-lg-4 col-md-4">
               <label class="form-label" for="unidadeSelect">Lotação atual</label>
-              <select id="unidadeSelect" class="form-select" disabled>
+              <select id="unidadeSelect" class="form-select" disabled data-required="true" aria-required="true">
                 <option>Selecione o distrito...</option>
               </select>
             </div>
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-lg-3 col-md-4">
               <label class="form-label" for="turnoSelect">Horário atual</label>
-              <select id="turnoSelect" class="form-select" disabled>
+              <select id="turnoSelect" class="form-select" disabled data-required="true" aria-required="true">
                 <option>Selecione a unidade...</option>
               </select>
             </div>
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-lg-2 col-md-4">
               <label class="form-label" for="regimeSelect">Regime de trabalho</label>
-              <select id="regimeSelect" class="form-select" disabled>
+              <select id="regimeSelect" class="form-select" disabled data-required="true" aria-required="true">
                 <option>Selecione a unidade...</option>
               </select>
             </div>
@@ -212,111 +396,175 @@
       </section>
 
       <!-- Preferências -->
-      <section class="card card-programa mb-4">
+      <section class="card card-programa mb-4" aria-labelledby="preferenciasTitulo">
         <div class="card-header py-3 d-flex align-items-center justify-content-between">
-          <div class="section-title">Preferências (máx. 10)</div>
-          <button id="btnAddLinha" class="btn btn-primary">Adicionar linha</button>
+          <div class="section-title" id="preferenciasTitulo">Seleção de Unidades</div>
+          <button id="btnAddLinha" class="btn btn-primary" type="button">Adicionar Unidade</button>
         </div>
         <div class="card-body">
           <div class="table-responsive">
             <table class="table table-sm align-middle table-fixed" id="tabelaPrefs">
               <thead>
                 <tr>
-                  <th style="width:100px">Prioridade</th>
-                  <th>Distrito</th>
+                  <th style="width: 90px">Prioridade</th>
+                  <th style="width: 170px">Distrito</th>
                   <th>Lotação</th>
-                  <th style="width:170px">Data de solicitação</th>
-                  <th style="width:190px">Data de credenciamento</th>
-                  <th class="table-actions">Ações</th>
+                  <th style="width: 170px">Data de solicitação</th>
+                  <th style="width: 190px">Data de credenciamento</th>
+                  <th class="text-center" style="width: 220px">Ações</th>
                 </tr>
               </thead>
-              <tbody id="prefsBody">
-                <!-- Linhas via JS -->
-              </tbody>
+              <tbody id="prefsBody" aria-live="polite"></tbody>
             </table>
           </div>
-          <div class="small-note mt-2">Linhas carregadas automaticamente não podem ser editadas (apenas removidas). A ordenação segue a prioridade (numérica).</div>
+          <div class="small-note mt-2">
+            Linhas carregadas automaticamente não podem ser editadas (apenas removidas). A ordenação segue a prioridade (numérica).
+          </div>
         </div>
       </section>
 
       <div class="d-flex justify-content-end mb-5">
-        <button class="btn btn-success" id="btnEnviar">Enviar formulário</button>
+        <button class="btn btn-success" id="btnEnviar" type="button">Enviar formulário</button>
       </div>
     </main>
 
-    <!-- Modal Adicionar Unidade -->
-    <div class="modal-backdrop-like" id="modalBackdrop" aria-hidden="true">
-      <div class="modal-card">
-        <div class="d-flex align-items-start justify-content-between mb-2">
-          <div class="h5 mb-0">Adicionar unidade</div>
-          <button class="btn btn-sm btn-outline-secondary" id="btnModalFechar">Fechar</button>
-        </div>
-        <div class="row g-3">
-          <div class="col-12 col-md-6">
-            <label class="form-label" for="mDs">Distrito</label>
-            <select id="mDs" class="form-select">
-              <option value="" selected disabled>Selecione...</option>
-              <option>SEAA - JURIDICO</option>
-              <option>SEAB</option>
-              <option>DS II</option>
-              <option>DS I</option>
-              <option>DS IV</option>
-              <option>SECOGE</option>
-              <option>SEGTES</option>
-              <option>SEAF</option>
-              <option>SEINFRA</option>
-              <option>SEVS</option>
-              <option>DS III</option>
-              <option>DS VII</option>
-              <option>DS VI</option>
-              <option>DS VIII</option>
-              <option>DS V</option>
-              <option>GABINETE SESAU</option>
-              <option>SERMAC</option>
-            </select>
+    <!-- Modal Unidade -->
+    <div
+      class="modal fade"
+      id="modalUnidade"
+      tabindex="-1"
+      aria-labelledby="modalUnidadeTitulo"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalUnidadeTitulo">Adicionar unidade</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
           </div>
-          <div class="col-12 col-md-6">
-            <label class="form-label" for="mUnidade">Unidade</label>
-            <select id="mUnidade" class="form-select" disabled>
-              <option>Selecione o distrito...</option>
-            </select>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label" for="mDs">Distrito</label>
+                <select id="mDs" class="form-select" data-required="true" aria-required="true">
+                  <option value="" selected disabled>Selecione...</option>
+                  <option>SEAA - JURIDICO</option>
+                  <option>SEAB</option>
+                  <option>DS II</option>
+                  <option>DS I</option>
+                  <option>DS IV</option>
+                  <option>SECOGE</option>
+                  <option>SEGTES</option>
+                  <option>SEAF</option>
+                  <option>SEINFRA</option>
+                  <option>SEVS</option>
+                  <option>DS III</option>
+                  <option>DS VII</option>
+                  <option>DS VI</option>
+                  <option>DS VIII</option>
+                  <option>DS V</option>
+                  <option>GABINETE SESAU</option>
+                  <option>SERMAC</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label" for="mUnidade">Unidade</label>
+                <select id="mUnidade" class="form-select" disabled data-required="true" aria-required="true">
+                  <option>Selecione o distrito...</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label" for="mTurno">Turno</label>
+                <select id="mTurno" class="form-select" disabled data-required="true" aria-required="true">
+                  <option>Selecione a unidade...</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label" for="mRegime">Regime</label>
+                <select id="mRegime" class="form-select" disabled data-required="true" aria-required="true">
+                  <option>Selecione a unidade...</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <div class="col-12 col-md-6">
-            <label class="form-label" for="mTurno">Turno</label>
-            <select id="mTurno" class="form-select" disabled>
-              <option>Selecione a unidade...</option>
-            </select>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" id="btnModalCancelar" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btnModalConfirmar">Salvar</button>
           </div>
-          <div class="col-12 col-md-6">
-            <label class="form-label" for="mRegime">Regime</label>
-            <select id="mRegime" class="form-select" disabled>
-              <option>Selecione a unidade...</option>
-            </select>
-          </div>
-        </div>
-        <div class="mt-3 d-flex gap-2 justify-content-end">
-          <button class="btn btn-primary" id="btnModalConfirmar">Adicionar</button>
         </div>
       </div>
     </div>
 
+    <!-- Modal de Alerta -->
+    <div class="modal fade" id="modalAlerta" tabindex="-1" aria-labelledby="modalAlertaTitulo" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <span role="img" aria-label="alerta">⚠️</span>
+              <span id="modalAlertaTitulo" class="modal-alert-title">Alerta</span>
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <p>Revise os campos listados antes de prosseguir:</p>
+            <ul id="alertList" class="alert-list"></ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Sucesso -->
+    <div class="modal fade" id="modalSucesso" tabindex="-1" aria-labelledby="modalSucessoTitulo" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalSucessoTitulo">Comprovante de solicitação</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <div id="resumoSolicitacao"></div>
+            <div id="printWrapper" class="d-none">
+              <div id="printComprovante" aria-live="polite"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-primary" id="btnSalvarPdf">Salvar em PDF</button>
+            <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      // ======== Helpers ========
       const postJSON = async (url, body) => {
-        const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body || {}) });
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body || {})
+        });
         if (!res.ok) throw new Error('Erro de rede');
         return res.json();
       };
       const toBRDate = (d) => {
         if (!d) return '';
-        const dt = (d instanceof Date) ? d : new Date(d);
-        return isNaN(dt) ? '' : dt.toLocaleDateString('pt-BR');
+        const dt = d instanceof Date ? d : new Date(d);
+        return Number.isNaN(dt.getTime()) ? '' : dt.toLocaleDateString('pt-BR');
       };
       const todayBR = () => toBRDate(new Date());
-      const isCEP = (v) => /^(\d{5}-?\d{3})$/.test((v||'').trim());
-      const sanitizeUF = (v) => (v||'').toUpperCase().slice(0,2);
+      const isCEP = (v) => /^(\d{5}\-?\d{3})$/.test((v || '').trim());
+      const sanitizeUF = (v) => (v || '').toUpperCase().slice(0, 2);
+      const onlyDigits = (value) => (value || '').replace(/\D+/g, '');
+      const ensureWhatsapp = (value) => {
+        const digits = onlyDigits(value);
+        return digits.length >= 10 && digits.length <= 11;
+      };
 
-      // ======== Mock bindings vindos do template (preenchidos em produção) ========
       const BIND = {
         dadosComuns: {
           nome: `{{ $json.data.dadosComuns.nome_servidor }}`,
@@ -335,236 +583,537 @@
           email: `{{ $json.data.dadosComuns.email }}`
         },
         vinculos: [
-          { matricula: `{{ $json.data.vinculos[0].matricula }}`, nome: `{{ $json.data.vinculos[0].nome }}`, cargo: `{{ $json.data.vinculos[0].cargo }}`, grupo: `{{ $json.data.vinculos[0].grupo }}`, admissao: `{{ $json.data.vinculos[0].admissao }}`, nascimento: `{{ $json.data.vinculos[0].nascimento }}`, vinculo: `{{ $json.data.vinculos[0].vinculo }}`, carga_horaria: `{{ $json.data.vinculos[0].carga_horaria }}` },
-          { matricula: `{{ $json.data.vinculos[1].matricula }}`, nome: `{{ $json.data.vinculos[1].nome }}`, cargo: `{{ $json.data.vinculos[1].cargo }}`, grupo: `{{ $json.data.vinculos[1].grupo }}`, admissao: `{{ $json.data.vinculos[1].admissao }}`, nascimento: `{{ $json.data.vinculos[1].nascimento }}`, vinculo: `{{ $json.data.vinculos[1].vinculo }}`, carga_horaria: `{{ $json.data.vinculos[1].carga_horaria }}` }
+          {
+            matricula: `{{ $json.data.vinculos[0].matricula }}`,
+            nome: `{{ $json.data.vinculos[0].nome }}`,
+            cargo: `{{ $json.data.vinculos[0].cargo }}`,
+            grupo: `{{ $json.data.vinculos[0].grupo }}`,
+            admissao: `{{ $json.data.vinculos[0].admissao }}`,
+            nascimento: `{{ $json.data.vinculos[0].nascimento }}`,
+            vinculo: `{{ $json.data.vinculos[0].vinculo }}`,
+            carga_horaria: `{{ $json.data.vinculos[0].carga_horaria }}`
+          },
+          {
+            matricula: `{{ $json.data.vinculos[1].matricula }}`,
+            nome: `{{ $json.data.vinculos[1].nome }}`,
+            cargo: `{{ $json.data.vinculos[1].cargo }}`,
+            grupo: `{{ $json.data.vinculos[1].grupo }}`,
+            admissao: `{{ $json.data.vinculos[1].admissao }}`,
+            nascimento: `{{ $json.data.vinculos[1].nascimento }}`,
+            vinculo: `{{ $json.data.vinculos[1].vinculo }}`,
+            carga_horaria: `{{ $json.data.vinculos[1].carga_horaria }}`
+          }
         ]
       };
 
-      // ======== Estado ========
       const state = {
-        prefs: [], // {prioridade, distrito, lotacao, data_solicitacao, data_credenciamento, imported:boolean}
-        max: 10
+        prefs: [],
+        max: 10,
+        modalMode: 'create',
+        editingIndex: null,
+        protocolo: null
       };
 
-      // ======== CEP -> BrasilAPI ========
+      const modalUnidade = new bootstrap.Modal(document.getElementById('modalUnidade'));
+      const modalAlerta = new bootstrap.Modal(document.getElementById('modalAlerta'));
+      const modalSucesso = new bootstrap.Modal(document.getElementById('modalSucesso'));
+
       async function fillByCEP(cep) {
         if (!isCEP(cep)) return;
         try {
-          const clean = cep.replace(/\D/g, '');
+          const clean = onlyDigits(cep);
           const r = await fetch(`https://brasilapi.com.br/api/cep/v2/${clean}`);
           if (!r.ok) return;
           const j = await r.json();
           document.getElementById('logradouro').value = j.street || '';
           document.getElementById('bairro').value = j.neighborhood || '';
           document.getElementById('cidade').value = j.city || '';
-          document.getElementById('uf').value = (j.state || '').slice(0,2);
-        } catch {}
+          document.getElementById('uf').value = sanitizeUF(j.state);
+        } catch (err) {
+          console.warn('CEP não encontrado', err);
+        }
       }
 
-      // ======== Render Tabela ========
-      function renderPrefs(){
+      function renderPrefs() {
         const tbody = document.getElementById('prefsBody');
         tbody.innerHTML = '';
-        // ordenar por prioridade
-        state.prefs.sort((a,b)=> (a.prioridade||999)-(b.prioridade||999));
+        state.prefs.sort((a, b) => (Number(a.prioridade) || 999) - (Number(b.prioridade) || 999));
         state.prefs.forEach((row, idx) => {
           const tr = document.createElement('tr');
-          const pCell = document.createElement('td');
-          if (row.imported) {
-            pCell.textContent = row.prioridade;
-          } else {
-            pCell.innerHTML = `<input type="number" min="1" class="form-control form-control-sm" value="${row.prioridade}" data-k="prioridade"/>`;
-          }
-          const dCell = document.createElement('td');
-          dCell.textContent = row.distrito || '';
-          const lCell = document.createElement('td');
-          if (row.imported) {
-            lCell.textContent = row.lotacao || '';
-          } else {
-            lCell.innerHTML = `<input class="form-control form-control-sm" value="${row.lotacao||''}" data-k="lotacao"/>`;
-          }
-          const dsCell = document.createElement('td');
-          dsCell.textContent = toBRDate(row.data_solicitacao);
-          const dcCell = document.createElement('td');
-          dcCell.textContent = toBRDate(row.data_credenciamento);
-          const aCell = document.createElement('td');
-          const del = document.createElement('button');
-          del.className = 'btn btn-sm btn-outline-danger';
-          del.textContent = 'Excluir';
-          del.addEventListener('click', () => { state.prefs.splice(idx,1); updateAddBtn(); renderPrefs(); });
-          aCell.appendChild(del);
+          if (row.imported) tr.classList.add('table-light');
 
-          // bind editable inputs
-          tr.addEventListener('input', (e)=>{
-            const t = e.target; if (!t.dataset.k) return;
-            state.prefs[idx][t.dataset.k] = t.value;
+          const priorityCell = document.createElement('td');
+          priorityCell.textContent = row.prioridade || '';
+
+          const distritoCell = document.createElement('td');
+          distritoCell.textContent = row.distrito || '';
+
+          const lotacaoCell = document.createElement('td');
+          lotacaoCell.textContent = [row.unidade, row.turno, row.regime].filter(Boolean).join(' • ');
+
+          const dataSolicCell = document.createElement('td');
+          dataSolicCell.textContent = toBRDate(row.data_solicitacao);
+
+          const dataCredCell = document.createElement('td');
+          dataCredCell.textContent = toBRDate(row.data_credenciamento);
+
+          const actionsCell = document.createElement('td');
+          actionsCell.className = 'actions-cell d-flex justify-content-center';
+
+          const viewBtn = document.createElement('button');
+          viewBtn.type = 'button';
+          viewBtn.className = 'btn btn-sm btn-outline-secondary';
+          viewBtn.textContent = 'Visualizar';
+          viewBtn.addEventListener('click', () => openModalUnidade('view', idx));
+
+          const editBtn = document.createElement('button');
+          editBtn.type = 'button';
+          editBtn.className = 'btn btn-sm btn-outline-primary';
+          editBtn.textContent = 'Editar';
+          editBtn.disabled = !!row.imported;
+          editBtn.addEventListener('click', () => {
+            if (!row.imported) openModalUnidade('edit', idx);
           });
 
-          tr.append(pCell,dCell,lCell,dsCell,dcCell,aCell);
-          if (row.imported) tr.classList.add('table-light');
+          const deleteBtn = document.createElement('button');
+          deleteBtn.type = 'button';
+          deleteBtn.className = 'btn btn-sm btn-outline-danger';
+          deleteBtn.textContent = 'Excluir';
+          deleteBtn.addEventListener('click', () => {
+            state.prefs.splice(idx, 1);
+            updateAddBtn();
+            renderPrefs();
+          });
+
+          actionsCell.append(viewBtn, editBtn, deleteBtn);
+          tr.append(priorityCell, distritoCell, lotacaoCell, dataSolicCell, dataCredCell, actionsCell);
           tbody.appendChild(tr);
         });
       }
 
-      function updateAddBtn(){
+      function updateAddBtn() {
         const btn = document.getElementById('btnAddLinha');
-        btn.textContent = state.prefs.length >= state.max ? 'Limite atingido' : 'Adicionar unidade';
-        btn.disabled = state.prefs.length >= state.max;
-      }
-
-      // ======== Encadeamentos (cards e modal) ========
-      async function loadUnidades(ds, targetSel){
-        const sel = document.getElementById(targetSel);
-        sel.innerHTML = '<option>Carregando...</option>'; sel.disabled = true;
-        try{
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/unidades',{ ds });
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
-          (data||[]).forEach(u=>{ if(u&&u.unidade) sel.insertAdjacentHTML('beforeend',`<option>${u.unidade}</option>`); });
-          sel.disabled = false;
-        }catch{ sel.innerHTML = '<option>Falha ao carregar</option>'; }
-      }
-      async function loadTurnos(unidade, targetSel){
-        const sel = document.getElementById(targetSel);
-        sel.innerHTML = '<option>Carregando...</option>'; sel.disabled = true;
-        try{
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/turnos',{ unidade });
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
-          (data||[]).forEach(t=>{ if(t&&t.turno) sel.insertAdjacentHTML('beforeend',`<option>${t.turno}</option>`); });
-          sel.disabled = false;
-        }catch{ sel.innerHTML = '<option>Falha ao carregar</option>'; }
-      }
-      async function loadRegimes(unidade, targetSel){
-        const sel = document.getElementById(targetSel);
-        sel.innerHTML = '<option>Carregando...</option>'; sel.disabled = true;
-        try{
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/regimes',{ unidade });
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
-          (data||[]).forEach(r=>{ if(r&&r.regime) sel.insertAdjacentHTML('beforeend',`<option>${r.regime}</option>`); });
-          sel.disabled = false;
-        }catch{ sel.innerHTML = '<option>Falha ao carregar</option>'; }
-      }
-
-      // ======== Matrícula -> preencher identificação + carregar preferências ========
-      function fillIdentificacaoFromVinculo(matricula){
-        const v = (BIND.vinculos||[]).find(x => (x&&x.matricula&&x.matricula.toString()===matricula.toString()));
-        const safe = (s) => (s && s !== 'undefined' && s !== 'null') ? s : '';
-        // Nome e nascimento são carregados de dadosComuns e NÃO devem ser sobrescritos
-        document.getElementById('admissao').value = toBRDate(safe(v?.admissao));
-        document.getElementById('cargo').value = safe(v?.cargo);
-        document.getElementById('grupo').value = safe(v?.grupo);
-        document.getElementById('vinculo').value = safe(v?.vinculo);
-        document.getElementById('carga').value = safe(v?.carga_horaria);
-      }{
-        const v = (BIND.vinculos||[]).find(x => (x&&x.matricula&&x.matricula.toString()===matricula.toString()));
-        const safe = (s) => (s && s !== 'undefined' && s !== 'null') ? s : '';
-        document.getElementById('admissao').value = toBRDate(safe(v?.admissao));
-        document.getElementById('nascimento').value = toBRDate(safe(v?.nascimento));
-        document.getElementById('nome').value = safe(v?.nome);
-        document.getElementById('cargo').value = safe(v?.cargo);
-        document.getElementById('vinculo').value = safe(v?.vinculo);
-        document.getElementById('carga').value = safe(v?.carga);
-      }
-
-      async function loadPreferenciasByMatricula(matricula){
-        try{
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2',{ matricula });
-          // mapear e limitar a 10
-          const imported = (Array.isArray(data)? data: []).slice(0,state.max).map(item=>({
-            prioridade: item.prioridade,
-            distrito: item.distrito,
-            lotacao: item.lotacao,
-            data_solicitacao: item.data_solicitacao,
-            data_credenciamento: item.data_credenciamento,
-            imported: true
-          }));
-          state.prefs = imported; // substitui pelo retorno
-          updateAddBtn();
-          renderPrefs();
-        }catch{
-          // falhou? apenas limpa
-          state.prefs = [];
-          updateAddBtn();
-          renderPrefs();
+        if (state.prefs.length >= state.max) {
+          btn.textContent = 'Limite atingido';
+          btn.disabled = true;
+        } else {
+          btn.textContent = 'Adicionar Unidade';
+          btn.disabled = false;
         }
       }
 
-      // ======== Inicialização ========
-      function populateMatriculas(){
+      function mapPreferencias(importedPrefs = []) {
+        return importedPrefs.slice(0, state.max).map((item) => ({
+          prioridade: item.prioridade,
+          distrito: item.distrito,
+          unidade: item.unidade || item.lotacao || '',
+          turno: item.turno || '',
+          regime: item.regime || '',
+          data_solicitacao: item.data_solicitacao,
+          data_credenciamento: item.data_credenciamento,
+          imported: true
+        }));
+      }
+
+      async function loadUnidades(ds, targetSel, selectedValue = '') {
+        const sel = document.getElementById(targetSel);
+        sel.innerHTML = '<option>Carregando...</option>';
+        sel.disabled = true;
+        const grupo = document.getElementById('grupo').value || null;
+        try {
+          const data = await postJSON(
+            'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/unidades',
+            { ds, grupo }
+          );
+          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+          (data || []).forEach((u) => {
+            if (u && u.unidade) {
+              const option = document.createElement('option');
+              option.value = u.unidade;
+              option.textContent = u.unidade;
+              sel.appendChild(option);
+            }
+          });
+          sel.disabled = false;
+          if (selectedValue) sel.value = selectedValue;
+        } catch (err) {
+          console.error(err);
+          sel.innerHTML = '<option>Falha ao carregar</option>';
+        }
+      }
+
+      async function loadTurnos(unidade, targetSel, ds, selectedValue = '') {
+        const sel = document.getElementById(targetSel);
+        sel.innerHTML = '<option>Carregando...</option>';
+        sel.disabled = true;
+        const grupo = document.getElementById('grupo').value || null;
+        try {
+          const data = await postJSON(
+            'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/turnos',
+            { unidade, ds, grupo }
+          );
+          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+          (data || []).forEach((t) => {
+            if (t && t.turno) {
+              const option = document.createElement('option');
+              option.value = t.turno;
+              option.textContent = t.turno;
+              sel.appendChild(option);
+            }
+          });
+          sel.disabled = false;
+          if (selectedValue) sel.value = selectedValue;
+        } catch (err) {
+          console.error(err);
+          sel.innerHTML = '<option>Falha ao carregar</option>';
+        }
+      }
+
+      async function loadRegimes(unidade, targetSel, ds, selectedValue = '') {
+        const sel = document.getElementById(targetSel);
+        sel.innerHTML = '<option>Carregando...</option>';
+        sel.disabled = true;
+        const grupo = document.getElementById('grupo').value || null;
+        try {
+          const data = await postJSON(
+            'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/regimes',
+            { unidade, ds, grupo }
+          );
+          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+          (data || []).forEach((r) => {
+            if (r && r.regime) {
+              const option = document.createElement('option');
+              option.value = r.regime;
+              option.textContent = r.regime;
+              sel.appendChild(option);
+            }
+          });
+          sel.disabled = false;
+          if (selectedValue) sel.value = selectedValue;
+        } catch (err) {
+          console.error(err);
+          sel.innerHTML = '<option>Falha ao carregar</option>';
+        }
+      }
+
+      function safeValue(v) {
+        return v && v !== 'undefined' && v !== 'null' ? v : '';
+      }
+
+      function fillIdentificacaoFromVinculo(matricula) {
+        const vinculo = (BIND.vinculos || []).find((x) => x && x.matricula && x.matricula.toString() === matricula.toString());
+        if (!vinculo) return;
+        document.getElementById('nome').value = safeValue(vinculo.nome) || document.getElementById('nome').value;
+        document.getElementById('nascimento').value = toBRDate(safeValue(vinculo.nascimento)) || document.getElementById('nascimento').value;
+        document.getElementById('admissao').value = toBRDate(safeValue(vinculo.admissao));
+        document.getElementById('cargo').value = safeValue(vinculo.cargo);
+        document.getElementById('grupo').value = safeValue(vinculo.grupo);
+        document.getElementById('vinculo').value = safeValue(vinculo.vinculo);
+        document.getElementById('carga').value = safeValue(vinculo.carga_horaria || vinculo.carga);
+      }
+
+      async function loadPreferenciasByMatricula(matricula) {
+        try {
+          const data = await postJSON(
+            'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2',
+            { matricula }
+          );
+          state.prefs = mapPreferencias(Array.isArray(data) ? data : []);
+        } catch (err) {
+          console.warn('Não foi possível carregar preferências', err);
+          state.prefs = [];
+        }
+        updateAddBtn();
+        renderPrefs();
+      }
+
+      function populateMatriculas() {
         const sel = document.getElementById('matricula');
         sel.innerHTML = '';
         const opts = [];
-        if (BIND.vinculos[0]?.matricula && BIND.vinculos[0].matricula !== 'undefined') opts.push(BIND.vinculos[0].matricula);
-        if (BIND.vinculos[1]?.matricula && BIND.vinculos[1].matricula !== 'undefined' && String(BIND.vinculos[1].matricula).trim() !== '') opts.push(BIND.vinculos[1].matricula);
-        if (!opts.length){ sel.innerHTML = '<option disabled selected>Sem matrículas disponíveis</option>'; sel.disabled = true; return; }
-        sel.insertAdjacentHTML('beforeend','<option value="" disabled selected>Selecione...</option>');
-        opts.forEach(v => sel.insertAdjacentHTML('beforeend',`<option>${v}</option>`));
+        if (safeValue(BIND.vinculos?.[0]?.matricula)) opts.push(BIND.vinculos[0].matricula);
+        if (safeValue(BIND.vinculos?.[1]?.matricula)) opts.push(BIND.vinculos[1].matricula);
+        if (!opts.length) {
+          sel.innerHTML = '<option disabled selected>Sem matrículas disponíveis</option>';
+          sel.disabled = true;
+          return;
+        }
+        sel.insertAdjacentHTML('beforeend', '<option value="" disabled selected>Selecione...</option>');
+        opts.forEach((v) => sel.insertAdjacentHTML('beforeend', `<option>${v}</option>`));
       }
 
-      function populateEnderecoContato(){
-        const dc = BIND.dadosComuns||{}; const e = dc.endereco||{};
-        const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.value = (val&&val!=='undefined'&&val!=='null')? val: ''; };
-        set('cep', e.cep); set('logradouro', e.logradouro); set('numero', e.numero); set('complemento', e.complemento);
-        set('bairro', e.bairro); set('cidade', e.cidade); set('uf', sanitizeUF(e.uf));
-        set('whatsapp', dc.whatsapp); set('telalt', dc.telalternativo); set('email', dc.email);
+      function populateEnderecoContato() {
+        const dc = BIND.dadosComuns || {};
+        const e = dc.endereco || {};
+        const set = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.value = safeValue(val);
+        };
+        set('cep', e.cep);
+        set('logradouro', e.logradouro);
+        set('numero', e.numero);
+        set('complemento', e.complemento);
+        set('bairro', e.bairro);
+        set('cidade', e.cidade);
+        set('uf', sanitizeUF(e.uf));
+        set('whatsapp', dc.whatsapp);
+        set('telalt', dc.telalternativo);
+        set('email', dc.email);
+        set('email2', dc.email);
       }
 
-      // ======== Modal ========
-      function openModal(){ document.getElementById('modalBackdrop').classList.add('active'); }
-      function closeModal(){ document.getElementById('modalBackdrop').classList.remove('active'); }
+      function applyUppercaseBehaviour() {
+        document.querySelectorAll('input[type="text"], input:not([data-uppercase="false"])').forEach((input) => {
+          if (input.dataset.uppercase === 'false' || input.type === 'email' || input.readOnly) return;
+          input.classList.add('uppercase');
+          if (input.value) input.value = input.value.toUpperCase();
+          input.addEventListener('input', () => {
+            const cursor = input.selectionStart;
+            input.value = input.value.toUpperCase();
+            if (document.activeElement === input && typeof cursor === 'number') {
+              input.setSelectionRange(cursor, cursor);
+            }
+          });
+        });
+      }
 
-      // ======== Eventos ========
-      document.getElementById('cep').addEventListener('change', (e)=> fillByCEP(e.target.value));
-      document.getElementById('uf').addEventListener('input', (e)=> e.target.value = sanitizeUF(e.target.value));
+      function applyNumericBehaviour() {
+        document.querySelectorAll('[data-numeric="true"]').forEach((input) => {
+          input.addEventListener('input', () => {
+            const cursor = input.selectionStart;
+            input.value = onlyDigits(input.value);
+            if (document.activeElement === input && typeof cursor === 'number') {
+              const newPos = Math.min(cursor, input.value.length);
+              input.setSelectionRange(newPos, newPos);
+            }
+          });
+        });
+      }
 
-      document.getElementById('dsSelect').addEventListener('change', (e)=>{
-        const v = e.target.value; if (v) loadUnidades(v,'unidadeSelect');
-      });
-      document.getElementById('unidadeSelect').addEventListener('change', (e)=>{
-        const u = e.target.value; if (u){ loadTurnos(u,'turnoSelect'); loadRegimes(u,'regimeSelect'); }
-      });
+      function markInvalidField(field) {
+        if (!field) return;
+        field.classList.add('is-invalid');
+        field.setAttribute('aria-invalid', 'true');
+      }
 
-      document.getElementById('mDs').addEventListener('change', (e)=>{
-        const v = e.target.value; if (v) loadUnidades(v,'mUnidade');
-      });
-      document.getElementById('mUnidade').addEventListener('change', (e)=>{
-        const u = e.target.value; if (u){ loadTurnos(u,'mTurno'); loadRegimes(u,'mRegime'); }
-      });
+      function clearInvalidMarkers() {
+        document.querySelectorAll('.is-invalid').forEach((el) => {
+          el.classList.remove('is-invalid');
+          el.removeAttribute('aria-invalid');
+        });
+      }
 
-      document.getElementById('matricula').addEventListener('change', async (e)=>{
-        const m = e.target.value; if(!m) return;
-        fillIdentificacaoFromVinculo(m);
-        await loadPreferenciasByMatricula(m);
-      });
+      function validateForm() {
+        clearInvalidMarkers();
+        const errors = [];
+        const requiredFields = Array.from(document.querySelectorAll('[data-required="true"]'));
 
-      document.getElementById('btnAddLinha').addEventListener('click', ()=>{ if (state.prefs.length < state.max) openModal(); });
-      document.getElementById('btnModalFechar').addEventListener('click', closeModal);
-      document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='modalBackdrop') closeModal(); });
+        requiredFields.forEach((field) => {
+          if (field.disabled || field.readOnly) return;
+          if (!field.value || !field.value.toString().trim()) {
+            errors.push({ fieldId: field.id, message: field.labels?.[0]?.textContent || field.id });
+            markInvalidField(field);
+          }
+        });
 
-      document.getElementById('btnModalConfirmar').addEventListener('click', ()=>{
-        const ds = document.getElementById('mDs').value;
-        const un = document.getElementById('mUnidade').value;
-        const tu = document.getElementById('mTurno').value;
-        const rg = document.getElementById('mRegime').value;
-        if (!ds || !un || !tu || !rg) return;
-        const pr = (state.prefs.reduce((mx, r)=> Math.max(mx, Number(r.prioridade)||0), 0) + 1) || 1;
-        state.prefs.push({ prioridade: pr, distrito: ds, lotacao: `${un} • ${tu} • ${rg}`, data_solicitacao: new Date(), data_credenciamento: new Date(), imported: false });
-        closeModal(); updateAddBtn(); renderPrefs();
-        // Reset modal fields
-        ['mDs','mUnidade','mTurno','mRegime'].forEach(id=>{ const el=document.getElementById(id); el.value=''; if(id!=='mDs'){ el.innerHTML = `<option>${id==='mUnidade'?'Selecione o distrito...':'Selecione a unidade...'}</option>`; el.disabled = true; } });
-      });
+        const cepField = document.getElementById('cep');
+        if (cepField && cepField.value && onlyDigits(cepField.value).length !== 8) {
+          errors.push({ fieldId: 'cep', message: 'CEP deve conter 8 dígitos.' });
+          markInvalidField(cepField);
+        }
 
-      document.getElementById('btnEnviar').addEventListener('click', ()=>{
-        // valida e-mails simples
-        const email = document.getElementById('email').value.trim();
-        const email2 = document.getElementById('email2').value.trim();
-        if (email && email2 && email!==email2){ alert('Os e-mails não conferem.'); return; }
-        const payload = {
+        const whatsappField = document.getElementById('whatsapp');
+        if (whatsappField && !ensureWhatsapp(whatsappField.value)) {
+          errors.push({ fieldId: 'whatsapp', message: 'Informe o WhatsApp com DDD.' });
+          markInvalidField(whatsappField);
+        }
+
+        const telAltField = document.getElementById('telalt');
+        if (telAltField && telAltField.value) {
+          const digits = onlyDigits(telAltField.value);
+          if (digits.length < 10 || digits.length > 11) {
+            errors.push({ fieldId: 'telalt', message: 'Telefone alternativo deve conter DDD.' });
+            markInvalidField(telAltField);
+          }
+        }
+
+        const email = (document.getElementById('email')?.value || '').trim();
+        const email2 = (document.getElementById('email2')?.value || '').trim();
+        if (email && email2 && email !== email2) {
+          errors.push({ fieldId: 'email2', message: 'Os e-mails devem coincidir.' });
+          markInvalidField(document.getElementById('email'));
+          markInvalidField(document.getElementById('email2'));
+        }
+
+        if (!state.prefs.length) {
+          errors.push({ fieldId: 'prefsBody', message: 'Inclua ao menos uma unidade na seleção.' });
+        }
+
+        return {
+          isValid: errors.length === 0,
+          errors
+        };
+      }
+
+      function fillResumo(payload) {
+        const resumoEl = document.getElementById('resumoSolicitacao');
+        const printEl = document.getElementById('printComprovante');
+        const protocolo = state.protocolo || `22${Date.now().toString().slice(-5)}`;
+        state.protocolo = protocolo;
+
+        const prefsRows = payload.preferencias
+          .map(
+            (p, index) => `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${payload.matricula || '-'}</td>
+                <td>${payload.dadosPessoais.cargo || '-'}</td>
+                <td>${p.distrito || '-'}</td>
+                <td>${p.unidade || '-'}</td>
+                <td>${toBRDate(p.data_credenciamento) || '-'}</td>
+              </tr>
+            `
+          )
+          .join('');
+
+        resumoEl.innerHTML = `
+          <div class="bg-light border rounded p-3">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+              <div>
+                <h6 class="text-muted mb-1">Solicitação registrada</h6>
+                <h4 class="mb-0">${payload.dadosPessoais.nome || 'Servidor(a)'}</h4>
+                <div class="text-muted small mt-1">Matrícula ${payload.matricula || '-'}</div>
+              </div>
+              <div class="text-lg-end">
+                <span class="text-muted d-block">Número da solicitação</span>
+                <span class="fs-4 fw-semibold">${protocolo}</span>
+              </div>
+            </div>
+            <hr />
+            <dl class="row mb-0">
+              <dt class="col-sm-3">Cargo</dt>
+              <dd class="col-sm-9">${payload.dadosPessoais.cargo || '-'}</dd>
+              <dt class="col-sm-3">Distrito atual</dt>
+              <dd class="col-sm-9">${payload.lotacaoAtual.ds || '-'}</dd>
+              <dt class="col-sm-3">Lotação atual</dt>
+              <dd class="col-sm-9">${payload.lotacaoAtual.unidade || '-'}</dd>
+              <dt class="col-sm-3">Última atualização</dt>
+              <dd class="col-sm-9">${todayBR()}</dd>
+            </dl>
+            <div class="table-responsive mt-3">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Prioridade</th>
+                    <th>Matrícula</th>
+                    <th>Cargo</th>
+                    <th>Distrito</th>
+                    <th>Lotação</th>
+                    <th>Credenciamento</th>
+                  </tr>
+                </thead>
+                <tbody>${prefsRows}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+
+        printEl.innerHTML = `
+          <div class="header">
+            <div class="left">
+              <img src="https://statics.recife.pe.gov.br/images/dynamics/conecta/logo_prefeitura_recife.svg" alt="Prefeitura do Recife" height="56" />
+              <strong>PREFEITURA DO RECIFE</strong>
+              <span>Secretaria de Saúde (SESAU)</span>
+              <span>Portal do Servidor · Mobilidade Interna</span>
+            </div>
+            <div class="text-end">
+              <div class="text-muted">Número da solicitação</div>
+              <div class="fs-3 fw-bold">${protocolo}</div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h5>Comprovante de solicitação</h5>
+            <p class="mb-0">Solicitação registrada em banco de dados para a matrícula <strong>${payload.matricula || '-'}</strong>.</p>
+          </div>
+          <div class="row mb-4">
+            <div class="col-sm-6">
+              <div><strong>Nome do servidor</strong></div>
+              <div>${payload.dadosPessoais.nome || '-'}</div>
+            </div>
+            <div class="col-sm-6">
+              <div><strong>CPF</strong></div>
+              <div>---</div>
+            </div>
+            <div class="col-sm-6 mt-3">
+              <div><strong>Cargo</strong></div>
+              <div>${payload.dadosPessoais.cargo || '-'}</div>
+            </div>
+            <div class="col-sm-6 mt-3">
+              <div><strong>Grupo</strong></div>
+              <div>${payload.dadosPessoais.grupo || '-'}</div>
+            </div>
+            <div class="col-sm-6 mt-3">
+              <div><strong>Data de emissão</strong></div>
+              <div>${todayBR()}</div>
+            </div>
+          </div>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Prioridade</th>
+                <th>Distrito</th>
+                <th>Lotação</th>
+                <th>Horário</th>
+                <th>Regime</th>
+                <th>Credenciamento</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${payload.preferencias
+                .map(
+                  (p, index) => `
+                    <tr>
+                      <td>${p.prioridade || index + 1}</td>
+                      <td>${p.distrito || '-'}</td>
+                      <td>${p.unidade || '-'}</td>
+                      <td>${p.turno || '-'}</td>
+                      <td>${p.regime || '-'}</td>
+                      <td>${toBRDate(p.data_credenciamento) || '-'}</td>
+                    </tr>
+                  `
+                )
+                .join('')}
+            </tbody>
+          </table>
+          <div class="mt-3 text-muted small">Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.</div>
+        `;
+      }
+
+      function openAlertModal(errors) {
+        const list = document.getElementById('alertList');
+        list.innerHTML = '';
+        errors.forEach((err) => {
+          const li = document.createElement('li');
+          li.textContent = err.message;
+          list.appendChild(li);
+        });
+        modalAlerta.show();
+      }
+
+      function openSuccessModal(payload) {
+        fillResumo(payload);
+        modalSucesso.show();
+      }
+
+      function collectPayload() {
+        return {
           matricula: document.getElementById('matricula').value || null,
           dadosPessoais: {
-            admissao: document.getElementById('admissao').value || null,
-            nascimento: document.getElementById('nascimento').value || null,
             nome: document.getElementById('nome').value || null,
+            nascimento: document.getElementById('nascimento').value || null,
+            admissao: document.getElementById('admissao').value || null,
             cargo: document.getElementById('cargo').value || null,
+            grupo: document.getElementById('grupo').value || null,
             vinculo: document.getElementById('vinculo').value || null,
             carga: document.getElementById('carga').value || null
           },
@@ -578,30 +1127,268 @@
             uf: document.getElementById('uf').value || null,
             whatsapp: document.getElementById('whatsapp').value || null,
             telalternativo: document.getElementById('telalt').value || null,
-            email,
+            email: document.getElementById('email').value || null
           },
           lotacaoAtual: {
             ds: document.getElementById('dsSelect').value || null,
             unidade: document.getElementById('unidadeSelect').value || null,
             turno: document.getElementById('turnoSelect').value || null,
-            regime: document.getElementById('regimeSelect').value || null,
+            regime: document.getElementById('regimeSelect').value || null
           },
-          preferencias: state.prefs.map(p=>({ prioridade: Number(p.prioridade)||null, distrito: p.distrito||null, lotacao: p.lotacao||null, data_solicitacao: toBRDate(p.data_solicitacao), data_credenciamento: toBRDate(p.data_credenciamento), imported: !!p.imported }))
+          preferencias: state.prefs.map((p) => ({
+            prioridade: Number(p.prioridade) || null,
+            distrito: p.distrito || null,
+            unidade: p.unidade || null,
+            turno: p.turno || null,
+            regime: p.regime || null,
+            data_solicitacao: p.data_solicitacao || null,
+            data_credenciamento: p.data_credenciamento || null,
+            imported: !!p.imported
+          }))
         };
-        console.log('Payload formulário mobilidade:', payload);
-        alert('Dados preparados para envio. Veja o console.');
-      });
+      }
 
-      // ======== Boot ========
-      (function init(){
+      function resetModalUnidade() {
+        ['mDs', 'mUnidade', 'mTurno', 'mRegime'].forEach((id) => {
+          const el = document.getElementById(id);
+          el.value = '';
+          if (id !== 'mDs') {
+            el.innerHTML = `<option>${id === 'mUnidade' ? 'Selecione o distrito...' : 'Selecione a unidade...'}</option>`;
+            el.disabled = true;
+          }
+          el.disabled = id !== 'mDs';
+        });
+        document.getElementById('btnModalConfirmar').classList.remove('d-none');
+        document.getElementById('btnModalCancelar').textContent = 'Cancelar';
+      }
+
+      async function openModalUnidade(mode, index = null) {
+        state.modalMode = mode;
+        state.editingIndex = index;
+        const title = document.getElementById('modalUnidadeTitulo');
+        const confirmBtn = document.getElementById('btnModalConfirmar');
+        const cancelBtn = document.getElementById('btnModalCancelar');
+        resetModalUnidade();
+
+        if (mode === 'create') {
+          title.textContent = 'Adicionar unidade';
+          confirmBtn.textContent = 'Adicionar';
+          confirmBtn.disabled = false;
+        } else {
+          const pref = state.prefs[index];
+          title.textContent = mode === 'edit' ? 'Editar unidade' : 'Visualizar unidade';
+          confirmBtn.textContent = mode === 'edit' ? 'Atualizar' : 'Fechar';
+          confirmBtn.disabled = mode === 'view';
+          if (mode === 'view') confirmBtn.classList.add('d-none');
+          if (mode === 'view') cancelBtn.textContent = 'Fechar';
+
+          const ds = pref?.distrito || '';
+          const unidade = pref?.unidade || '';
+          const turno = pref?.turno || '';
+          const regime = pref?.regime || '';
+          const dsSelect = document.getElementById('mDs');
+          dsSelect.value = ds;
+
+          if (ds) {
+            await loadUnidades(ds, 'mUnidade', unidade);
+            if (unidade) {
+              await loadTurnos(unidade, 'mTurno', ds, turno);
+              await loadRegimes(unidade, 'mRegime', ds, regime);
+            }
+          }
+
+          ['mDs', 'mUnidade', 'mTurno', 'mRegime'].forEach((id) => {
+            const el = document.getElementById(id);
+            el.disabled = mode === 'view';
+          });
+        }
+
+        modalUnidade.show();
+      }
+
+      function closeModalUnidade() {
+        modalUnidade.hide();
+      }
+
+      function buildPreferenceFromModal() {
+        const ds = document.getElementById('mDs').value;
+        const unidade = document.getElementById('mUnidade').value;
+        const turno = document.getElementById('mTurno').value;
+        const regime = document.getElementById('mRegime').value;
+        if (!ds || !unidade || !turno || !regime) return null;
+        const nextPriority = state.prefs.reduce((mx, r) => Math.max(mx, Number(r.prioridade) || 0), 0) + 1;
+        return {
+          prioridade: nextPriority,
+          distrito: ds,
+          unidade,
+          turno,
+          regime,
+          data_solicitacao: new Date(),
+          data_credenciamento: new Date(),
+          imported: false
+        };
+      }
+
+      function updatePreferenceFromModal(index) {
+        const ds = document.getElementById('mDs').value;
+        const unidade = document.getElementById('mUnidade').value;
+        const turno = document.getElementById('mTurno').value;
+        const regime = document.getElementById('mRegime').value;
+        if (!ds || !unidade || !turno || !regime) return false;
+        const pref = state.prefs[index];
+        pref.distrito = ds;
+        pref.unidade = unidade;
+        pref.turno = turno;
+        pref.regime = regime;
+        if (!pref.data_solicitacao) pref.data_solicitacao = new Date();
+        if (!pref.data_credenciamento) pref.data_credenciamento = new Date();
+        return true;
+      }
+
+      function preparePrintArea() {
+        const wrapper = document.getElementById('printWrapper');
+        wrapper.classList.remove('d-none');
+        setTimeout(() => {
+          window.print();
+        }, 50);
+      }
+
+      function afterPrintCleanup() {
+        document.getElementById('printWrapper').classList.add('d-none');
+      }
+
+      function initEvents() {
+        document.getElementById('cep').addEventListener('change', (e) => fillByCEP(e.target.value));
+        document.getElementById('uf').addEventListener('input', (e) => {
+          e.target.value = sanitizeUF(e.target.value);
+        });
+
+        document.getElementById('dsSelect').addEventListener('change', async (e) => {
+          const v = e.target.value;
+          const unidadeSelect = document.getElementById('unidadeSelect');
+          const turnoSelect = document.getElementById('turnoSelect');
+          const regimeSelect = document.getElementById('regimeSelect');
+          unidadeSelect.innerHTML = '<option>Selecione o distrito...</option>';
+          unidadeSelect.value = '';
+          unidadeSelect.disabled = true;
+          turnoSelect.innerHTML = '<option>Selecione a unidade...</option>';
+          turnoSelect.value = '';
+          regimeSelect.innerHTML = '<option>Selecione a unidade...</option>';
+          regimeSelect.value = '';
+          turnoSelect.disabled = true;
+          regimeSelect.disabled = true;
+          if (v) {
+            await loadUnidades(v, 'unidadeSelect');
+            unidadeSelect.disabled = false;
+          }
+        });
+        document.getElementById('unidadeSelect').addEventListener('change', async (e) => {
+          const unidade = e.target.value;
+          const ds = document.getElementById('dsSelect').value;
+          const turnoSelect = document.getElementById('turnoSelect');
+          const regimeSelect = document.getElementById('regimeSelect');
+          turnoSelect.innerHTML = '<option>Carregando...</option>';
+          regimeSelect.innerHTML = '<option>Carregando...</option>';
+          if (unidade && ds) {
+            await loadTurnos(unidade, 'turnoSelect', ds);
+            await loadRegimes(unidade, 'regimeSelect', ds);
+          }
+        });
+
+        document.getElementById('mDs').addEventListener('change', async (e) => {
+          const v = e.target.value;
+          const turnoSelect = document.getElementById('mTurno');
+          const regimeSelect = document.getElementById('mRegime');
+          const unidadeModal = document.getElementById('mUnidade');
+          unidadeModal.innerHTML = '<option>Selecione o distrito...</option>';
+          unidadeModal.value = '';
+          unidadeModal.disabled = true;
+          turnoSelect.innerHTML = '<option>Selecione a unidade...</option>';
+          turnoSelect.value = '';
+          regimeSelect.innerHTML = '<option>Selecione a unidade...</option>';
+          regimeSelect.value = '';
+          turnoSelect.disabled = true;
+          regimeSelect.disabled = true;
+          if (v) await loadUnidades(v, 'mUnidade');
+        });
+        document.getElementById('mUnidade').addEventListener('change', async (e) => {
+          const unidade = e.target.value;
+          const ds = document.getElementById('mDs').value;
+          const turnoSelect = document.getElementById('mTurno');
+          const regimeSelect = document.getElementById('mRegime');
+          turnoSelect.innerHTML = '<option>Carregando...</option>';
+          regimeSelect.innerHTML = '<option>Carregando...</option>';
+          if (unidade && ds) {
+            await loadTurnos(unidade, 'mTurno', ds);
+            await loadRegimes(unidade, 'mRegime', ds);
+          }
+        });
+
+        document.getElementById('btnAddLinha').addEventListener('click', () => {
+          if (state.prefs.length < state.max) openModalUnidade('create');
+        });
+
+        document.getElementById('btnModalConfirmar').addEventListener('click', () => {
+          if (state.modalMode === 'view') {
+            closeModalUnidade();
+            return;
+          }
+          if (state.modalMode === 'edit') {
+            if (updatePreferenceFromModal(state.editingIndex)) {
+              closeModalUnidade();
+              renderPrefs();
+            }
+            return;
+          }
+          const pref = buildPreferenceFromModal();
+          if (!pref) return;
+          state.prefs.push(pref);
+          closeModalUnidade();
+          updateAddBtn();
+          renderPrefs();
+        });
+
+        document.getElementById('matricula').addEventListener('change', async (e) => {
+          const m = e.target.value;
+          if (!m) return;
+          fillIdentificacaoFromVinculo(m);
+          await loadPreferenciasByMatricula(m);
+        });
+
+        document.getElementById('btnEnviar').addEventListener('click', () => {
+          const validation = validateForm();
+          if (!validation.isValid) {
+            openAlertModal(validation.errors);
+            return;
+          }
+          const payload = collectPayload();
+          console.log('Payload formulário mobilidade:', payload);
+          openSuccessModal(payload);
+        });
+
+        document.getElementById('btnSalvarPdf').addEventListener('click', () => {
+          preparePrintArea();
+        });
+        document.getElementById('btnImprimir').addEventListener('click', () => {
+          preparePrintArea();
+        });
+
+        window.addEventListener('afterprint', afterPrintCleanup);
+      }
+
+      function init() {
         populateMatriculas();
         populateEnderecoContato();
-        // Carrega nome e nascimento independentemente da matrícula
         const dc = BIND.dadosComuns || {};
-        document.getElementById('nome').value = (dc.nome && dc.nome!=='undefined' && dc.nome!=='null') ? dc.nome : '';
+        document.getElementById('nome').value = safeValue(dc.nome);
         document.getElementById('nascimento').value = toBRDate(dc.nascimento);
+        applyUppercaseBehaviour();
+        applyNumericBehaviour();
         updateAddBtn();
-      })();
+        initEvents();
+      }
+
+      document.addEventListener('DOMContentLoaded', init);
     </script>
   </body>
 </html>
