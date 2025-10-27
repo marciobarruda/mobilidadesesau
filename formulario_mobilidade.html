@@ -96,8 +96,16 @@
         color: var(--text-muted);
       }
       .actions-cell {
-        white-space: nowrap;
+        white-space: normal;
+        vertical-align: middle;
+      }
+      .actions-cell .actions-wrapper {
+        display: inline-flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
         gap: 0.35rem;
+        width: 100%;
       }
       .uppercase {
         text-transform: uppercase;
@@ -566,7 +574,7 @@
             <div class="row g-3">
               <div class="col-12 col-md-6">
                 <label class="form-label" for="mDs">Distrito</label>
-                <select id="mDs" class="form-select" data-required="true" aria-required="true">
+                <select id="mDs" class="form-select">
                   <option value="" selected disabled>Selecione...</option>
                   <option>SEAA - JURIDICO</option>
                   <option>SEAB</option>
@@ -589,19 +597,19 @@
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label" for="mUnidade">Unidade</label>
-                <select id="mUnidade" class="form-select" disabled data-required="true" aria-required="true">
+                <select id="mUnidade" class="form-select" disabled>
                   <option>Selecione o distrito...</option>
                 </select>
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label" for="mTurno">Turno</label>
-                <select id="mTurno" class="form-select" disabled data-required="true" aria-required="true">
+                <select id="mTurno" class="form-select" disabled>
                   <option>Selecione a unidade...</option>
                 </select>
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label" for="mRegime">Regime</label>
-                <select id="mRegime" class="form-select" disabled data-required="true" aria-required="true">
+                <select id="mRegime" class="form-select" disabled>
                   <option>Selecione a unidade...</option>
                 </select>
               </div>
@@ -742,7 +750,8 @@
         modalMode: 'create',
         editingIndex: null,
         protocolo: null,
-        printMode: 'print'
+        printMode: 'print',
+        pendingFocusId: null
       };
 
       const modalUnidade = new bootstrap.Modal(document.getElementById('modalUnidade'));
@@ -789,7 +798,9 @@
           dataCredCell.textContent = toBRDate(row.data_credenciamento);
 
           const actionsCell = document.createElement('td');
-          actionsCell.className = 'actions-cell d-flex justify-content-center';
+          actionsCell.className = 'actions-cell text-center';
+          const actionsWrapper = document.createElement('div');
+          actionsWrapper.className = 'actions-wrapper';
 
           const viewBtn = document.createElement('button');
           viewBtn.type = 'button';
@@ -816,7 +827,8 @@
             renderPrefs();
           });
 
-          actionsCell.append(viewBtn, editBtn, deleteBtn);
+          actionsWrapper.append(viewBtn, editBtn, deleteBtn);
+          actionsCell.append(actionsWrapper);
           tr.append(priorityCell, distritoCell, lotacaoCell, dataSolicCell, dataCredCell, actionsCell);
           tbody.appendChild(tr);
         });
@@ -1087,6 +1099,20 @@
         };
       }
 
+      function resolveFirstInvalidFieldId(errors = []) {
+        for (const err of errors) {
+          if (!err || !err.fieldId) continue;
+          if (err.fieldId === 'prefsBody') {
+            return 'btnAddLinha';
+          }
+          const field = document.getElementById(err.fieldId);
+          if (field) {
+            return err.fieldId;
+          }
+        }
+        return null;
+      }
+
       function fillResumo(payload) {
         const resumoEl = document.getElementById('resumoSolicitacao');
         const printEl = document.getElementById('printComprovante');
@@ -1257,6 +1283,7 @@
           li.textContent = err.message;
           list.appendChild(li);
         });
+        state.pendingFocusId = resolveFirstInvalidFieldId(errors);
         modalAlerta.show();
       }
 
@@ -1540,6 +1567,23 @@
         });
 
         window.addEventListener('afterprint', afterPrintCleanup);
+
+        document.getElementById('modalAlerta').addEventListener('hidden.bs.modal', () => {
+          if (!state.pendingFocusId) return;
+          const target = document.getElementById(state.pendingFocusId);
+          state.pendingFocusId = null;
+          if (!target) return;
+          if (typeof target.focus === 'function') {
+            try {
+              target.focus({ preventScroll: true });
+            } catch (err) {
+              target.focus();
+            }
+          }
+          if (typeof target.scrollIntoView === 'function') {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
       }
 
       function init() {
