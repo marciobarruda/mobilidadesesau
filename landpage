@@ -626,9 +626,27 @@
 
                     <!-- Contatos -->
                     <div class="col-12 col-md-6">
+                      <label for="email" class="form-label">E-mail</label>
+                      <input
+                        id="email"
+                        type="email"
+                        class="form-control"
+                        placeholder="seu.email@recife.pe.gov.br"
+                        autocomplete="email"
+                      />
+                      <div class="invalid-feedback">Informe um e-mail válido.</div>
+                    </div>
+                    <div class="col-12 col-md-6">
                       <label for="whatsapp" class="form-label">WhatsApp</label>
-                      <input id="whatsapp" class="form-control" placeholder="(81) 9 9999-9999" />
-                      <div class="invalid-feedback">Informe um WhatsApp válido.</div>
+                      <input
+                        id="whatsapp"
+                        class="form-control"
+                        placeholder="81999999999"
+                        inputmode="numeric"
+                        pattern="\d{11}"
+                        maxlength="11"
+                      />
+                      <div class="invalid-feedback">Informe um WhatsApp com 11 dígitos numéricos.</div>
                     </div>
                     <div class="col-12 col-md-6">
                       <label for="telefonealternativo" class="form-label">Telefone alternativo</label>
@@ -852,7 +870,10 @@
       const sanitizeUF = (val) => (val || '').toUpperCase().slice(0,2);
       const isUF = (val) => /^[A-Za-z]{2}$/.test(val || '');
       const isCEP = (val) => /^(\d{5}-?\d{3})$/.test(val || '');
-      const isWhats = (val) => /^(\(\d{2}\)\s?)?(9)?\d{4}-?\d{4}$/.test((val || '').replace(/\s/g, ''));
+      const onlyDigits = (val) => (val || '').replace(/\D+/g, '');
+      const normalizeWhats = (val) => onlyDigits(val).slice(0, 11);
+      const isWhats = (val) => /^\d{11}$/.test(String(val || '').trim());
+      const isEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(val || '').trim());
 
       const formatCPF = (value) => {
         const digits = (value || '').replace(/\D+/g, '');
@@ -965,6 +986,7 @@
           }
         ],
         contatos: {
+          email: sanitizeValue(`{{ $json.data.dadosComuns.email }}`).toLowerCase(),
           whatsapp: sanitizeValue(`{{ $json.data.dadosComuns.whatsapp }}`),
           telalternativo: sanitizeValue(`{{ $json.data.dadosComuns.telalternativo }}`)
         },
@@ -1037,7 +1059,8 @@
 
       function populateContatosEndereco() {
         const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = (v && v !== 'undefined' && v !== 'null') ? v : ''; };
-        setVal('whatsapp', DATA.contatos.whatsapp);
+        setVal('email', sanitizeValue(DATA.contatos.email).toLowerCase());
+        setVal('whatsapp', normalizeWhats(DATA.contatos.whatsapp));
         setVal('telefonealternativo', DATA.contatos.telalternativo);
         setVal('cep', DATA.endereco.cep);
         setVal('logradouro', DATA.endereco.logradouro);
@@ -1448,8 +1471,8 @@
       function validarFormulario() {
         const requiredFields = [
           { id: 'matriculaSelect', label: 'Matrícula' },
+          { id: 'email', label: 'E-mail' },
           { id: 'whatsapp', label: 'WhatsApp' },
-          { id: 'telefonealternativo', label: 'Telefone alternativo' },
           { id: 'cep', label: 'CEP' },
           { id: 'logradouro', label: 'Logradouro' },
           { id: 'numero', label: 'Número' },
@@ -1483,10 +1506,32 @@
           }
         });
 
+        const emailEl = document.getElementById('email');
+        if (emailEl) {
+          const emailVal = sanitizeValue(emailEl.value);
+          emailEl.value = emailVal;
+          if (emailVal && !isEmail(emailVal)) {
+            invalid.push('E-mail (formato inválido)');
+            markInvalid(emailEl);
+          } else if (emailVal) {
+            markValid(emailEl);
+          }
+        }
+
         const whatsappEl = document.getElementById('whatsapp');
-        if (whatsappEl && sanitizeValue(whatsappEl.value) && !isWhats(whatsappEl.value)) {
-          invalid.push('WhatsApp (formato inválido)');
-          markInvalid(whatsappEl);
+        if (whatsappEl) {
+          const trimmed = sanitizeValue(whatsappEl.value);
+          const normalized = normalizeWhats(trimmed);
+          whatsappEl.value = normalized;
+          if (trimmed && !normalized) {
+            invalid.push('WhatsApp (utilize apenas números)');
+            markInvalid(whatsappEl);
+          } else if (normalized && !isWhats(normalized)) {
+            invalid.push('WhatsApp (informe 11 dígitos numéricos)');
+            markInvalid(whatsappEl);
+          } else if (normalized) {
+            markValid(whatsappEl);
+          }
         }
 
         const cepEl = document.getElementById('cep');
@@ -1509,6 +1554,14 @@
       }
 
       // ===== Eventos =====
+      const whatsappInput = document.getElementById('whatsapp');
+      if (whatsappInput) {
+        whatsappInput.addEventListener('input', (event) => {
+          const digits = normalizeWhats(event.target.value);
+          event.target.value = digits;
+        });
+      }
+
       document.getElementById('dsSelect').addEventListener('change', (e) => {
         const v = e.target.value;
         if (v) {
@@ -1551,8 +1604,9 @@
         const grupoAtual = sanitizeValue(document.getElementById('grupoHidden')?.value || '');
         const payload = {
           matricula: document.getElementById('matriculaSelect').value || null,
-          whatsapp: document.getElementById('whatsapp').value || null,
-          telefonealternativo: document.getElementById('telefonealternativo').value || null,
+          email: (sanitizeValue(document.getElementById('email')?.value || '').toLowerCase()) || null,
+          whatsapp: normalizeWhats(document.getElementById('whatsapp').value || '') || null,
+          telefonealternativo: sanitizeValue(document.getElementById('telefonealternativo')?.value || '') || null,
           endereco: {
             cep: document.getElementById('cep').value || null,
             logradouro: document.getElementById('logradouro').value || null,
