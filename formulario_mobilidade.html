@@ -669,7 +669,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-success" id="btnSalvarPdf">Salvar em PDF</button>
+            <button type="button" class="btn btn-success" id="btnSalvarPDF">Salvar em PDF</button>
             <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
           </div>
@@ -678,9 +678,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
-      integrity="sha512-YcsIPMt2rt7NmBGG99nmCaTKty+O+kO5OVwOB1p5MNDoAuCEi0aKBslZx2drXr/7Lr1gChX2NDVYTHQmjwA+7A=="
+      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
@@ -706,6 +706,42 @@
       const ensureWhatsapp = (value) => {
         const digits = onlyDigits(value);
         return digits.length >= 10 && digits.length <= 11;
+      };
+
+      const sanitizeValue = (val) => {
+        if (val === null || val === undefined) return '';
+        const str = String(val).trim();
+        return str === 'undefined' || str === 'null' ? '' : str;
+      };
+
+      const formatCPF = (value) => {
+        const digits = (value || '').replace(/\D+/g, '');
+        if (digits.length !== 11) return sanitizeValue(value);
+        return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      };
+
+      const COMPROVANTE_LOGO_URL = 'https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200';
+      let comprovanteLogoDataUrlPromise = null;
+
+      const getComprovanteLogoDataUrl = async () => {
+        if (!comprovanteLogoDataUrlPromise) {
+          comprovanteLogoDataUrlPromise = fetch(COMPROVANTE_LOGO_URL)
+            .then((response) => {
+              if (!response.ok) throw new Error('Erro ao carregar logotipo');
+              return response.blob();
+            })
+            .then(
+              (blob) =>
+                new Promise((resolve, reject) => {
+                  const reader = new FileReader();
+                  reader.onloadend = () => resolve(reader.result);
+                  reader.onerror = () => reject(new Error('Falha ao converter logotipo'));
+                  reader.readAsDataURL(blob);
+                })
+            )
+            .catch(() => null);
+        }
+        return comprovanteLogoDataUrlPromise;
       };
 
       const BIND = {
@@ -1458,40 +1494,248 @@
         state.printMode = 'print';
       }
 
-      function exportReceiptPdf() {
-        const wrapper = document.getElementById('printWrapper');
-        const previousMode = state.printMode;
-        state.printMode = 'pdf';
-        document.body.dataset.printMode = 'pdf';
-        wrapper.classList.remove('d-none');
+      async function gerarPdfModal() {
+        const triggerButton = document.getElementById('btnSalvarPDF');
+        const resumoContainer = document.getElementById('resumoSolicitacao');
+        const { jsPDF } = window.jspdf || {};
+        if (!jsPDF) {
+          alert('Não foi possível gerar o PDF no momento. Tente novamente mais tarde.');
+          return;
+        }
 
-        const printEl = document.getElementById('printComprovante');
-        const matricula = safeValue(state.lastPayload?.matricula) || 'solicitacao';
-        const filename = `comprovante_mobilidade_${matricula}.pdf`;
+        try {
+          if (triggerButton) triggerButton.setAttribute('aria-busy', 'true');
 
-        const options = {
-          margin: [10, 12, 16, 12],
-          filename,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
+          const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+          if (typeof doc.autoTable !== 'function') {
+            alert('Recurso de tabela indisponível para gerar o PDF.');
+            return;
+          }
 
-        const cleanup = () => {
-          wrapper.classList.add('d-none');
-          delete document.body.dataset.printMode;
-          state.printMode = previousMode;
-        };
+          const numero = sanitizeValue(state.protocolo) || '—';
+          const table = resumoContainer ? resumoContainer.querySelector('table') : null;
 
-        if (typeof html2pdf === 'function') {
-          html2pdf()
-            .set(options)
-            .from(printEl)
-            .save()
-            .then(cleanup)
-            .catch(cleanup);
-        } else {
-          cleanup();
+          const headers = table
+            ? Array.from(table.querySelectorAll('thead th')).map((th) => th.textContent.trim())
+            : [];
+          const rows = table
+            ? Array.from(table.querySelectorAll('tbody tr')).map((tr) =>
+                Array.from(tr.children).map((td) => td.textContent.trim())
+              )
+            : [];
+
+          const matriculaColIndex = headers.findIndex((label) => /matr[íi]cula/i.test(label));
+          const cargoColIndex = headers.findIndex((label) => /cargo/i.test(label));
+          const firstRow = rows[0] || [];
+          const rawMatriculaFromTable = matriculaColIndex >= 0 ? firstRow[matriculaColIndex] : '';
+          const rawCargoFromTable = cargoColIndex >= 0 ? firstRow[cargoColIndex] : '';
+
+          const payload = state.lastPayload || {};
+          const matriculaFromPayload = sanitizeValue(payload.matricula);
+          const cargoFromPayload = sanitizeValue(payload?.dadosPessoais?.cargo);
+          const nomeServidor = sanitizeValue(payload?.dadosPessoais?.nome);
+          const cpfServidor = formatCPF(payload?.dadosPessoais?.cpf);
+          const cargoServidor = sanitizeValue(rawCargoFromTable) || cargoFromPayload;
+          const matricula = sanitizeValue(rawMatriculaFromTable) || matriculaFromPayload;
+          const subtitleText = matricula
+            ? `Solicitação registrada em banco de dados para a matrícula ${matricula}`
+            : 'Solicitação registrada em banco de dados.';
+          const dataEmissao = new Date().toLocaleDateString('pt-BR');
+
+          const logoDataUrl = await getComprovanteLogoDataUrl();
+
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const pageHeight = doc.internal.pageSize.getHeight();
+          const margin = 36;
+          const cardWidth = pageWidth - margin * 2;
+          const cardHeight = pageHeight - margin * 2;
+          const cardPaddingX = 36;
+          const cardPaddingY = 30;
+          const headerBandHeight = 120;
+          const badgeWidth = 200;
+          const badgeHeight = 64;
+
+          const drawCardBase = () => {
+            doc.setDrawColor(214, 222, 234);
+            doc.setLineWidth(1.2);
+            doc.setFillColor(244, 247, 254);
+            doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18, 'F');
+            doc.setFillColor(255, 255, 255);
+            doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18);
+            doc.rect(margin, margin + headerBandHeight, cardWidth, Math.max(cardHeight - headerBandHeight, 0), 'F');
+            doc.setFillColor(0, 74, 173);
+            doc.roundedRect(margin, margin, cardWidth, headerBandHeight, 18, 18, 'F');
+
+            const contentX = margin + cardPaddingX;
+            const contentY = margin + cardPaddingY;
+
+            if (logoDataUrl) {
+              doc.addImage(logoDataUrl, 'PNG', contentX, contentY, 120, 38);
+            }
+
+            const headerTextX = contentX + (logoDataUrl ? 136 : 0);
+            const headerTextY = contentY + 16;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.setTextColor(255, 255, 255);
+            doc.text('PREFEITURA DO RECIFE', headerTextX, headerTextY);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(11);
+            doc.text('Secretaria de Saúde (SESAU)', headerTextX, headerTextY + 20);
+            doc.text('Portal do Servidor • Mobilidade Interna', headerTextX, headerTextY + 38);
+
+            const badgeX = margin + cardWidth - cardPaddingX - badgeWidth;
+            const badgeY = margin + cardPaddingY;
+            doc.setFillColor(255, 255, 255);
+            doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 12, 12, 'F');
+            doc.setDrawColor(0, 74, 173);
+            doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 12, 12);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(0, 74, 173);
+            doc.text('NÚMERO DA SOLICITAÇÃO', badgeX + 18, badgeY + 24);
+            doc.setFontSize(22);
+            doc.setTextColor(17, 24, 39);
+            doc.text(numero || '—', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
+          };
+
+          drawCardBase();
+
+          let currentY = margin + headerBandHeight + 38;
+          const contentX = margin + cardPaddingX;
+          const contentMaxX = margin + cardWidth - cardPaddingX;
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(20);
+          doc.setTextColor(0, 74, 173);
+          doc.text('Comprovante de solicitação', contentX, currentY);
+          currentY += 28;
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(12);
+          doc.setTextColor(55, 65, 81);
+          const subtitleLines = doc.splitTextToSize(subtitleText, contentMaxX - contentX);
+          subtitleLines.forEach((line) => {
+            doc.text(line, contentX, currentY);
+            currentY += 18;
+          });
+
+          currentY += 6;
+          const infoRows = [
+            [
+              { label: 'Nome do servidor', value: nomeServidor || '—' },
+              { label: 'CPF', value: cpfServidor || '—' }
+            ],
+            [
+              { label: 'Matrícula', value: matricula || '—' },
+              { label: 'Cargo', value: cargoServidor || '—' }
+            ],
+            [
+              { label: 'Data de emissão', value: dataEmissao },
+              null
+            ]
+          ];
+
+          const columnGap = 16;
+          const infoRowHeight = 34;
+          const infoColumnWidth = (contentMaxX - contentX - columnGap) / 2;
+          infoRows.forEach((rowItems, rowIndex) => {
+            rowItems.forEach((item, columnIndex) => {
+              if (!item) return;
+              const x = contentX + columnIndex * (infoColumnWidth + columnGap);
+              const y = currentY + rowIndex * infoRowHeight;
+              doc.setFont('helvetica', 'bold');
+              doc.setFontSize(11);
+              doc.setTextColor(0, 74, 173);
+              doc.text(item.label.toUpperCase(), x, y);
+              doc.setFont('helvetica', 'normal');
+              doc.setFontSize(11);
+              doc.setTextColor(31, 41, 55);
+              doc.text(item.value || '—', x, y + 16);
+            });
+          });
+
+          currentY += infoRows.length * infoRowHeight + 18;
+          doc.setDrawColor(226, 232, 240);
+          doc.setLineWidth(1);
+          doc.line(contentX, currentY, contentMaxX, currentY);
+          currentY += 24;
+
+          const indicesToRemove = [matriculaColIndex, cargoColIndex].filter((idx) => idx >= 0);
+          const pdfHeaders = headers.filter((_, idx) => !indicesToRemove.includes(idx));
+          const pdfRows = rows.map((row) => row.filter((_, idx) => !indicesToRemove.includes(idx)));
+
+          let footerBaseY = currentY;
+          if (pdfHeaders.length && pdfRows.length) {
+            const columnStyles = {};
+            pdfHeaders.forEach((header, index) => {
+              const key = header.toLowerCase();
+              if (key.includes('prioridade')) {
+                columnStyles[index] = { halign: 'center', cellWidth: 55 };
+              } else if (key.includes('distrito')) {
+                columnStyles[index] = { cellWidth: 90 };
+              } else if (key.includes('lotação')) {
+                columnStyles[index] = { cellWidth: 150 };
+              } else if (key.includes('credenciamento')) {
+                columnStyles[index] = { halign: 'center', cellWidth: 75 };
+              } else if (key.includes('solicitação')) {
+                columnStyles[index] = { halign: 'center', cellWidth: 75 };
+              }
+            });
+            doc.autoTable({
+              head: [pdfHeaders],
+              body: pdfRows,
+              startY: currentY,
+              theme: 'plain',
+              margin: { left: contentX, right: pageWidth - contentMaxX },
+              tableWidth: contentMaxX - contentX,
+              styles: {
+                font: 'helvetica',
+                fontSize: 10,
+                textColor: [31, 41, 55],
+                cellPadding: { top: 6, right: 8, bottom: 6, left: 8 },
+                lineWidth: 0.6,
+                lineColor: [226, 232, 240],
+                overflow: 'linebreak'
+              },
+              headStyles: {
+                fontStyle: 'bold',
+                fontSize: 10,
+                fillColor: [226, 235, 255],
+                textColor: [0, 74, 173],
+                halign: 'left',
+                cellPadding: { top: 8, right: 8, bottom: 8, left: 8 },
+                lineWidth: 0
+              },
+              alternateRowStyles: {
+                fillColor: [248, 250, 255]
+              },
+              columnStyles,
+              pageBreak: 'avoid',
+              rowPageBreak: 'avoid'
+            });
+            footerBaseY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || currentY;
+          } else {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            doc.setTextColor(107, 114, 128);
+            doc.text('Não há dados para exportar.', contentX, currentY + 12);
+            footerBaseY = currentY + 12;
+          }
+
+          const footerY = Math.min(pageHeight - margin - 12, footerBaseY + 32);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(107, 114, 128);
+          doc.text('Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.', contentX, footerY);
+
+          const safeNumero = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
+          doc.save(`solicitacao-${safeNumero}.pdf`);
+        } catch (error) {
+          console.error('Erro ao gerar PDF:', error);
+          alert('Não foi possível gerar o PDF no momento. Tente novamente mais tarde.');
+        } finally {
+          if (triggerButton) triggerButton.removeAttribute('aria-busy');
         }
       }
 
@@ -1604,7 +1848,7 @@
           openSuccessModal(payload);
         });
 
-        document.getElementById('btnSalvarPdf').addEventListener('click', exportReceiptPdf);
+        document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
         document.getElementById('btnImprimir').addEventListener('click', () => {
           preparePrintArea();
         });
