@@ -678,6 +678,12 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+      integrity="sha512-YcsIPMt2rt7NmBGG99nmCaTKty+O+kO5OVwOB1p5MNDoAuCEi0aKBslZx2drXr/7Lr1gChX2NDVYTHQmjwA+7A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <script>
       const postJSON = async (url, body) => {
         const res = await fetch(url, {
@@ -751,7 +757,8 @@
         editingIndex: null,
         protocolo: null,
         printMode: 'print',
-        pendingFocusId: null
+        pendingFocusId: null,
+        lastPayload: null
       };
 
       const modalUnidade = new bootstrap.Modal(document.getElementById('modalUnidade'));
@@ -1289,6 +1296,7 @@
 
       function openSuccessModal(payload) {
         fillResumo(payload);
+        state.lastPayload = payload;
         modalSucesso.show();
       }
 
@@ -1434,20 +1442,57 @@
         return true;
       }
 
-      function preparePrintArea(mode = 'print') {
-        state.printMode = mode;
-        document.body.dataset.printMode = mode;
+      function preparePrintArea() {
+        state.printMode = 'print';
+        document.body.dataset.printMode = 'print';
         const wrapper = document.getElementById('printWrapper');
         wrapper.classList.remove('d-none');
         setTimeout(() => {
           window.print();
-        }, mode === 'pdf' ? 200 : 100);
+        }, 100);
       }
 
       function afterPrintCleanup() {
         document.getElementById('printWrapper').classList.add('d-none');
         delete document.body.dataset.printMode;
         state.printMode = 'print';
+      }
+
+      function exportReceiptPdf() {
+        const wrapper = document.getElementById('printWrapper');
+        const previousMode = state.printMode;
+        state.printMode = 'pdf';
+        document.body.dataset.printMode = 'pdf';
+        wrapper.classList.remove('d-none');
+
+        const printEl = document.getElementById('printComprovante');
+        const matricula = safeValue(state.lastPayload?.matricula) || 'solicitacao';
+        const filename = `comprovante_mobilidade_${matricula}.pdf`;
+
+        const options = {
+          margin: [10, 12, 16, 12],
+          filename,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        const cleanup = () => {
+          wrapper.classList.add('d-none');
+          delete document.body.dataset.printMode;
+          state.printMode = previousMode;
+        };
+
+        if (typeof html2pdf === 'function') {
+          html2pdf()
+            .set(options)
+            .from(printEl)
+            .save()
+            .then(cleanup)
+            .catch(cleanup);
+        } else {
+          cleanup();
+        }
       }
 
       function initEvents() {
@@ -1559,11 +1604,9 @@
           openSuccessModal(payload);
         });
 
-        document.getElementById('btnSalvarPdf').addEventListener('click', () => {
-          preparePrintArea('pdf');
-        });
+        document.getElementById('btnSalvarPdf').addEventListener('click', exportReceiptPdf);
         document.getElementById('btnImprimir').addEventListener('click', () => {
-          preparePrintArea('print');
+          preparePrintArea();
         });
 
         window.addEventListener('afterprint', afterPrintCleanup);
