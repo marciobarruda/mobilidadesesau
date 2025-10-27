@@ -1661,9 +1661,23 @@
           doc.line(contentX, currentY, contentMaxX, currentY);
           currentY += 24;
 
-          const indicesToRemove = [matriculaColIndex, cargoColIndex].filter((idx) => idx >= 0);
-          const pdfHeaders = headers.filter((_, idx) => !indicesToRemove.includes(idx));
-          const pdfRows = rows.map((row) => row.filter((_, idx) => !indicesToRemove.includes(idx)));
+          const allowedHeaderMatchers = [
+            { test: /prioridade/i, label: 'Prioridade' },
+            { test: /distrito/i, label: 'Distrito' },
+            { test: /lota[cç][aã]o/i, label: 'Lotação' },
+            { test: /credenciamento/i, label: 'Credenciamento' },
+            { test: /solicita[cç][aã]o/i, label: 'Solicitação' }
+          ];
+          const allowedColumns = allowedHeaderMatchers
+            .map(({ test, label }) => {
+              const matchIndex = headers.findIndex((header) => test.test(header));
+              return matchIndex >= 0 ? { index: matchIndex, label } : null;
+            })
+            .filter(Boolean);
+          const pdfHeaders = allowedColumns.map((column) => column.label);
+          const pdfRows = allowedColumns.length
+            ? rows.map((row) => allowedColumns.map((column) => row[column.index]))
+            : [];
 
           let footerBaseY = currentY;
           if (pdfHeaders.length && pdfRows.length) {
@@ -1673,13 +1687,13 @@
               if (key.includes('prioridade')) {
                 columnStyles[index] = { halign: 'center', cellWidth: 55 };
               } else if (key.includes('distrito')) {
-                columnStyles[index] = { cellWidth: 90 };
+                columnStyles[index] = { cellWidth: 110 };
               } else if (key.includes('lotação')) {
-                columnStyles[index] = { cellWidth: 150 };
+                columnStyles[index] = { cellWidth: 170 };
               } else if (key.includes('credenciamento')) {
-                columnStyles[index] = { halign: 'center', cellWidth: 75 };
+                columnStyles[index] = { halign: 'center', cellWidth: 95 };
               } else if (key.includes('solicitação')) {
-                columnStyles[index] = { halign: 'center', cellWidth: 75 };
+                columnStyles[index] = { halign: 'center', cellWidth: 95 };
               }
             });
             doc.autoTable({
