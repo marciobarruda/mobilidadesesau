@@ -1716,23 +1716,6 @@
         if (event.key === 'Escape') closeFormFeedback();
       });
 
-      const scrollHeroIntoView = () => {
-        if (window.location.hash) return;
-        if (window.scrollY > 16) return;
-        if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        const heroRow = document.getElementById('heroCardsRow');
-        if (!heroRow) return;
-        const rect = heroRow.getBoundingClientRect();
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-        const midpoint = window.scrollY + rect.top + rect.height / 2;
-        const target = Math.max(midpoint - viewportHeight / 2, 0);
-        window.scrollTo({ top: target, behavior: 'smooth' });
-      };
-
-      window.addEventListener('load', () => {
-        setTimeout(scrollHeroIntoView, 350);
-      });
-
       // ===== Bootstrap inicial =====
       (function init() {
         populateMatriculas();
