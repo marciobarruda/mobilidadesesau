@@ -415,6 +415,32 @@
           width: auto;
         }
       }
+      @media (max-width: 576px) {
+        #tabelaPrefs {
+          table-layout: fixed;
+          width: 100%;
+        }
+        #tabelaPrefs thead th,
+        #tabelaPrefs tbody td {
+          padding: 0.5rem;
+          line-height: 1.3;
+          font-size: 0.95rem;
+          word-break: break-word;
+          white-space: normal;
+        }
+        #tabelaPrefs tbody tr {
+          padding: 0.85rem 1rem;
+        }
+        #tabelaPrefs tbody td {
+          min-height: 44px;
+        }
+        #tabelaPrefs tbody td.actions-cell .actions-wrapper {
+          gap: 0.6rem;
+        }
+        #tabelaPrefs tbody td.actions-cell .actions-wrapper .btn {
+          margin: 0.1rem 0;
+        }
+      }
     </style>
   </head>
   <body>
