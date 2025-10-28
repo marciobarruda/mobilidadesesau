@@ -830,11 +830,7 @@
           </div>
         </div>
         <div id="modalBody" class="feedback-modal-message"></div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-success" id="btnSalvarPDF">Salvar em PDF</button>
-          <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
-          <button type="button" class="btn btn-danger" id="btnFecharModal">Fechar</button>
-        </div>
+        <div class="modal-actions" id="modalActions"></div>
       </div>
     </div>
 
@@ -1054,6 +1050,47 @@
         endereco: dadosComunsTemplate.endereco
       };
 
+      let modalContext = { tipo: 'solicitacao', matricula: '' };
+
+      function configurarAcoesModal(tipo = 'solicitacao') {
+        const container = document.getElementById('modalActions');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const createButton = (id, text, className, handler) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          if (id) button.id = id;
+          button.className = className;
+          button.textContent = text;
+          if (typeof handler === 'function') {
+            button.addEventListener('click', handler);
+          }
+          container.appendChild(button);
+          return button;
+        };
+
+        if (tipo === 'renovacao') {
+          createButton('btnRenovarPedido', 'Renovar pedido', 'btn btn-success', () => {
+            console.log(
+              'Renovar pedido solicitado para a matrícula',
+              modalContext.matricula || ''
+            );
+          });
+          createButton('btnNaoRenovarPedido', 'Não renovar pedido', 'btn btn-danger', () => {
+            console.log(
+              'Não renovar pedido para a matrícula',
+              modalContext.matricula || ''
+            );
+          });
+          createButton('btnFecharModal', 'Fechar', 'btn btn-secondary', fecharModal);
+        } else {
+          createButton('btnSalvarPDF', 'Salvar em PDF', 'btn btn-success', gerarPdfModal);
+          createButton('btnImprimir', 'Imprimir', 'btn btn-primary', () => window.print());
+          createButton('btnFecharModal', 'Fechar', 'btn btn-danger', fecharModal);
+        }
+      }
+
       const buildNovaSolicitacaoPayload = () => ({
         cpf: sanitizeValue(
           dadosComunsTemplate.cpf || document.getElementById('cpfHidden')?.value || ''
@@ -1150,7 +1187,9 @@
               <div class="text-muted small">${cargo}</div>
             </div>
           `;
-          card.querySelector('.minha-card').addEventListener('click', () => abrirRevisaoSolicitacao(v.matricula));
+          card.querySelector('.minha-card').addEventListener('click', () =>
+            abrirRevisaoSolicitacao(v.matricula, 'solicitacao')
+          );
           wrap.appendChild(card);
         });
       }
@@ -1183,7 +1222,7 @@
             </div>
           `;
           const miniCard = card.querySelector('.minha-card');
-          miniCard.addEventListener('click', () => abrirRevisaoSolicitacao(v.matricula));
+          miniCard.addEventListener('click', () => abrirRevisaoSolicitacao(v.matricula, 'renovacao'));
           wrap.appendChild(card);
         });
       }
@@ -1260,15 +1299,21 @@
       }
 
       // ===== Minhas Solicitações -> Modal =====
-      async function abrirRevisaoSolicitacao(matricula) {
+      async function abrirRevisaoSolicitacao(matricula, tipo = 'solicitacao') {
         const backdrop = document.getElementById('modalBackdrop');
         const modalBody = document.getElementById('modalBody');
+        const matriculaSanitizada = sanitizeValue(matricula);
+        modalContext = { tipo, matricula: matriculaSanitizada };
+        configurarAcoesModal(tipo);
         document.getElementById('modalNumeroSolicitacao').textContent = '—';
         modalBody.innerHTML = '<div class="text-muted">Carregando...</div>';
         backdrop.classList.add('active');
         backdrop.setAttribute('aria-hidden', 'false');
         try {
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2', { matricula });
+          const data = await postJSON(
+            'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2',
+            { matricula: matriculaSanitizada }
+          );
           if (!Array.isArray(data) || data.length === 0) {
             modalBody.innerHTML = '<div class="text-danger">Nenhum registro encontrado.</div>';
             return;
@@ -1306,7 +1351,7 @@
           `;
         } catch (e) {
           document.getElementById('modalNumeroSolicitacao').textContent = '—';
-          modalBody.innerHTML = '<div class="text-danger">Falha ao carregar dados da solicitação.</div>';
+          modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
         }
       }
 
@@ -1799,9 +1844,6 @@
 
       document.getElementById('btnNovaSolicitacao').addEventListener('click', enviarNovaSolicitacao);
 
-      document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
-      document.getElementById('btnImprimir').addEventListener('click', () => window.print());
-      document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
       document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
       document.getElementById('formFeedbackClose').addEventListener('click', closeFormFeedback);
       document.getElementById('formFeedback').addEventListener('click', (e) => {
