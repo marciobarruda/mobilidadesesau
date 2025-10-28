@@ -401,6 +401,15 @@
         gap: 0.75rem;
       }
 
+      .modal-actions-default,
+      .modal-actions-renovacoes {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        width: 100%;
+      }
+
       .form-feedback {
         position: fixed;
         inset: 0;
@@ -568,7 +577,7 @@
     </header>
 
     <main class="container py-4">
-      <div class="user-greeting" id="saudacao">Olá, <strong>{{ $json.data.dadosComuns.nome }}!</strong> Este é o seu painel de mobilidade interna.</div>
+      <div class="user-greeting" id="saudacao">Olá, <strong>{{$json["data"]["dadosComuns"]["nome"]}}!</strong> Este é o seu painel de mobilidade interna.</div>
 
       <div class="row g-4" id="heroCardsRow">
         <!-- Card 1: Mobilidade Interna -->
@@ -594,7 +603,7 @@
                   <input type="hidden" name="ds" id="novaSolicitacaoDs" />
                   <input type="hidden" name="grupo" id="novaSolicitacaoGrupo" />
                   <input type="hidden" name="cpf" id="novaSolicitacaoCpf" />
-                  <input type="hidden" name="matricula" id="novaSolicitacaoMatricula" value="{{ $json.data.vinculos[0].matricula }}" />
+                  <input type="hidden" name="matricula" id="novaSolicitacaoMatricula" value="{{$json["data"]["vinculos"][0]["matricula"]}}" />
                   <button type="button" class="btn btn-primary" id="btnNovaSolicitacao">Nova solicitação</button>
                 </form>
                 <a class="btn btn-outline-primary" href="#orientacoesContainer">Orientações</a>
@@ -618,10 +627,10 @@
                     <div class="col-12">
                       <label for="matriculaSelect" class="form-label">Matrícula</label>
                       <select id="matriculaSelect" class="form-select" required></select>
-                      <input type="hidden" id="grupoHidden" value="{{ $json.data.vinculos[0].grupo }}" />
-                      <input type="hidden" id="cpfHidden" value="{{ $json.data.dadosComuns.cpf }}" />
-                      <input type="hidden" id="dsHidden" value="{{ $json.data.vinculos[0].ds }}" />
-                      <input type="hidden" id="servidorHidden" value="{{ $json.data.dadosComuns.servidor }}" />
+                      <input type="hidden" id="grupoHidden" value="{{$json["data"]["vinculos"][0]["grupo"]}}" />
+                      <input type="hidden" id="cpfHidden" value="{{$json["data"]["dadosComuns"]["cpf"]}}" />
+                      <input type="hidden" id="dsHidden" value="{{$json["data"]["vinculos"][0]["ds"]}}" />
+                      <input type="hidden" id="servidorHidden" value="{{$json["data"]["dadosComuns"]["servidor"]}}" />
                       <div class="invalid-feedback">Selecione uma matrícula válida.</div>
                     </div>
 
@@ -747,7 +756,7 @@
         </section>
 
         <!-- Card 3: Minhas Solicitações -->
-        <section class="col-12">
+        <section class="col-12 col-xl-6">
           <div class="card card-programa">
             <div class="card-header">
               <div class="section-title">Minhas solicitações</div>
@@ -761,7 +770,22 @@
           </div>
         </section>
 
-        <!-- Card 4: Orientações -->
+        <!-- Card 4: Minhas Renovações -->
+        <section class="col-12 col-xl-6">
+          <div class="card card-programa">
+            <div class="card-header">
+              <div class="section-title">Minhas renovações</div>
+            </div>
+            <div class="card-body">
+              <div id="minhasRenovacoes" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 minhas-grid">
+                <!-- Mini cards renderizados via JS -->
+              </div>
+              <div id="minhasRenovacoesPlaceholder" class="minhas-placeholder mt-3 d-none">Nenhum vínculo encontrado.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card 5: Orientações -->
         <section class="col-12 col-lg-6">
           <div class="card card-programa h-100">
             <div class="card-header">
@@ -773,7 +797,7 @@
           </div>
         </section>
 
-        <!-- Card 5: Publicações -->
+        <!-- Card 6: Publicações -->
         <section class="col-12 col-lg-6">
           <div class="card card-programa h-100">
             <div class="card-header">
@@ -806,7 +830,7 @@
             />
             <div>
               <div class="feedback-modal-title">Comprovante de solicitação</div>
-              <div class="feedback-modal-subtitle">Solicitação registrada em banco de dados para a matrícula <strong>{{ $json.data.vinculos[0].matricula }}</strong></div>
+              <div class="feedback-modal-subtitle">Solicitação registrada em banco de dados para a matrícula <strong>{{$json["data"]["vinculos"][0]["matricula"]}}</strong></div>
             </div>
           </div>
           <div class="modal-meta">
@@ -816,9 +840,16 @@
         </div>
         <div id="modalBody" class="feedback-modal-message"></div>
         <div class="modal-actions">
-          <button type="button" class="btn btn-success" id="btnSalvarPDF">Salvar em PDF</button>
-          <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
-          <button type="button" class="btn btn-danger" id="btnFecharModal">Fechar</button>
+          <div class="modal-actions-default" aria-hidden="false">
+            <button type="button" class="btn btn-success" id="btnSalvarPDF">Salvar em PDF</button>
+            <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
+            <button type="button" class="btn btn-danger" id="btnFecharModal">Fechar</button>
+          </div>
+          <div class="modal-actions-renovacoes d-none" aria-hidden="true">
+            <button type="button" class="btn btn-success" id="btnRenovarPedido">Renovar pedido</button>
+            <button type="button" class="btn btn-danger" id="btnNaoRenovarPedido">Não renovar pedido</button>
+            <button type="button" class="btn btn-secondary" id="btnFecharRenovacao">Fechar</button>
+          </div>
         </div>
       </div>
     </div>
@@ -969,40 +1000,40 @@
       };
 
       // Dados vindos do template (quando presentes)
-      const nomeServidorTemplate = sanitizeValue(`{{ $json.data.dadosComuns.servidor }}`);
-      const nomeExibicaoTemplate = sanitizeValue(`{{ $json.data.dadosComuns.nome }}`);
+      const nomeServidorTemplate = sanitizeValue(`{{$json["data"]["dadosComuns"]["servidor"]}}`);
+      const nomeExibicaoTemplate = sanitizeValue(`{{$json["data"]["dadosComuns"]["nome"]}}`);
       const DATA = {
         nome: nomeServidorTemplate || nomeExibicaoTemplate,
         servidor: nomeServidorTemplate,
         nomeExibicao: nomeExibicaoTemplate,
-        cpf: sanitizeValue(`{{ $json.data.dadosComuns.cpf }}`),
+        cpf: sanitizeValue(`{{$json["data"]["dadosComuns"]["cpf"]}}`),
         vinculos: [
           {
-            matricula: sanitizeValue(`{{ $json.data.vinculos[0].matricula }}`),
-            cargo: sanitizeValue(`{{ $json.data.vinculos[0].cargo }}`),
-            grupo: sanitizeValue(`{{ $json.data.vinculos[0].grupo }}`),
-            ds: sanitizeValue(`{{ $json.data.vinculos[0].ds }}`)
+            matricula: sanitizeValue(`{{$json["data"]["vinculos"][0]["matricula"]}}`),
+            cargo: sanitizeValue(`{{$json["data"]["vinculos"][0]["cargo"]}}`),
+            grupo: sanitizeValue(`{{$json["data"]["vinculos"][0]["grupo"]}}`),
+            ds: sanitizeValue(`{{$json["data"]["vinculos"][0]["ds"]}}`)
           },
           {
-            matricula: sanitizeValue(`{{ $json.data.vinculos[1].matricula }}`),
-            cargo: sanitizeValue(`{{ $json.data.vinculos[1].cargo }}`),
-            grupo: sanitizeValue(`{{ $json.data.vinculos[1].grupo }}`),
-            ds: sanitizeValue(`{{ $json.data.vinculos[1].ds }}`)
+            matricula: sanitizeValue(`{{$json["data"]["vinculos"][1]["matricula"]}}`),
+            cargo: sanitizeValue(`{{$json["data"]["vinculos"][1]["cargo"]}}`),
+            grupo: sanitizeValue(`{{$json["data"]["vinculos"][1]["grupo"]}}`),
+            ds: sanitizeValue(`{{$json["data"]["vinculos"][1]["ds"]}}`)
           }
         ],
         contatos: {
-          email: sanitizeValue(`{{ $json.data.dadosComuns.email }}`).toLowerCase(),
-          whatsapp: sanitizeValue(`{{ $json.data.dadosComuns.whatsapp }}`),
-          telalternativo: sanitizeValue(`{{ $json.data.dadosComuns.telalternativo }}`)
+          email: sanitizeValue(`{{$json["data"]["dadosComuns"]["email"]}}`).toLowerCase(),
+          whatsapp: sanitizeValue(`{{$json["data"]["dadosComuns"]["whatsapp"]}}`),
+          telalternativo: sanitizeValue(`{{$json["data"]["dadosComuns"]["telalternativo"]}}`)
         },
         endereco: {
-          cep: sanitizeValue(`{{ $json.data.dadosComuns.endereco.cep }}`),
-          logradouro: sanitizeValue(`{{ $json.data.dadosComuns.endereco.logradouro }}`),
-          numero: sanitizeValue(`{{ $json.data.dadosComuns.endereco.numero }}`),
-          complemento: sanitizeValue(`{{ $json.data.dadosComuns.endereco.complemento }}`),
-          bairro: sanitizeValue(`{{ $json.data.dadosComuns.endereco.bairro }}`),
-          cidade: sanitizeValue(`{{ $json.data.dadosComuns.endereco.cidade }}`),
-          uf: sanitizeValue(`{{ $json.data.dadosComuns.endereco.uf }}`)
+          cep: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["cep"]}}`),
+          logradouro: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["logradouro"]}}`),
+          numero: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["numero"]}}`),
+          complemento: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["complemento"]}}`),
+          bairro: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["bairro"]}}`),
+          cidade: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["cidade"]}}`),
+          uf: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["uf"]}}`)
         }
       };
 
@@ -1076,29 +1107,38 @@
         setVal('uf', sanitizeUF(DATA.endereco.uf));
       }
 
-      function renderMinhasSolicitacoesCards() {
-        const wrap = document.getElementById('minhasSolicitacoes');
-        const placeholder = document.getElementById('minhasPlaceholder');
+      function renderVinculoCards(containerId, placeholderId, clickHandler) {
+        const wrap = document.getElementById(containerId);
+        const placeholder = document.getElementById(placeholderId);
+        if (!wrap || !placeholder) return;
         wrap.innerHTML = '';
-        const entries = DATA.vinculos.filter(v => v && v.matricula && v.matricula !== 'undefined' && v.matricula.trim() !== '');
+        const entries = DATA.vinculos.filter((v) => v && v.matricula && v.matricula !== 'undefined' && v.matricula.trim() !== '');
         if (entries.length === 0) {
           placeholder.classList.remove('d-none');
           return;
         }
         placeholder.classList.add('d-none');
-        entries.forEach((v, idx) => {
-          const cargo = (v.cargo && v.cargo !== 'undefined') ? v.cargo : '';
+        entries.forEach((vinculo) => {
+          const cargo = vinculo.cargo && vinculo.cargo !== 'undefined' ? vinculo.cargo : '';
           const card = document.createElement('div');
           card.className = 'col';
           card.innerHTML = `
             <div class="minha-card h-100">
-              <div class="fw-bold mb-1">${v.matricula}</div>
+              <div class="fw-bold mb-1">${vinculo.matricula}</div>
               <div class="text-muted small">${cargo}</div>
             </div>
           `;
-          card.querySelector('.minha-card').addEventListener('click', () => abrirRevisaoSolicitacao(v.matricula));
+          card.querySelector('.minha-card').addEventListener('click', () => clickHandler(vinculo.matricula));
           wrap.appendChild(card);
         });
+      }
+
+      function renderMinhasSolicitacoesCards() {
+        renderVinculoCards('minhasSolicitacoes', 'minhasPlaceholder', (matricula) => abrirRevisaoSolicitacao(matricula, 'solicitacoes'));
+      }
+
+      function renderMinhasRenovacoesCards() {
+        renderVinculoCards('minhasRenovacoes', 'minhasRenovacoesPlaceholder', (matricula) => abrirRevisaoSolicitacao(matricula, 'renovacoes'));
       }
 
       // ===== Encadeamento DS -> Unidade -> Turno/Regime =====
@@ -1172,10 +1212,23 @@
         }
       }
 
+      function setModalActionsContext(context) {
+        const defaultActions = document.querySelector('.modal-actions-default');
+        const renovacoesActions = document.querySelector('.modal-actions-renovacoes');
+        if (!defaultActions || !renovacoesActions) return;
+        const showRenovacoes = context === 'renovacoes';
+        defaultActions.classList.toggle('d-none', showRenovacoes);
+        renovacoesActions.classList.toggle('d-none', !showRenovacoes);
+        defaultActions.setAttribute('aria-hidden', showRenovacoes ? 'true' : 'false');
+        renovacoesActions.setAttribute('aria-hidden', showRenovacoes ? 'false' : 'true');
+      }
+
       // ===== Minhas Solicitações -> Modal =====
-      async function abrirRevisaoSolicitacao(matricula) {
+      async function abrirRevisaoSolicitacao(matricula, origem = 'solicitacoes') {
         const backdrop = document.getElementById('modalBackdrop');
         const modalBody = document.getElementById('modalBody');
+        const contexto = origem === 'renovacoes' ? 'renovacoes' : 'solicitacoes';
+        setModalActionsContext(contexto);
         document.getElementById('modalNumeroSolicitacao').textContent = '—';
         modalBody.innerHTML = '<div class="text-muted">Carregando...</div>';
         backdrop.classList.add('active');
@@ -1183,7 +1236,7 @@
         try {
           const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2', { matricula });
           if (!Array.isArray(data) || data.length === 0) {
-            modalBody.innerHTML = '<div class="text-danger">Nenhum registro encontrado.</div>';
+            modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
             return;
           }
           const numeroSolicitacao = data[0]?.protocolo || '';
@@ -1219,7 +1272,7 @@
           `;
         } catch (e) {
           document.getElementById('modalNumeroSolicitacao').textContent = '—';
-          modalBody.innerHTML = '<div class="text-danger">Falha ao carregar dados da solicitação.</div>';
+          modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
         }
       }
 
@@ -1489,6 +1542,7 @@
         backdrop.classList.remove('active');
         backdrop.setAttribute('aria-hidden', 'true');
         document.getElementById('modalNumeroSolicitacao').textContent = '—';
+        setModalActionsContext('solicitacoes');
       }
 
       // ===== Orientações (TXT) =====
@@ -1705,6 +1759,7 @@
       });
 
       document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
+      document.getElementById('btnFecharRenovacao').addEventListener('click', fecharModal);
       document.getElementById('btnImprimir').addEventListener('click', () => window.print());
       document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
       document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
@@ -1738,6 +1793,8 @@
         populateMatriculas();
         populateContatosEndereco();
         renderMinhasSolicitacoesCards();
+        renderMinhasRenovacoesCards();
+        setModalActionsContext('solicitacoes');
         document.querySelectorAll('.collapsible-form').forEach((details) => {
           details.open = false;
         });
@@ -1808,7 +1865,7 @@
       /* Layout geral do widget SUSi */
       .susi-chat-root {
         position: relative;
-        z-index: 0;
+        z-index: 11000;
       }
 
       .susi-chat-toggle {
@@ -1826,7 +1883,7 @@
         justify-content: center;
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-        z-index: 10001;
+        z-index: 11001;
       }
 
       .susi-chat-toggle:hover {
@@ -1852,8 +1909,8 @@
 
       .susi-chat-modal {
         position: fixed;
-        bottom: 24px;
-        left: 24px;
+        bottom: calc(24px + 80px);
+        right: 24px;
         width: min(360px, 90vw);
         height: min(520px, 70vh);
         background: #ffffff;
@@ -1867,7 +1924,7 @@
         pointer-events: none;
         transform: translate3d(0, 12px, 0);
         transition: opacity 0.25s ease, transform 0.25s ease;
-        z-index: 10000;
+        z-index: 11002;
       }
 
       .susi-chat-modal--open {
@@ -2000,15 +2057,10 @@
         }
 
         .susi-chat-modal {
-          bottom: 16px;
-          left: 50%;
+          bottom: calc(16px + 80px);
+          right: 16px;
           width: min(420px, 92vw);
           height: min(520px, 72vh);
-          transform: translate3d(-50%, 12px, 0);
-        }
-
-        .susi-chat-modal--open {
-          transform: translate3d(-50%, 0, 0);
         }
       }
 
