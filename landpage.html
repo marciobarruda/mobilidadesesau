@@ -1045,6 +1045,7 @@
         nascimento: dadosComunsTemplate.nascimento,
         dadosComuns: dadosComunsTemplate,
         vinculos: vinculosTemplate,
+        renovacoes: vinculosTemplate.map((vinculo) => ({ ...vinculo })),
         contatos: {
           email: dadosComunsTemplate.email,
           whatsapp: dadosComunsTemplate.whatsapp,
@@ -1150,6 +1151,39 @@
             </div>
           `;
           card.querySelector('.minha-card').addEventListener('click', () => abrirRevisaoSolicitacao(v.matricula));
+          wrap.appendChild(card);
+        });
+      }
+
+      function renderMinhasRenovacoesCards() {
+        const wrap = document.getElementById('minhasRenovacoes');
+        const placeholder = document.getElementById('minhasRenovacoesPlaceholder');
+        if (!wrap || !placeholder) return;
+        wrap.innerHTML = '';
+        const fonte = Array.isArray(DATA.renovacoes) && DATA.renovacoes.length ? DATA.renovacoes : DATA.vinculos;
+        const entries = (fonte || []).filter((vinculo) => {
+          const matriculaValida = vinculo && vinculo.matricula && vinculo.matricula !== 'undefined' && vinculo.matricula.trim() !== '';
+          const cargoValido = vinculo && vinculo.cargo && vinculo.cargo !== 'undefined';
+          return matriculaValida || cargoValido;
+        });
+        if (entries.length === 0) {
+          placeholder.classList.remove('d-none');
+          return;
+        }
+        placeholder.classList.add('d-none');
+        entries.forEach((v) => {
+          const matricula = v.matricula && v.matricula !== 'undefined' ? v.matricula : '';
+          const cargo = v.cargo && v.cargo !== 'undefined' ? v.cargo : '';
+          const card = document.createElement('div');
+          card.className = 'col';
+          card.innerHTML = `
+            <div class="minha-card h-100">
+              <div class="fw-bold mb-1">${matricula}</div>
+              <div class="text-muted small">${cargo}</div>
+            </div>
+          `;
+          const miniCard = card.querySelector('.minha-card');
+          miniCard.addEventListener('click', () => abrirRevisaoSolicitacao(v.matricula));
           wrap.appendChild(card);
         });
       }
@@ -1782,6 +1816,7 @@
         populateMatriculas();
         populateContatosEndereco();
         renderMinhasSolicitacoesCards();
+        renderMinhasRenovacoesCards();
         document.querySelectorAll('.collapsible-form').forEach((details) => {
           details.open = false;
         });
