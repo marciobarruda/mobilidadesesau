@@ -848,6 +848,9 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+    <script type="application/json" id="templateData">
+      {{ JSON.stringify($json.data || {}) }}
+    </script>
     <script>
       // ===== Helpers =====
       const postJSON = async (url, body) => {
@@ -980,43 +983,56 @@
       };
 
       // Dados vindos do template (quando presentes)
-      const nomeServidorTemplate = sanitizeValue(`{{ $json.data.dadosComuns.servidor }}`);
-      const nomeExibicaoTemplate = sanitizeValue(`{{ $json.data.dadosComuns.nome }}`);
+      const templateDataElement = document.getElementById('templateData');
+      let templateData = null;
+      if (templateDataElement) {
+        try {
+          templateData = JSON.parse(templateDataElement.textContent || '{}');
+        } catch (error) {
+          console.warn('Não foi possível interpretar os dados do template:', error);
+          templateData = null;
+        }
+      }
+
+      const dadosComunsSource = templateData?.dadosComuns || {};
+      const enderecoSource = dadosComunsSource.endereco || {};
+      const nomeServidorTemplate = sanitizeValue(dadosComunsSource.servidor);
+      const nomeExibicaoTemplate = sanitizeValue(dadosComunsSource.nome);
       const dadosComunsTemplate = {
-        cpf: sanitizeValue(`{{ $json.data.dadosComuns.cpf }}`),
+        cpf: sanitizeValue(dadosComunsSource.cpf),
         nome: nomeExibicaoTemplate,
         servidor: nomeServidorTemplate,
-        nascimento: sanitizeValue(`{{ $json.data.dadosComuns.nascimento }}`),
-        email: sanitizeValue(`{{ $json.data.dadosComuns.email }}`).toLowerCase(),
-        whatsapp: sanitizeValue(`{{ $json.data.dadosComuns.whatsapp }}`),
-        telalternativo: sanitizeValue(`{{ $json.data.dadosComuns.telalternativo }}`),
+        nascimento: sanitizeValue(dadosComunsSource.nascimento),
+        email: sanitizeValue(dadosComunsSource.email).toLowerCase(),
+        whatsapp: sanitizeValue(dadosComunsSource.whatsapp),
+        telalternativo: sanitizeValue(dadosComunsSource.telalternativo),
         endereco: {
-          cep: sanitizeValue(`{{ $json.data.dadosComuns.endereco.cep }}`),
-          logradouro: sanitizeValue(`{{ $json.data.dadosComuns.endereco.logradouro }}`),
-          numero: sanitizeValue(`{{ $json.data.dadosComuns.endereco.numero }}`),
-          complemento: sanitizeValue(`{{ $json.data.dadosComuns.endereco.complemento }}`),
-          bairro: sanitizeValue(`{{ $json.data.dadosComuns.endereco.bairro }}`),
-          cidade: sanitizeValue(`{{ $json.data.dadosComuns.endereco.cidade }}`),
-          uf: sanitizeValue(`{{ $json.data.dadosComuns.endereco.uf }}`)
+          cep: sanitizeValue(enderecoSource.cep),
+          logradouro: sanitizeValue(enderecoSource.logradouro),
+          numero: sanitizeValue(enderecoSource.numero),
+          complemento: sanitizeValue(enderecoSource.complemento),
+          bairro: sanitizeValue(enderecoSource.bairro),
+          cidade: sanitizeValue(enderecoSource.cidade),
+          uf: sanitizeValue(enderecoSource.uf)
         }
       };
 
-      const buildVinculoTemplate = (index) => ({
-        matricula: sanitizeValue(`{{ $json.data.vinculos[${index}].matricula }}`),
-        cargo: sanitizeValue(`{{ $json.data.vinculos[${index}].cargo }}`),
-        distrito: sanitizeValue(`{{ $json.data.vinculos[${index}].distrito }}`),
-        lotacao: sanitizeValue(`{{ $json.data.vinculos[${index}].lotacao }}`),
-        turno: sanitizeValue(`{{ $json.data.vinculos[${index}].turno }}`),
-        regime: sanitizeValue(`{{ $json.data.vinculos[${index}].regime }}`),
-        admissao: sanitizeValue(`{{ $json.data.vinculos[${index}].admissao }}`),
-        carga_horaria: sanitizeValue(`{{ $json.data.vinculos[${index}].carga_horaria }}`),
-        grupo: sanitizeValue(`{{ $json.data.vinculos[${index}].grupo }}`),
-        vinculo: sanitizeValue(`{{ $json.data.vinculos[${index}].vinculo }}`),
-        ds: sanitizeValue(`{{ $json.data.vinculos[${index}].ds }}`)
+      const normalizeVinculo = (vinculo = {}) => ({
+        matricula: sanitizeValue(vinculo.matricula),
+        cargo: sanitizeValue(vinculo.cargo),
+        distrito: sanitizeValue(vinculo.distrito),
+        lotacao: sanitizeValue(vinculo.lotacao),
+        turno: sanitizeValue(vinculo.turno),
+        regime: sanitizeValue(vinculo.regime),
+        admissao: sanitizeValue(vinculo.admissao),
+        carga_horaria: sanitizeValue(vinculo.carga_horaria),
+        grupo: sanitizeValue(vinculo.grupo),
+        vinculo: sanitizeValue(vinculo.vinculo),
+        ds: sanitizeValue(vinculo.ds)
       });
 
-      const rawVinculosTemplate = [buildVinculoTemplate(0), buildVinculoTemplate(1)];
-      const vinculosTemplate = rawVinculosTemplate.filter((vinculo) => {
+      const possuiInformacoesRelevantes = (vinculo) => {
+        if (!vinculo) return false;
         const relevante = {
           matricula: vinculo.matricula,
           cargo: vinculo.cargo,
@@ -1031,7 +1047,15 @@
           ds: vinculo.ds
         };
         return Object.values(relevante).some((value) => Boolean(value));
-      });
+      };
+
+      const vinculosTemplate = (Array.isArray(templateData?.vinculos) ? templateData.vinculos : [])
+        .map(normalizeVinculo)
+        .filter(possuiInformacoesRelevantes);
+
+      const renovacoesTemplate = (Array.isArray(templateData?.renovacoes) ? templateData.renovacoes : [])
+        .map(normalizeVinculo)
+        .filter(possuiInformacoesRelevantes);
 
       const DATA = {
         nome: nomeServidorTemplate || nomeExibicaoTemplate,
@@ -1041,7 +1065,9 @@
         nascimento: dadosComunsTemplate.nascimento,
         dadosComuns: dadosComunsTemplate,
         vinculos: vinculosTemplate,
-        renovacoes: vinculosTemplate.map((vinculo) => ({ ...vinculo })),
+        renovacoes: renovacoesTemplate.length
+          ? renovacoesTemplate
+          : vinculosTemplate.map((vinculo) => ({ ...vinculo })),
         contatos: {
           email: dadosComunsTemplate.email,
           whatsapp: dadosComunsTemplate.whatsapp,
