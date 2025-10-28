@@ -1775,13 +1775,14 @@
         tabindex="-1"
       >
         <div class="susi-chat-modal__header">
-          <h2 class="susi-chat-modal__title" id="susi-chat-title">SUSi • Atendimento</h2>
+          <h2 class="susi-chat-modal__title" id="susi-chat-title" tabindex="-1">SUSi • Atendimento</h2>
           <button type="button" class="susi-chat-close" aria-label="Fechar chat">&times;</button>
         </div>
         <div class="susi-chat-modal__body">
           <iframe
             class="susi-chat-iframe"
-            src="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/susi"
+            src="about:blank"
+            data-src="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/susi"
             title="Atendimento SUSi"
             loading="lazy"
             referrerpolicy="no-referrer"
@@ -1891,6 +1892,11 @@
         font-weight: 600;
         color: #003579;
         margin: 0;
+      }
+
+      .susi-chat-modal__title:focus-visible {
+        outline: 3px solid rgba(0, 163, 255, 0.55);
+        outline-offset: 2px;
       }
 
       .susi-chat-close {
@@ -2027,6 +2033,8 @@
         const iframe = root.querySelector('.susi-chat-iframe');
         const fallback = root.querySelector('.susi-chat-modal__fallback');
         const status = root.querySelector('.susi-chat-status');
+        const modalTitle = root.querySelector('.susi-chat-modal__title');
+        const chatUrl = iframe ? iframe.dataset.src || iframe.getAttribute('src') || '' : '';
 
         const focusableSelectors = [
           'button',
@@ -2056,6 +2064,15 @@
           });
         };
 
+        const requestIframeLoad = () => {
+          if (!iframe || !chatUrl) return;
+          const currentSrc = iframe.getAttribute('src');
+          const alreadyLoaded = iframe.dataset.loaded === 'true';
+          if (!alreadyLoaded || !currentSrc || currentSrc === 'about:blank') {
+            iframe.setAttribute('src', chatUrl);
+          }
+        };
+
         const resetFallback = () => {
           if (fallback) {
             fallback.hidden = true;
@@ -2075,18 +2092,25 @@
           if (iframe) {
             iframe.hidden = true;
             iframe.setAttribute('aria-hidden', 'true');
+            iframe.dataset.loaded = 'false';
+            iframe.setAttribute('src', 'about:blank');
           }
         };
 
         const startWatchdog = () => {
-          iframeLoaded = false;
+          if (!iframe || !chatUrl) return;
           resetFallback();
           window.clearTimeout(watchdogTimer);
+          if (iframe.dataset.loaded === 'true') {
+            iframeLoaded = true;
+            return;
+          }
+          iframeLoaded = false;
           watchdogTimer = window.setTimeout(() => {
             if (!iframeLoaded) {
               showFallback();
             }
-          }, 4000);
+          }, 4500);
         };
 
         const handleKeydown = (event) => {
@@ -2134,10 +2158,13 @@
           modal.setAttribute('aria-hidden', 'false');
           toggleButton.setAttribute('aria-expanded', 'true');
           modal.classList.add('susi-chat-modal--open');
-          requestAnimationFrame(() => modal.focus());
+          const firstFocusable = getFocusableElements()[0];
+          const focusTarget = modalTitle || firstFocusable || modal;
+          requestAnimationFrame(() => focusTarget.focus());
           document.addEventListener('keydown', handleKeydown);
           document.addEventListener('focusin', handleFocusIn);
           announce('Janela do chat SUSi aberta.');
+          requestIframeLoad();
           startWatchdog();
         };
 
@@ -2163,11 +2190,13 @@
         if (iframe) {
           iframe.addEventListener('load', () => {
             iframeLoaded = true;
+            iframe.dataset.loaded = 'true';
             window.clearTimeout(watchdogTimer);
             resetFallback();
           });
           iframe.addEventListener('error', () => {
             iframeLoaded = false;
+            iframe.dataset.loaded = 'false';
             window.clearTimeout(watchdogTimer);
             showFallback();
           });
