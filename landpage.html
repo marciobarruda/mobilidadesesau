@@ -200,6 +200,18 @@
         min-height: 170px;
       }
 
+      .mapa-unidades-wrapper {
+        border-radius: 12px;
+        overflow: hidden;
+        background: #f6f9ff;
+      }
+
+      .mapa-unidades-frame {
+        border: 0;
+        width: 100%;
+        height: 100%;
+      }
+
       .collapsible-form {
         border: 1px solid rgba(0, 83, 164, 0.18);
         border-radius: 16px;
@@ -785,7 +797,27 @@
           </div>
         </section>
 
-        <!-- Card 5: Orientações -->
+        <!-- Card 5: Mapa das Unidades -->
+        <section class="col-12">
+          <div class="card card-programa h-100">
+            <div class="card-header">
+              <div class="section-title">Mapa das unidades SESAU</div>
+            </div>
+            <div class="card-body">
+              <div class="mapa-unidades-wrapper ratio ratio-4x3">
+                <iframe
+                  src="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/mapa-unidades-sesau"
+                  title="Mapa das unidades de saúde"
+                  class="mapa-unidades-frame"
+                  loading="lazy"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card 6: Orientações -->
         <section class="col-12 col-lg-6">
           <div class="card card-programa h-100">
             <div class="card-header">
@@ -797,7 +829,7 @@
           </div>
         </section>
 
-        <!-- Card 6: Publicações -->
+        <!-- Card 7: Publicações -->
         <section class="col-12 col-lg-6">
           <div class="card card-programa h-100">
             <div class="card-header">
