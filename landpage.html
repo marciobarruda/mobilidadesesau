@@ -591,10 +591,8 @@
                   target="_blank"
                   class="d-inline"
                 >
-                  <input type="hidden" name="ds" id="novaSolicitacaoDs" />
-                  <input type="hidden" name="grupo" id="novaSolicitacaoGrupo" />
                   <input type="hidden" name="cpf" id="novaSolicitacaoCpf" />
-                  <input type="hidden" name="matricula" id="novaSolicitacaoMatricula" value="{{ $json.data.vinculos[0].matricula }}" />
+                  <input type="hidden" id="novaSolicitacaoMatricula" value="{{ $json.data.vinculos[0].matricula }}" />
                   <button type="button" class="btn btn-primary" id="btnNovaSolicitacao">Nova solicitação</button>
                 </form>
                 <a class="btn btn-outline-primary" href="#orientacoesContainer">Orientações</a>
@@ -1116,12 +1114,6 @@
           createButton('btnFecharModal', 'Fechar', 'btn btn-danger', fecharModal);
         }
       }
-
-      const buildNovaSolicitacaoPayload = () => ({
-        cpf: sanitizeValue(
-          dadosComunsTemplate.cpf || document.getElementById('cpfHidden')?.value || ''
-        )
-      });
 
       // ===== Inicialização dos campos =====
       function populateMatriculas() {
@@ -1838,34 +1830,12 @@
         showFormFeedbackPopup('success');
       });
 
-      async function enviarNovaSolicitacao() {
+      function enviarNovaSolicitacao() {
         const form = document.getElementById('novaSolicitacaoForm');
-        const button = document.getElementById('btnNovaSolicitacao');
-        if (!form || !button) return;
-        button.setAttribute('disabled', 'disabled');
-        button.setAttribute('aria-busy', 'true');
-        setStatus('Enviando nova solicitação...', true);
-        try {
-          const payload = buildNovaSolicitacaoPayload();
-          console.log('Payload nova solicitação:', payload);
-          const response = await fetch(form.action, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-          setStatus('Nova solicitação enviada com sucesso.', true);
-          const responseText = await response.text();
-          if (responseText) console.log('Resposta nova solicitação:', responseText);
-        } catch (error) {
-          console.error('Erro ao enviar nova solicitação:', error);
-          setStatus('Não foi possível enviar a nova solicitação.', false);
-        } finally {
-          button.removeAttribute('disabled');
-          button.removeAttribute('aria-busy');
-        }
+        if (!form) return;
+        const hiddenCpf = document.getElementById('novaSolicitacaoCpf');
+        if (hiddenCpf) hiddenCpf.value = sanitizeValue(DATA.cpf || dadosComunsTemplate.cpf || '');
+        form.submit();
       }
 
       document.getElementById('btnNovaSolicitacao').addEventListener('click', enviarNovaSolicitacao);
