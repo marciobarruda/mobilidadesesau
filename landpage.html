@@ -1849,7 +1849,7 @@
         aria-haspopup="dialog"
       >
         <img
-          src="https://statics.recife.pe.gov.br/images/dynamics/automacao/susi.png?w=100"
+          src="https://sesuite.recife.pe.gov.br/se/v67178/temp/imgtor-seblob-ff80808197c1061d0197caf410162615--.png"
           alt=""
           class="susi-chat-toggle__icon"
           decoding="async"
@@ -1930,14 +1930,15 @@
       }
 
       .susi-chat-toggle__icon {
-        width: 78%;
-        height: 78%;
-        object-fit: contain;
+        width: 90%;
+        height: 90%;
         border-radius: 50%;
-        background: transparent;
-        filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.25));
-        -webkit-mask-image: radial-gradient(circle at center, #000 70%, transparent 75%);
-        mask-image: radial-gradient(circle at center, #000 70%, transparent 75%);
+        object-fit: cover;
+        object-position: center;
+        background: #ffffff;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6);
+        filter: drop-shadow(0 2px 4px rgba(15, 37, 78, 0.28));
+        clip-path: circle(50% at 50% 50%);
       }
 
       .susi-chat-modal {
