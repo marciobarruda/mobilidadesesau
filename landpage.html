@@ -591,10 +591,8 @@
                   target="_blank"
                   class="d-inline"
                 >
-                  <input type="hidden" name="ds" id="novaSolicitacaoDs" />
-                  <input type="hidden" name="grupo" id="novaSolicitacaoGrupo" />
                   <input type="hidden" name="cpf" id="novaSolicitacaoCpf" />
-                  <input type="hidden" name="matricula" id="novaSolicitacaoMatricula" value="{{ $json.data.vinculos[0].matricula }}" />
+                  <input type="hidden" id="novaSolicitacaoMatricula" value="{{ $json.data.vinculos[0].matricula }}" />
                   <button type="button" class="btn btn-primary" id="btnNovaSolicitacao">Nova solicitação</button>
                 </form>
                 <a class="btn btn-outline-primary" href="#orientacoesContainer">Orientações</a>
@@ -747,8 +745,8 @@
         </section>
 
         <!-- Card 3: Minhas Solicitações -->
-        <section class="col-12">
-          <div class="card card-programa">
+        <section class="col-12 col-lg-6">
+          <div class="card card-programa h-100">
             <div class="card-header">
               <div class="section-title">Minhas solicitações</div>
             </div>
@@ -761,7 +759,22 @@
           </div>
         </section>
 
-        <!-- Card 4: Orientações -->
+        <!-- Card 4: Minhas Renovações -->
+        <section class="col-12 col-lg-6">
+          <div class="card card-programa h-100">
+            <div class="card-header">
+              <div class="section-title">Minhas renovações</div>
+            </div>
+            <div class="card-body">
+              <div id="minhasRenovacoes" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 minhas-grid">
+                <!-- Mini cards de renovações renderizados via JS -->
+              </div>
+              <div id="minhasRenovacoesPlaceholder" class="minhas-placeholder mt-3 d-none">Nenhuma renovação encontrada.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card 5: Orientações -->
         <section class="col-12 col-lg-6">
           <div class="card card-programa h-100">
             <div class="card-header">
@@ -773,7 +786,7 @@
           </div>
         </section>
 
-        <!-- Card 5: Publicações -->
+        <!-- Card 6: Publicações -->
         <section class="col-12 col-lg-6">
           <div class="card card-programa h-100">
             <div class="card-header">
@@ -815,11 +828,7 @@
           </div>
         </div>
         <div id="modalBody" class="feedback-modal-message"></div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-success" id="btnSalvarPDF">Salvar em PDF</button>
-          <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
-          <button type="button" class="btn btn-danger" id="btnFecharModal">Fechar</button>
-        </div>
+        <div class="modal-actions" id="modalActions"></div>
       </div>
     </div>
 
@@ -837,6 +846,9 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+    <script type="application/json" id="templateData">
+      {{ JSON.stringify($json.data || {}) }}
+    </script>
     <script>
       // ===== Helpers =====
       const postJSON = async (url, body) => {
@@ -969,42 +981,139 @@
       };
 
       // Dados vindos do template (quando presentes)
-      const nomeServidorTemplate = sanitizeValue(`{{ $json.data.dadosComuns.servidor }}`);
-      const nomeExibicaoTemplate = sanitizeValue(`{{ $json.data.dadosComuns.nome }}`);
+      const templateDataElement = document.getElementById('templateData');
+      let templateData = null;
+      if (templateDataElement) {
+        try {
+          templateData = JSON.parse(templateDataElement.textContent || '{}');
+        } catch (error) {
+          console.warn('Não foi possível interpretar os dados do template:', error);
+          templateData = null;
+        }
+      }
+
+      const dadosComunsSource = templateData?.dadosComuns || {};
+      const enderecoSource = dadosComunsSource.endereco || {};
+      const nomeServidorTemplate = sanitizeValue(dadosComunsSource.servidor);
+      const nomeExibicaoTemplate = sanitizeValue(dadosComunsSource.nome);
+      const dadosComunsTemplate = {
+        cpf: sanitizeValue(dadosComunsSource.cpf),
+        nome: nomeExibicaoTemplate,
+        servidor: nomeServidorTemplate,
+        nascimento: sanitizeValue(dadosComunsSource.nascimento),
+        email: sanitizeValue(dadosComunsSource.email).toLowerCase(),
+        whatsapp: sanitizeValue(dadosComunsSource.whatsapp),
+        telalternativo: sanitizeValue(dadosComunsSource.telalternativo),
+        endereco: {
+          cep: sanitizeValue(enderecoSource.cep),
+          logradouro: sanitizeValue(enderecoSource.logradouro),
+          numero: sanitizeValue(enderecoSource.numero),
+          complemento: sanitizeValue(enderecoSource.complemento),
+          bairro: sanitizeValue(enderecoSource.bairro),
+          cidade: sanitizeValue(enderecoSource.cidade),
+          uf: sanitizeValue(enderecoSource.uf)
+        }
+      };
+
+      const normalizeVinculo = (vinculo = {}) => ({
+        matricula: sanitizeValue(vinculo.matricula),
+        cargo: sanitizeValue(vinculo.cargo),
+        distrito: sanitizeValue(vinculo.distrito),
+        lotacao: sanitizeValue(vinculo.lotacao),
+        turno: sanitizeValue(vinculo.turno),
+        regime: sanitizeValue(vinculo.regime),
+        admissao: sanitizeValue(vinculo.admissao),
+        carga_horaria: sanitizeValue(vinculo.carga_horaria),
+        grupo: sanitizeValue(vinculo.grupo),
+        vinculo: sanitizeValue(vinculo.vinculo),
+        ds: sanitizeValue(vinculo.ds)
+      });
+
+      const possuiInformacoesRelevantes = (vinculo) => {
+        if (!vinculo) return false;
+        const relevante = {
+          matricula: vinculo.matricula,
+          cargo: vinculo.cargo,
+          distrito: vinculo.distrito,
+          lotacao: vinculo.lotacao,
+          turno: vinculo.turno,
+          regime: vinculo.regime,
+          admissao: vinculo.admissao,
+          carga_horaria: vinculo.carga_horaria,
+          grupo: vinculo.grupo,
+          vinculo: vinculo.vinculo,
+          ds: vinculo.ds
+        };
+        return Object.values(relevante).some((value) => Boolean(value));
+      };
+
+      const vinculosTemplate = (Array.isArray(templateData?.vinculos) ? templateData.vinculos : [])
+        .map(normalizeVinculo)
+        .filter(possuiInformacoesRelevantes);
+
+      const renovacoesTemplate = (Array.isArray(templateData?.renovacoes) ? templateData.renovacoes : [])
+        .map(normalizeVinculo)
+        .filter(possuiInformacoesRelevantes);
+
       const DATA = {
         nome: nomeServidorTemplate || nomeExibicaoTemplate,
         servidor: nomeServidorTemplate,
         nomeExibicao: nomeExibicaoTemplate,
-        cpf: sanitizeValue(`{{ $json.data.dadosComuns.cpf }}`),
-        vinculos: [
-          {
-            matricula: sanitizeValue(`{{ $json.data.vinculos[0].matricula }}`),
-            cargo: sanitizeValue(`{{ $json.data.vinculos[0].cargo }}`),
-            grupo: sanitizeValue(`{{ $json.data.vinculos[0].grupo }}`),
-            ds: sanitizeValue(`{{ $json.data.vinculos[0].ds }}`)
-          },
-          {
-            matricula: sanitizeValue(`{{ $json.data.vinculos[1].matricula }}`),
-            cargo: sanitizeValue(`{{ $json.data.vinculos[1].cargo }}`),
-            grupo: sanitizeValue(`{{ $json.data.vinculos[1].grupo }}`),
-            ds: sanitizeValue(`{{ $json.data.vinculos[1].ds }}`)
-          }
-        ],
+        cpf: dadosComunsTemplate.cpf,
+        nascimento: dadosComunsTemplate.nascimento,
+        dadosComuns: dadosComunsTemplate,
+        vinculos: vinculosTemplate,
+        renovacoes: renovacoesTemplate.length
+          ? renovacoesTemplate
+          : vinculosTemplate.map((vinculo) => ({ ...vinculo })),
         contatos: {
-          email: sanitizeValue(`{{ $json.data.dadosComuns.email }}`).toLowerCase(),
-          whatsapp: sanitizeValue(`{{ $json.data.dadosComuns.whatsapp }}`),
-          telalternativo: sanitizeValue(`{{ $json.data.dadosComuns.telalternativo }}`)
+          email: dadosComunsTemplate.email,
+          whatsapp: dadosComunsTemplate.whatsapp,
+          telalternativo: dadosComunsTemplate.telalternativo
         },
-        endereco: {
-          cep: sanitizeValue(`{{ $json.data.dadosComuns.endereco.cep }}`),
-          logradouro: sanitizeValue(`{{ $json.data.dadosComuns.endereco.logradouro }}`),
-          numero: sanitizeValue(`{{ $json.data.dadosComuns.endereco.numero }}`),
-          complemento: sanitizeValue(`{{ $json.data.dadosComuns.endereco.complemento }}`),
-          bairro: sanitizeValue(`{{ $json.data.dadosComuns.endereco.bairro }}`),
-          cidade: sanitizeValue(`{{ $json.data.dadosComuns.endereco.cidade }}`),
-          uf: sanitizeValue(`{{ $json.data.dadosComuns.endereco.uf }}`)
-        }
+        endereco: dadosComunsTemplate.endereco
       };
+
+      let modalContext = { tipo: 'solicitacao', matricula: '' };
+
+      function configurarAcoesModal(tipo = 'solicitacao') {
+        const container = document.getElementById('modalActions');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const createButton = (id, text, className, handler) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          if (id) button.id = id;
+          button.className = className;
+          button.textContent = text;
+          if (typeof handler === 'function') {
+            button.addEventListener('click', handler);
+          }
+          container.appendChild(button);
+          return button;
+        };
+
+        if (tipo === 'renovacao') {
+          createButton('btnRenovarPedido', 'Renovar pedido', 'btn btn-success', () => {
+            console.log(
+              'Renovar pedido solicitado para a matrícula',
+              modalContext.matricula || ''
+            );
+          });
+          createButton('btnNaoRenovarPedido', 'Não renovar pedido', 'btn btn-danger', () => {
+            console.log(
+              'Não renovar pedido para a matrícula',
+              modalContext.matricula || ''
+            );
+          });
+          createButton('btnFecharModal', 'Fechar', 'btn btn-secondary', fecharModal);
+        } else {
+          createButton('btnSalvarPDF', 'Salvar em PDF', 'btn btn-success', gerarPdfModal);
+          createButton('btnImprimir', 'Imprimir', 'btn btn-primary', () => window.print());
+          createButton('btnFecharModal', 'Fechar', 'btn btn-danger', fecharModal);
+        }
+      }
 
       // ===== Inicialização dos campos =====
       function populateMatriculas() {
@@ -1096,7 +1205,42 @@
               <div class="text-muted small">${cargo}</div>
             </div>
           `;
-          card.querySelector('.minha-card').addEventListener('click', () => abrirRevisaoSolicitacao(v.matricula));
+          card.querySelector('.minha-card').addEventListener('click', () =>
+            abrirRevisaoSolicitacao(v.matricula, 'solicitacao')
+          );
+          wrap.appendChild(card);
+        });
+      }
+
+      function renderMinhasRenovacoesCards() {
+        const wrap = document.getElementById('minhasRenovacoes');
+        const placeholder = document.getElementById('minhasRenovacoesPlaceholder');
+        if (!wrap || !placeholder) return;
+        wrap.innerHTML = '';
+        const fonte = Array.isArray(DATA.renovacoes) && DATA.renovacoes.length ? DATA.renovacoes : DATA.vinculos;
+        const entries = (fonte || []).filter((vinculo) => {
+          const matriculaValida = vinculo && vinculo.matricula && vinculo.matricula !== 'undefined' && vinculo.matricula.trim() !== '';
+          const cargoValido = vinculo && vinculo.cargo && vinculo.cargo !== 'undefined';
+          return matriculaValida || cargoValido;
+        });
+        if (entries.length === 0) {
+          placeholder.classList.remove('d-none');
+          return;
+        }
+        placeholder.classList.add('d-none');
+        entries.forEach((v) => {
+          const matricula = v.matricula && v.matricula !== 'undefined' ? v.matricula : '';
+          const cargo = v.cargo && v.cargo !== 'undefined' ? v.cargo : '';
+          const card = document.createElement('div');
+          card.className = 'col';
+          card.innerHTML = `
+            <div class="minha-card h-100">
+              <div class="fw-bold mb-1">${matricula}</div>
+              <div class="text-muted small">${cargo}</div>
+            </div>
+          `;
+          const miniCard = card.querySelector('.minha-card');
+          miniCard.addEventListener('click', () => abrirRevisaoSolicitacao(v.matricula, 'renovacao'));
           wrap.appendChild(card);
         });
       }
@@ -1173,15 +1317,21 @@
       }
 
       // ===== Minhas Solicitações -> Modal =====
-      async function abrirRevisaoSolicitacao(matricula) {
+      async function abrirRevisaoSolicitacao(matricula, tipo = 'solicitacao') {
         const backdrop = document.getElementById('modalBackdrop');
         const modalBody = document.getElementById('modalBody');
+        const matriculaSanitizada = sanitizeValue(matricula);
+        modalContext = { tipo, matricula: matriculaSanitizada };
+        configurarAcoesModal(tipo);
         document.getElementById('modalNumeroSolicitacao').textContent = '—';
         modalBody.innerHTML = '<div class="text-muted">Carregando...</div>';
         backdrop.classList.add('active');
         backdrop.setAttribute('aria-hidden', 'false');
         try {
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2', { matricula });
+          const data = await postJSON(
+            'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2',
+            { matricula: matriculaSanitizada }
+          );
           if (!Array.isArray(data) || data.length === 0) {
             modalBody.innerHTML = '<div class="text-danger">Nenhum registro encontrado.</div>';
             return;
@@ -1219,7 +1369,7 @@
           `;
         } catch (e) {
           document.getElementById('modalNumeroSolicitacao').textContent = '—';
-          modalBody.innerHTML = '<div class="text-danger">Falha ao carregar dados da solicitação.</div>';
+          modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
         }
       }
 
@@ -1680,33 +1830,16 @@
         showFormFeedbackPopup('success');
       });
 
-      document.getElementById('btnNovaSolicitacao').addEventListener('click', () => {
-        const matriculaSelect = document.getElementById('matriculaSelect');
-        const selected = matriculaSelect?.selectedOptions?.[0];
-        const fallbackMatricula = sanitizeValue(document.getElementById('novaSolicitacaoMatricula')?.value || '');
-        const matriculaValue = sanitizeValue(selected?.value || fallbackMatricula);
-        const grupoValue = sanitizeValue(selected?.dataset?.grupo || document.getElementById('grupoHidden')?.value || '');
-        const dsSelectValue = sanitizeValue(document.getElementById('dsSelect')?.value || '');
-        const hiddenDsValue = sanitizeValue(document.getElementById('dsHidden')?.value || '');
-        const cpfValue = sanitizeValue(document.getElementById('cpfHidden')?.value || '');
-        const dsValue = dsSelectValue || hiddenDsValue;
+      function enviarNovaSolicitacao() {
         const form = document.getElementById('novaSolicitacaoForm');
         if (!form) return;
-        const dsField = document.getElementById('novaSolicitacaoDs');
-        const grupoField = document.getElementById('novaSolicitacaoGrupo');
-        const cpfField = document.getElementById('novaSolicitacaoCpf');
-        const matriculaField = document.getElementById('novaSolicitacaoMatricula');
-        if (dsField) dsField.value = dsValue;
-        if (grupoField) grupoField.value = grupoValue;
-        if (cpfField) cpfField.value = cpfValue;
-        if (matriculaField) matriculaField.value = matriculaValue;
-        if (document.getElementById('grupoHidden')) document.getElementById('grupoHidden').value = grupoValue;
+        const hiddenCpf = document.getElementById('novaSolicitacaoCpf');
+        if (hiddenCpf) hiddenCpf.value = sanitizeValue(DATA.cpf || dadosComunsTemplate.cpf || '');
         form.submit();
-      });
+      }
 
-      document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
-      document.getElementById('btnImprimir').addEventListener('click', () => window.print());
-      document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
+      document.getElementById('btnNovaSolicitacao').addEventListener('click', enviarNovaSolicitacao);
+
       document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
       document.getElementById('formFeedbackClose').addEventListener('click', closeFormFeedback);
       document.getElementById('formFeedback').addEventListener('click', (e) => {
@@ -1716,28 +1849,12 @@
         if (event.key === 'Escape') closeFormFeedback();
       });
 
-      const scrollHeroIntoView = () => {
-        if (window.location.hash) return;
-        if (window.scrollY > 16) return;
-        if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        const heroRow = document.getElementById('heroCardsRow');
-        if (!heroRow) return;
-        const rect = heroRow.getBoundingClientRect();
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-        const midpoint = window.scrollY + rect.top + rect.height / 2;
-        const target = Math.max(midpoint - viewportHeight / 2, 0);
-        window.scrollTo({ top: target, behavior: 'smooth' });
-      };
-
-      window.addEventListener('load', () => {
-        setTimeout(scrollHeroIntoView, 350);
-      });
-
       // ===== Bootstrap inicial =====
       (function init() {
         populateMatriculas();
         populateContatosEndereco();
         renderMinhasSolicitacoesCards();
+        renderMinhasRenovacoesCards();
         document.querySelectorAll('.collapsible-form').forEach((details) => {
           details.open = false;
         });
@@ -1746,6 +1863,432 @@
         else renderOrientacoes('Carregaremos aqui as orientações do processo.');
         // Publicações: use window.PUBLICACOES = [{titulo, descricao, url}, ...]; em produção
         renderPublicacoes(window.PUBLICACOES || []);
+      })();
+    </script>
+
+    <!-- SUSi chat floating button and modal -->
+    <div class="susi-chat-root">
+      <button
+        type="button"
+        class="susi-chat-toggle"
+        aria-label="Abrir chat SUSi"
+        aria-expanded="false"
+        aria-haspopup="dialog"
+      >
+        <img
+          src="https://statics.recife.pe.gov.br/images/dynamics/automacao/susi.png?w=100"
+          alt=""
+          class="susi-chat-toggle__icon"
+          decoding="async"
+        />
+      </button>
+
+      <div
+        class="susi-chat-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="susi-chat-title"
+        aria-hidden="true"
+        tabindex="-1"
+      >
+        <div class="susi-chat-modal__header">
+          <h2 class="susi-chat-modal__title" id="susi-chat-title">SUSi • Atendimento</h2>
+          <button type="button" class="susi-chat-close" aria-label="Fechar chat">&times;</button>
+        </div>
+        <div class="susi-chat-modal__body">
+          <iframe
+            class="susi-chat-iframe"
+            src="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/susi"
+            title="Atendimento SUSi"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+          ></iframe>
+        </div>
+        <div class="susi-chat-modal__fallback" hidden aria-hidden="true">
+          <p>Não foi possível carregar o chat embutido.</p>
+          <a
+            class="susi-chat-fallback-link"
+            href="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/susi"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Abrir chat em nova aba
+          </a>
+        </div>
+      </div>
+
+      <p class="susi-chat-status" aria-live="polite" aria-atomic="true"></p>
+    </div>
+
+    <style>
+      /* Layout geral do widget SUSi */
+      .susi-chat-root {
+        position: relative;
+        z-index: 0;
+      }
+
+      .susi-chat-toggle {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 64px;
+        height: 64px;
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(135deg, #004aad, #00a3ff);
+        box-shadow: 0 16px 36px rgba(15, 37, 78, 0.24);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        z-index: 10001;
+      }
+
+      .susi-chat-toggle:hover {
+        transform: scale(1.05);
+        box-shadow: 0 20px 44px rgba(15, 37, 78, 0.3);
+      }
+
+      .susi-chat-toggle:focus-visible {
+        outline: 3px solid rgba(0, 163, 255, 0.9);
+        outline-offset: 4px;
+      }
+
+      .susi-chat-toggle__icon {
+        width: 64%;
+        height: 64%;
+        object-fit: contain;
+        border-radius: 50%;
+        background: transparent;
+        filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.25));
+        -webkit-mask-image: radial-gradient(circle at center, #000 70%, transparent 75%);
+        mask-image: radial-gradient(circle at center, #000 70%, transparent 75%);
+      }
+
+      .susi-chat-modal {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        width: min(360px, 90vw);
+        height: min(520px, 70vh);
+        background: #ffffff;
+        border-radius: 18px;
+        box-shadow: 0 24px 60px rgba(15, 37, 78, 0.24);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translate3d(0, 12px, 0);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        z-index: 10000;
+      }
+
+      .susi-chat-modal--open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translate3d(0, 0, 0);
+      }
+
+      .susi-chat-modal__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.9rem 1.25rem;
+        background: linear-gradient(180deg, rgba(0, 74, 173, 0.08), rgba(0, 163, 255, 0.08));
+        border-bottom: 1px solid rgba(0, 74, 173, 0.12);
+      }
+
+      .susi-chat-modal__title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #003579;
+        margin: 0;
+      }
+
+      .susi-chat-close {
+        border: none;
+        background: transparent;
+        color: #003579;
+        font-size: 1.75rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0;
+        width: 2rem;
+        height: 2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        transition: background-color 0.2s ease;
+      }
+
+      .susi-chat-close:hover {
+        background-color: rgba(0, 74, 173, 0.08);
+      }
+
+      .susi-chat-close:focus-visible {
+        outline: 3px solid rgba(0, 74, 173, 0.45);
+        outline-offset: 2px;
+      }
+
+      .susi-chat-modal__body {
+        flex: 1;
+        position: relative;
+        background: #f7fbff;
+      }
+
+      .susi-chat-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: transparent;
+      }
+
+      .susi-chat-iframe[hidden] {
+        display: none !important;
+      }
+
+      .susi-chat-modal__fallback {
+        padding: 1.2rem 1.4rem 1.6rem;
+        background: #ffffff;
+        text-align: center;
+      }
+
+      .susi-chat-modal__fallback p {
+        margin-bottom: 0.75rem;
+        color: #1f2937;
+      }
+
+      .susi-chat-fallback-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        padding: 0.55rem 1.1rem;
+        border-radius: 999px;
+        background: #004aad;
+        color: #ffffff;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+      }
+
+      .susi-chat-fallback-link:hover {
+        background: #003579;
+        transform: translateY(-1px);
+      }
+
+      .susi-chat-fallback-link:focus-visible {
+        outline: 3px solid rgba(0, 163, 255, 0.6);
+        outline-offset: 3px;
+      }
+
+      .susi-chat-modal__fallback[hidden] {
+        display: none !important;
+      }
+
+      .susi-chat-status {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      @media (max-width: 768px) {
+        .susi-chat-toggle {
+          bottom: 16px;
+          right: 16px;
+        }
+
+        .susi-chat-modal {
+          bottom: 16px;
+          left: 50%;
+          width: min(420px, 92vw);
+          height: min(520px, 72vh);
+          transform: translate3d(-50%, 12px, 0);
+        }
+
+        .susi-chat-modal--open {
+          transform: translate3d(-50%, 0, 0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .susi-chat-toggle,
+        .susi-chat-modal,
+        .susi-chat-fallback-link {
+          transition: none !important;
+        }
+      }
+    </style>
+
+    <script>
+      // Controle de abertura, foco e fallback do chat SUSi
+      (function () {
+        const root = document.querySelector('.susi-chat-root');
+        if (!root) return;
+
+        const toggleButton = root.querySelector('.susi-chat-toggle');
+        const modal = root.querySelector('.susi-chat-modal');
+        const closeButton = root.querySelector('.susi-chat-close');
+        const iframe = root.querySelector('.susi-chat-iframe');
+        const fallback = root.querySelector('.susi-chat-modal__fallback');
+        const status = root.querySelector('.susi-chat-status');
+
+        const focusableSelectors = [
+          'button',
+          '[href]',
+          'input',
+          'select',
+          'textarea',
+          '[tabindex]:not([tabindex="-1"])'
+        ].join(', ');
+
+        let isOpen = false;
+        let previouslyFocusedElement = null;
+        let watchdogTimer = null;
+        let iframeLoaded = false;
+
+        const announce = (message) => {
+          if (status) status.textContent = message;
+        };
+
+        const getFocusableElements = () => {
+          return Array.from(modal.querySelectorAll(focusableSelectors)).filter((element) => {
+            return (
+              !element.hasAttribute('disabled') &&
+              element.getAttribute('aria-hidden') !== 'true' &&
+              element.offsetParent !== null
+            );
+          });
+        };
+
+        const resetFallback = () => {
+          if (fallback) {
+            fallback.hidden = true;
+            fallback.setAttribute('aria-hidden', 'true');
+          }
+          if (iframe) {
+            iframe.hidden = false;
+            iframe.removeAttribute('aria-hidden');
+          }
+        };
+
+        const showFallback = () => {
+          if (fallback) {
+            fallback.hidden = false;
+            fallback.setAttribute('aria-hidden', 'false');
+          }
+          if (iframe) {
+            iframe.hidden = true;
+            iframe.setAttribute('aria-hidden', 'true');
+          }
+        };
+
+        const startWatchdog = () => {
+          iframeLoaded = false;
+          resetFallback();
+          window.clearTimeout(watchdogTimer);
+          watchdogTimer = window.setTimeout(() => {
+            if (!iframeLoaded) {
+              showFallback();
+            }
+          }, 4000);
+        };
+
+        const handleKeydown = (event) => {
+          if (!isOpen) return;
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            closeChat();
+            return;
+          }
+          if (event.key !== 'Tab') return;
+
+          const focusable = getFocusableElements();
+          if (!focusable.length) {
+            event.preventDefault();
+            modal.focus();
+            return;
+          }
+
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey) {
+            if (document.activeElement === first || document.activeElement === modal) {
+              event.preventDefault();
+              last.focus();
+            }
+          } else if (document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        };
+
+        const handleFocusIn = (event) => {
+          if (!isOpen) return;
+          if (!modal.contains(event.target)) {
+            const focusable = getFocusableElements();
+            const focusTarget = focusable[0] || modal;
+            requestAnimationFrame(() => focusTarget.focus());
+          }
+        };
+
+        const openChat = () => {
+          if (isOpen) return;
+          previouslyFocusedElement = document.activeElement;
+          isOpen = true;
+          modal.setAttribute('aria-hidden', 'false');
+          toggleButton.setAttribute('aria-expanded', 'true');
+          modal.classList.add('susi-chat-modal--open');
+          requestAnimationFrame(() => modal.focus());
+          document.addEventListener('keydown', handleKeydown);
+          document.addEventListener('focusin', handleFocusIn);
+          announce('Janela do chat SUSi aberta.');
+          startWatchdog();
+        };
+
+        const closeChat = () => {
+          if (!isOpen) return;
+          isOpen = false;
+          modal.setAttribute('aria-hidden', 'true');
+          toggleButton.setAttribute('aria-expanded', 'false');
+          modal.classList.remove('susi-chat-modal--open');
+          document.removeEventListener('keydown', handleKeydown);
+          document.removeEventListener('focusin', handleFocusIn);
+          window.clearTimeout(watchdogTimer);
+          announce('Janela do chat SUSi fechada.');
+          const returnFocusTarget = previouslyFocusedElement && previouslyFocusedElement.focus ? previouslyFocusedElement : toggleButton;
+          requestAnimationFrame(() => returnFocusTarget.focus());
+        };
+
+        const toggleChat = () => (isOpen ? closeChat() : openChat());
+
+        if (toggleButton) toggleButton.addEventListener('click', toggleChat);
+        if (closeButton) closeButton.addEventListener('click', closeChat);
+
+        if (iframe) {
+          iframe.addEventListener('load', () => {
+            iframeLoaded = true;
+            window.clearTimeout(watchdogTimer);
+            resetFallback();
+          });
+          iframe.addEventListener('error', () => {
+            iframeLoaded = false;
+            window.clearTimeout(watchdogTimer);
+            showFallback();
+          });
+        }
       })();
     </script>
   </body>
