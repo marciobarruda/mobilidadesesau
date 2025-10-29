@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SESAU • Secretaria de Saúde do Recife</title>
+    <link
+      rel="icon"
+      href="https://statics.recife.pe.gov.br/images/dynamics/conecta/icons/favicon.png?w=32&h=32&fit=fill&border=2,transparent,shrink"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      :root {
+        --brand-primary: #0053a4;
+        --brand-secondary: #003a73;
+        --brand-highlight: #00a3ff;
+        --surface: #f4f7fb;
+        --surface-strong: #ffffff;
+        --border-color: #d0d7e2;
+        --text-strong: #1b263b;
+        --text-muted: #5b6c8c;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Public Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--surface);
+        color: var(--text-strong);
+        min-height: 100vh;
+      }
+
+      header.site-header {
+        background: url("https://statics.recife.pe.gov.br/images/dynamics/automacao/header.png?w=3000")
+          center/cover no-repeat;
+        color: #ffffff;
+        padding: 3.5rem 0 2.75rem;
+      }
+
+      header .lead {
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 100%;
+        font-size: 1rem;
+        line-height: 1.65;
+        text-align: justify;
+      }
+
+      .badge-open {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        padding: 0.45rem 0.9rem;
+        border-radius: 999px;
+        background-color: rgba(255, 255, 255, 0.14);
+      }
+
+      .user-greeting {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, rgba(0, 83, 164, 0.09), rgba(0, 163, 255, 0.12));
+        color: var(--text-strong);
+        box-shadow: 0 10px 30px rgba(0, 45, 98, 0.08);
+      }
+
+      .user-greeting::before {
+        content: "👋";
+        font-size: 1.4rem;
+      }
+
+      .card {
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .rounded-4 {
+        border-radius: 4px !important;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: 0.02em;
+        color: var(--text-strong);
+      }
+
+      .section-title::before {
+        content: "";
+        display: inline-block;
+        width: 32px;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--brand-highlight);
+      }
+
+      .card-programa {
+        border: 1px solid rgba(0, 83, 164, 0.08);
+        border-radius: 4px;
+        background: var(--surface-strong);
+        box-shadow: 0 16px 34px rgba(0, 45, 98, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        height: 100%;
+      }
+
+      .card-programa:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 38px rgba(0, 45, 98, 0.12);
+      }
+
+      .card-programa .card-header {
+        border-bottom: 1px solid rgba(0, 83, 164, 0.08);
+        background: linear-gradient(180deg, #ffffff 0%, #f5f8fc 100%);
+        padding: 1.5rem 1.6rem 1.1rem;
+        border-radius: 4px 4px 0 0;
+      }
+
+      .card-programa .card-body {
+        padding: 1.6rem 1.6rem 1.75rem;
+        border-radius: 0 0 4px 4px;
+      }
+
+      .downloads-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+      }
+
+      .download-card {
+        border: 1px solid var(--border-color);
+        background: var(--surface-strong);
+        border-radius: 4px;
+        padding: 1.35rem 1.4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-height: 170px;
+      }
+
+      .collapsible-form {
+        border: 1px solid rgba(0, 83, 164, 0.15);
+        border-radius: 4px;
+        background: rgba(0, 83, 164, 0.05);
+        padding: 1rem 1.25rem;
+      }
+
+      .collapsible-form summary {
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        list-style: none;
+      }
+
+      .collapsible-form summary::marker,
+      .collapsible-form summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .collapsible-form summary::before {
+        content: "➕";
+        font-size: 0.9rem;
+        transition: transform 0.2s ease;
+      }
+
+      .collapsible-form[open] summary::before {
+        transform: rotate(45deg);
+      }
+
+      .minhas-grid {
+        margin-top: 1rem;
+      }
+
+      .minha-card {
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        border: 1px solid rgba(0, 83, 164, 0.12);
+        border-radius: 4px;
+      }
+
+      .minha-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 45, 98, 0.12);
+      }
+
+      .minhas-placeholder {
+        padding: 1.25rem;
+        border-radius: 4px;
+        background: rgba(0, 83, 164, 0.05);
+        border: 1px dashed rgba(0, 83, 164, 0.2);
+        color: var(--text-muted);
+      }
+
+      .feedback-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(27, 38, 59, 0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        z-index: 1050;
+      }
+      .feedback-modal-backdrop.active { display: flex; }
+      .feedback-modal {
+        background: #ffffff;
+        border-radius: 1rem;
+        max-width: 860px;
+        width: 100%;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+        padding: 1.75rem;
+        margin: 0 auto;
+      }
+      .feedback-modal-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--text-strong); }
+      .feedback-modal-message { font-size: 0.95rem; line-height: 1.6; color: var(--text-strong); max-height: 60vh; overflow-y: auto; }
+
+      footer {
+        color: var(--text-muted);
+        padding: 2.5rem 0 2rem;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 768px) {
+        header.site-header { padding: 2.5rem 0 2rem; }
+        .badge-open { width: 100%; justify-content: center; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Campos ocultos (carregados junto à carta) -->
+    <input type="hidden" id="cpf" value="{{ $json.data.dadosComuns.cpf }}" />
+
+    <header class="site-header">
+      <div class="container">
+        <span class="badge-open">Secretaria de Saúde — SESAU • Prefeitura do Recife</span>
+        <h1 class="display-6 fw-semibold mt-3">Portal do Servidor</h1>
+        <p class="lead mt-2" id="resumo-mobilidade">
+          A mobilidade interna na SESAU organiza formas e critérios para deslocamento de servidores entre unidades da rede,
+          podendo ocorrer a pedido do servidor ou ex officio, sempre sem reduzir a oferta de serviços. Os pedidos são
+          protocolados exclusivamente em sistema eletrônico, têm validade de 12 meses e seguem ordem de prioridade por data
+          de protocolo, observadas vedações e critérios de desempate previstos na Portaria nº 127/2023.
+        </p>
+      </div>
+    </header>
+
+    <main class="container my-5">
+      <p class="user-greeting">Olá, {{ $json.data.dadosComuns.nome }}! Este é o seu painel de mobilidade interna.</p>
+
+      <!-- CARD: Mobilidade Interna -->
+      <section class="mb-5">
+        <div class="row g-4">
+          <div class="col-lg-7">
+            <article class="card card-programa">
+              <div class="card-header">
+                <span class="badge text-bg-light text-primary text-uppercase">Mobilidade interna</span>
+                <h3 class="h5 mt-3 mb-1">Solicitação de Mobilidade (SESAU)</h3>
+                <p class="mb-0 text-muted">Fluxo eletrônico para cadastrar e acompanhar pedidos de mobilidade.</p>
+              </div>
+              <div class="card-body">
+                <ul class="mb-3 text-muted">
+                  <li>Mobilidade <strong>a pedido</strong> ou <strong>ex officio</strong>, conforme Portaria nº 127/2023.</li>
+                  <li>Pedidos válidos por 12 meses, com necessidade de renovação.</li>
+                  <li>Sem impacto na continuidade dos serviços nas unidades.</li>
+                </ul>
+
+                <div class="d-flex flex-wrap gap-2">
+                  <a class="btn btn-primary rounded-pill px-4 py-2" id="btn-nova-solicitacao" href="#" role="button">Nova solicitação</a>
+                  <a class="btn btn-outline-primary rounded-pill px-4 py-2" id="btn-ver-orientacoes" href="#orientacoes">Orientações</a>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- CARD: Atualização cadastral (colapsado) -->
+          <div class="col-lg-5">
+            <article class="card card-programa">
+              <div class="card-header">
+                <span class="badge text-bg-light text-primary text-uppercase">Atualização cadastral</span>
+                <h3 class="h5 mt-3 mb-1">Dados para contato e lotação</h3>
+                <p class="mb-0 text-muted">Mantenha seus dados atualizados para agilizar análises de mobilidade.</p>
+              </div>
+              <div class="card-body">
+                <details class="collapsible-form">
+                  <summary>Atualizar cadastro</summary>
+
+                  <div class="mt-3">
+                    <label class="form-label" for="sel-matricula">Matrícula</label>
+                    <select class="form-select" id="sel-matricula" required></select>
+                    <div class="form-text">Selecione o vínculo a atualizar.</div>
+                  </div>
+
+                  <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                      <label class="form-label" for="in-whatsapp">WhatsApp</label>
+                      <input class="form-control" type="tel" id="in-whatsapp" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ $json.data.dadosComuns.whatsapp }}"/>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="in-telefone-alt">Telefone alternativo</label>
+                      <input class="form-control" type="tel" id="in-telefone-alt" inputmode="numeric" maxlength="11" placeholder="DDD + número" />
+                    </div>
+                  </div>
+
+                  <div class="mt-3">
+                    <label class="form-label" for="in-email">E-mail</label>
+                    <input class="form-control" type="email" id="in-email" placeholder="nome@exemplo.com" autocomplete="email" value="{{ $json.data.dadosComuns.email }}"/>
+                  </div>
+
+                  <div class="mt-3">
+                    <label class="form-label" for="in-cep">CEP</label>
+                    <input class="form-control" type="text" id="in-cep" inputmode="numeric" maxlength="8" placeholder="00000000" value="{{ $json.data.dadosComuns.endereco.cep }}" />
+                    <div class="form-text">Ao informar o CEP, os demais campos de endereço serão preenchidos automaticamente.</div>
+                  </div>
+
+                  <div class="row g-3 mt-1">
+                    <div class="col-md-8">
+                      <label class="form-label" for="in-logradouro">Logradouro</label>
+                      <input class="form-control" type="text" id="in-logradouro" value="{{ $json.data.dadosComuns.endereco.logradouro }}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label" for="in-numero">Número</label>
+                      <input class="form-control" type="text" id="in-numero" value="{{ $json.data.dadosComuns.endereco.numero }}" />
+                    </div>
+                  </div>
+
+                  <div class="mt-3">
+                    <label class="form-label" for="in-complemento">Complemento</label>
+                    <input class="form-control" type="text" id="in-complemento" value="{{ $json.data.dadosComuns.endereco.complemento }}" />
+                  </div>
+
+                  <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                      <label class="form-label" for="in-bairro">Bairro</label>
+                      <input class="form-control" type="text" id="in-bairro" value="{{ $json.data.dadosComuns.endereco.bairro }}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label" for="in-cidade">Cidade</label>
+                      <input class="form-control" type="text" id="in-cidade" value="{{ $json.data.dadosComuns.endereco.cidade }}" />
+                    </div>
+                    <div class="col-md-2">
+                      <label class="form-label" for="in-uf">UF</label>
+                      <input class="form-control text-uppercase" type="text" id="in-uf" maxlength="2" value="{{ $json.data.dadosComuns.endereco.uf }}" />
+                    </div>
+                  </div>
+
+                  <hr class="my-3" />
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label" for="sel-ds">DS/Executiva</label>
+                      <select class="form-select" id="sel-ds"></select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="sel-unidade">Unidade</label>
+                      <select class="form-select" id="sel-unidade"></select>
+                    </div>
+                  </div>
+
+                  <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                      <label class="form-label" for="sel-turno">Turno</label>
+                      <select class="form-select" id="sel-turno"></select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="sel-regime">Regime</label>
+                      <select class="form-select" id="sel-regime"></select>
+                    </div>
+                  </div>
+
+                  <button class="btn btn-outline-primary rounded-pill mt-3" id="btn-atualizar-cadastro" type="button" disabled>Enviar atualização</button>
+                </details>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Minhas Solicitações -->
+      <section class="mb-5" id="minhas-solicitacoes-section">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+          <h2 class="section-title mb-0">Minhas solicitações</h2>
+          <p class="text-muted small mb-0">Selecione uma solicitação para visualizar o resumo.</p>
+        </div>
+        <div id="minhas-solicitacoes-loading" class="minhas-placeholder">
+          Carregando solicitações vinculadas ao CPF informado...
+        </div>
+        <div id="minhas-solicitacoes-empty" class="minhas-placeholder d-none">
+          Nenhuma solicitação encontrada.
+        </div>
+        <div id="minhas-solicitacoes-cards"
+             class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 minhas-grid d-none"></div>
+      </section>
+
+      <!-- Orientações -->
+      <section class="row g-4 align-items-start mb-5" id="orientacoes">
+        <div class="col-lg-7">
+          <h2 class="section-title mb-3">Orientações</h2>
+          <ol class="list-group list-group-numbered shadow-sm">
+            <li class="list-group-item">Cadastre seu pedido exclusivamente pelo sistema eletrônico.</li>
+            <li class="list-group-item">Mantenha dados de contato e lotação atualizados.</li>
+            <li class="list-group-item">Pedidos têm validade de 12 meses; renove com antecedência.</li>
+            <li class="list-group-item">A prioridade segue a data de protocolo e demais critérios da Portaria 127/2023.</li>
+          </ol>
+        </div>
+        <div class="col-lg-5">
+          <div class="p-4 bg-white rounded-4 border shadow-sm">
+            <h3 class="h6 text-uppercase text-secondary fw-bold mb-3">Publicações</h3>
+            <ul class="list-unstyled mb-0" id="publicacoes-list">
+              <li class="text-muted">Carregando publicações...</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-white border-top">
+      <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
+        <span>Secretaria de Saúde — SESAU • Prefeitura do Recife</span>
+        <span class="text-muted">© 2025 • Gestão do Trabalho e Educação na Saúde</span>
+      </div>
+    </footer>
+
+    <!-- Modal -->
+    <div class="feedback-modal-backdrop" id="feedback-modal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="feedback-modal">
+        <h4 class="feedback-modal-title" id="feedback-modal-title">Detalhes</h4>
+        <div class="feedback-modal-message" id="feedback-modal-message"></div>
+        <button type="button" class="btn btn-primary mt-4" id="feedback-modal-close">Fechar</button>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const cpf = (document.getElementById("cpf")?.value || "").replace(/\\D/g, "");
+        const solicitacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/cbda8a38-3a07-4b85-9d63-7ebda0294f6a";
+        const publicacoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/7b3f9046-f11b-4cc3-b570-c3e586748f6c";
+
+        // Endpoints de dados iniciais (preencher selects). Ajuste conforme sua API.
+        const initialDataEndpoint = ""; // ex.: "https://.../webhook/dados-iniciais"
+        const atualizarCadastroEndpoint = ""; // ex.: "https://.../webhook/atualizar-cadastro"
+
+        // UI helpers
+        const modal = document.getElementById("feedback-modal");
+        const modalTitle = document.getElementById("feedback-modal-title");
+        const modalMessage = document.getElementById("feedback-modal-message");
+        const modalClose = document.getElementById("feedback-modal-close");
+        const openModal = (title, html) => {
+          modalTitle.textContent = title || "Detalhes";
+          modalMessage.innerHTML = html || "<p class='mb-0 text-muted'>Sem conteúdo.</p>";
+          modal.classList.add("active");
+          modal.setAttribute("aria-hidden", "false");
+          modalClose?.focus();
+        };
+        const closeModal = () => {
+          modal.classList.remove("active");
+          modal.setAttribute("aria-hidden", "true");
+        };
+        modalClose?.addEventListener("click", closeModal);
+        modal?.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+        document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+        // CEP -> autopreencher
+        const inCep = document.getElementById("in-cep");
+        const inLogradouro = document.getElementById("in-logradouro");
+        const inNumero = document.getElementById("in-numero");
+        const inComplemento = document.getElementById("in-complemento");
+        const inBairro = document.getElementById("in-bairro");
+        const inCidade = document.getElementById("in-cidade");
+        const inUf = document.getElementById("in-uf");
+        let lastCep = "";
+        const onlyDigits = (v) => (v || "").replace(/\\D/g, "");
+        function cepLookup() {
+          const cepVal = onlyDigits(inCep?.value).slice(0, 8);
+          if (inCep && inCep.value !== cepVal) inCep.value = cepVal;
+          if (cepVal.length !== 8 || cepVal === lastCep) return;
+          lastCep = cepVal;
+
+          fetch("https://brasilapi.com.br/api/cep/v1/" + cepVal)
+            .then(r => { if (!r.ok) throw new Error("CEP não encontrado"); return r.json(); })
+            .then(data => {
+              if (data) {
+                if (inLogradouro && data.street) inLogradouro.value = String(data.street).toUpperCase();
+                if (inBairro && data.neighborhood) inBairro.value = String(data.neighborhood).toUpperCase();
+                if (inCidade && data.city) inCidade.value = String(data.city).toUpperCase();
+                if (inUf && data.state) inUf.value = String(data.state).toUpperCase();
+              }
+              validateUpdateForm();
+            })
+            .catch(() => {
+              lastCep = "";
+              openModal("⚠️ Atenção", "<p>Não encontramos informações para o CEP informado. Você pode preencher os campos manualmente.</p>");
+            });
+        }
+        inCep?.addEventListener("input", cepLookup);
+        inCep?.addEventListener("keyup", cepLookup);
+        inCep?.addEventListener("change", cepLookup);
+        inCep?.addEventListener("blur", cepLookup);
+
+        // Carregar publicações
+        fetch(publicacoesEndpoint)
+          .then(r => r.json())
+          .then(data => {
+            const list = document.getElementById("publicacoes-list");
+            list.innerHTML = "";
+            const items = Array.isArray(data) ? data : (Array.isArray(data?.items) ? data.items : []);
+            if (!items.length) {
+              list.innerHTML = "<li class='text-muted'>Nenhuma publicação disponível no momento.</li>";
+              return;
+            }
+            const parseDate = (raw) => {
+              if (!raw) return null;
+              const d = new Date(raw);
+              if (!isNaN(d)) return d;
+              const m = String(raw).match(/^([0-3]?\\d)\\/([0-1]?\\d)\\/(\\d{4})$/);
+              if (m) return new Date(parseInt(m[3],10), parseInt(m[2],10)-1, parseInt(m[1],10));
+              return null;
+            };
+            const fmt = (d) => d?.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }) || "";
+            items.map(it => ({
+              url: it.url,
+              descricao: it.description || it.descricao || it.title || it.titulo,
+              dt: parseDate(it.date || it.data || it.dt || it.createdAt)
+            }))
+            .filter(it => it.url && it.descricao)
+            .sort((a,b) => (b.dt?.getTime()||0) - (a.dt?.getTime()||0))
+            .forEach(it => {
+              const li = document.createElement("li");
+              li.className = "mb-2";
+              const container = document.createElement("div");
+              container.className = "d-flex flex-column flex-sm-row align-items-sm-center gap-2";
+              if (it.dt) {
+                const time = document.createElement("time");
+                time.textContent = fmt(it.dt);
+                time.dateTime = it.dt.toISOString();
+                container.appendChild(time);
+              }
+              const a = document.createElement("a");
+              a.href = it.url;
+              a.rel = "noopener";
+              a.className = "link-primary fw-semibold";
+              a.textContent = "📄 " + it.descricao;
+              container.appendChild(a);
+              li.appendChild(container);
+              list.appendChild(li);
+            });
+          })
+          .catch(() => {
+            const list = document.getElementById("publicacoes-list");
+            if (list) list.innerHTML = "<li class='text-muted'>Não foi possível carregar as publicações.</li>";
+          });
+
+        // Minhas solicitações
+        const secMinhas = document.getElementById("minhas-solicitacoes-section");
+        const grid = document.getElementById("minhas-solicitacoes-cards");
+        const loadBox = document.getElementById("minhas-solicitacoes-loading");
+        const emptyBox = document.getElementById("minhas-solicitacoes-empty");
+
+        function setMinhasState(state) {
+          loadBox?.classList.toggle("d-none", state !== "loading");
+          emptyBox?.classList.toggle("d-none", state !== "empty");
+          grid?.classList.toggle("d-none", state !== "ready");
+        }
+
+        function normalizeSolicitacoes(data) {
+          let items = [];
+          if (Array.isArray(data)) items = data;
+          else if (Array.isArray(data?.items)) items = data.items;
+          else if (Array.isArray(data?.data)) items = data.data;
+          else if (Array.isArray(data?.result)) items = data.result;
+          else if (data && typeof data === "object") items = [data];
+
+          return items.map(x => {
+            const matricula = (x.matricula || x.MATRICULA || x.id || x.titulo || "").toString().trim();
+            const cargo = (x.cargo || x.CARGO || x.subtitulo || "Cargo não informado").toString().trim();
+            const resumo = x.resumo || x.descricao || "";
+            return { matricula, cargo, resumo, raw: x };
+          }).filter(x => x.matricula);
+        }
+
+        function buildResumo(obj) {
+          const safe = (v) => typeof v === "string" ? v : JSON.stringify(v, null, 2);
+          const lines = Object.entries(obj || {}).slice(0, 30).map(([k,v]) => {
+            const label = k.replace(/([a-z])([A-Z])/g,"$1 $2").replace(/[_-]+/g," ").replace(/\\s+/g," ").trim();
+            return "<dt class='col-sm-4'>" + label + "</dt><dd class='col-sm-8'><pre class='mb-0' style='white-space:pre-wrap;background:#f6f8fb;border-radius:.5rem;padding:.5rem'>" + safe(v) + "</pre></dd>";
+          }).join("");
+          return "<dl class='row g-2 mb-0'>" + (lines || "<p class='mb-0 text-muted'>Sem dados.</p>") + "</dl>";
+        }
+
+        function renderSolicitacoes(entries) {
+          grid.innerHTML = "";
+          entries.forEach(entry => {
+            const col = document.createElement("div");
+            col.className = "col";
+
+            const card = document.createElement("article");
+            card.className = "card h-100 shadow-sm minha-card";
+            card.setAttribute("role", "button");
+            card.setAttribute("tabindex", "0");
+            card.setAttribute("aria-label", "Solicitação da matrícula " + entry.matricula);
+
+            const body = document.createElement("div");
+            body.className = "card-body";
+            const title = document.createElement("h3");
+            title.className = "h6 fw-semibold text-primary mb-1";
+            title.textContent = entry.matricula;
+            const sub = document.createElement("p");
+            sub.className = "text-muted mb-0";
+            sub.textContent = entry.cargo || "Cargo não informado";
+
+            body.appendChild(title);
+            body.appendChild(sub);
+            card.appendChild(body);
+
+            card.addEventListener("click", () => {
+              openModal("📄 Resumo da solicitação", buildResumo(entry.raw));
+            });
+            card.addEventListener("keydown", (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openModal("📄 Resumo da solicitação", buildResumo(entry.raw));
+              }
+            });
+
+            col.appendChild(card);
+            grid.appendChild(col);
+          });
+          setMinhasState(entries.length ? "ready" : "empty");
+        }
+
+        function carregarMinhasSolicitacoes() {
+          if (!cpf) { setMinhasState("empty"); return; }
+          setMinhasState("loading");
+          fetch(solicitacoesEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cpf })
+          })
+            .then(r => { if (!r.ok) throw new Error("Falha na consulta"); return r.json(); })
+            .then(data => renderSolicitacoes(normalizeSolicitacoes(data)))
+            .catch(() => {
+              if (emptyBox) emptyBox.textContent = "Não foi possível carregar suas solicitações. Tente novamente mais tarde.";
+              setMinhasState("empty");
+            });
+        }
+
+        // Dados iniciais (preencher selects). Se não houver endpoint, usa placeholders.
+        function carregarDadosIniciais() {
+          const selMat = document.getElementById("sel-matricula");
+          const selDs = document.getElementById("sel-ds");
+          const selUn = document.getElementById("sel-unidade");
+          const selTurno = document.getElementById("sel-turno");
+          const selRegime = document.getElementById("sel-regime");
+
+          function setOptions(select, list, placeholder) {
+            if (!select) return;
+            select.innerHTML = "";
+            const opt0 = document.createElement("option");
+            opt0.value = "";
+            opt0.textContent = placeholder || "Selecione...";
+            select.appendChild(opt0);
+            (list || []).forEach(item => {
+              const opt = document.createElement("option");
+              if (typeof item === "string") {
+                opt.value = item;
+                opt.textContent = item;
+              } else {
+                opt.value = item.value ?? item.id ?? item.codigo ?? item.nome ?? "";
+                opt.textContent = item.label ?? item.nome ?? item.descricao ?? String(opt.value);
+              }
+              select.appendChild(opt);
+            });
+          }
+
+          if (!initialDataEndpoint) {
+            // Placeholders
+            setOptions(selMat, [{id:"20201234",label:"20201234"},{id:"20194567",label:"20194567"}], "Selecione a matrícula");
+            setOptions(selDs, ["DS I", "DS II", "Executiva"], "Selecione DS/Executiva");
+            setOptions(selUn, ["UPA Ibura", "PA Imaging", "Policlínica Centro"], "Selecione a unidade");
+            setOptions(selTurno, ["Manhã", "Tarde", "Noite", "12x36"], "Selecione o turno");
+            setOptions(selRegime, ["20h", "30h", "40h", "Plantão"], "Selecione o regime");
+            return;
+          }
+
+          fetch(initialDataEndpoint, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ cpf }) })
+            .then(r => r.json())
+            .then(data => {
+              setOptions(selMat, data?.matriculas, "Selecione a matrícula");
+              setOptions(selDs, data?.dsExecutiva, "Selecione DS/Executiva");
+              setOptions(selUn, data?.unidades, "Selecione a unidade");
+              setOptions(selTurno, data?.turnos, "Selecione o turno");
+              setOptions(selRegime, data?.regimes, "Selecione o regime");
+            })
+            .catch(() => {
+              // Fallback em caso de erro
+              setOptions(selMat, [{id:"20201234",label:"20201234"}], "Selecione a matrícula");
+              setOptions(selDs, ["DS I", "DS II", "Executiva"], "Selecione DS/Executiva");
+              setOptions(selUn, ["UPA Ibura"], "Selecione a unidade");
+              setOptions(selTurno, ["Manhã","Tarde"], "Selecione o turno");
+              setOptions(selRegime, ["30h","40h"], "Selecione o regime");
+            });
+        }
+
+        // Validação simples do formulário de atualização
+        const btnAtualizar = document.getElementById("btn-atualizar-cadastro");
+        const inWhats = document.getElementById("in-whatsapp");
+        const inTelAlt = document.getElementById("in-telefone-alt");
+        const inEmail = document.getElementById("in-email");
+        const only11 = (v) => onlyDigits(v).slice(0, 11);
+        function validateUpdateForm() {
+          if (inWhats) inWhats.value = only11(inWhats.value);
+          if (inTelAlt) inTelAlt.value = only11(inTelAlt.value);
+          if (inCep) inCep.value = onlyDigits(inCep.value).slice(0,8);
+          const selMat = document.getElementById("sel-matricula");
+          const selDs = document.getElementById("sel-ds");
+          const selUn = document.getElementById("sel-unidade");
+          const selTurno = document.getElementById("sel-turno");
+          const selRegime = document.getElementById("sel-regime");
+
+          const emailOk = !!(inEmail?.value && /.+@.+\\..+/.test(inEmail.value));
+          const wppOk = !!(inWhats?.value && inWhats.value.length === 11);
+          const cepOk = !!(inCep?.value && inCep.value.length === 8);
+          const matOk = !!selMat?.value;
+          const dsOk = !!selDs?.value;
+          const unOk = !!selUn?.value;
+          const turnoOk = !!selTurno?.value;
+          const regimeOk = !!selRegime?.value;
+
+          btnAtualizar.disabled = !(emailOk && wppOk && cepOk && matOk && dsOk && unOk && turnoOk && regimeOk);
+        }
+        [ "input","change","blur" ].forEach(evt => {
+          inWhats?.addEventListener(evt, validateUpdateForm);
+          inTelAlt?.addEventListener(evt, validateUpdateForm);
+          inEmail?.addEventListener(evt, validateUpdateForm);
+          inCep?.addEventListener(evt, validateUpdateForm);
+          inLogradouro?.addEventListener(evt, validateUpdateForm);
+          inNumero?.addEventListener(evt, validateUpdateForm);
+          inComplemento?.addEventListener(evt, validateUpdateForm);
+          inBairro?.addEventListener(evt, validateUpdateForm);
+          inCidade?.addEventListener(evt, validateUpdateForm);
+          inUf?.addEventListener(evt, validateUpdateForm);
+          ["sel-matricula","sel-ds","sel-unidade","sel-turno","sel-regime"].forEach(id => {
+            const el = document.getElementById(id);
+            el?.addEventListener(evt, validateUpdateForm);
+          });
+        });
+
+        btnAtualizar?.addEventListener("click", function () {
+          const payload = {
+            cpf,
+            matricula: document.getElementById("sel-matricula")?.value || "",
+            whatsapp: inWhats?.value || "",
+            telefoneAlternativo: inTelAlt?.value || "",
+            email: inEmail?.value || "",
+            cep: inCep?.value || "",
+            logradouro: inLogradouro?.value || "",
+            numero: inNumero?.value || "",
+            complemento: inComplemento?.value || "",
+            bairro: inBairro?.value || "",
+            cidade: inCidade?.value || "",
+            uf: (inUf?.value || "").toUpperCase(),
+            dsExecutiva: document.getElementById("sel-ds")?.value || "",
+            unidade: document.getElementById("sel-unidade")?.value || "",
+            turno: document.getElementById("sel-turno")?.value || "",
+            regime: document.getElementById("sel-regime")?.value || ""
+          };
+
+          if (!atualizarCadastroEndpoint) {
+            openModal("✅ Sucesso (demo)",
+              "<p>Os dados seriam enviados para a API definida em <code>atualizarCadastroEndpoint</code>.</p>" +
+              "<pre class='mb-0' style='white-space:pre-wrap;background:#f6f8fb;border-radius:.5rem;padding:.5rem'>" +
+              JSON.stringify(payload, null, 2) + "</pre>"
+            );
+            return;
+          }
+
+          fetch(atualizarCadastroEndpoint, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload)})
+            .then(r => r.json().catch(() => ({})))
+            .then(resp => openModal("✅ Sucesso", "<pre class='mb-0' style='white-space:pre-wrap;background:#f6f8fb;border-radius:.5rem;padding:.5rem'>" + JSON.stringify(resp, null, 2) + "</pre>"))
+            .catch(() => openModal("❌ Erro", "<p>Não foi possível enviar a atualização. Tente novamente.</p>"));
+        });
+
+        // Inicializações
+        carregarDadosIniciais();
+        carregarMinhasSolicitacoes();
+        validateUpdateForm();
+      });
+    </script>
+  </body>
+</html>
