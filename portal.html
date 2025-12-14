@@ -1732,7 +1732,7 @@
         }
       });
 
-      document.getElementById('form-cadastro').addEventListener('submit', (e) => {
+      document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
         e.preventDefault();
         const validation = validarFormulario();
         if (!validation.ok) {
@@ -1740,30 +1740,52 @@
           showFormFeedbackPopup('error', validation);
           return;
         }
-        const grupoAtual = sanitizeValue(document.getElementById('grupoHidden')?.value || '');
+
+        const numeroRaw = sanitizeValue(document.getElementById('numero')?.value || '');
+        const numeroParsed = numeroRaw ? Number(numeroRaw.replace(/\D+/g, '')) : null;
+        const telefoneAlternativo = sanitizeValue(document.getElementById('telefonealternativo')?.value || '');
+        const cepValor = sanitizeValue(document.getElementById('cep')?.value || '');
+        const cepNumeros = cepValor.replace(/\D+/g, '');
+        const cidadeValor = sanitizeValue(document.getElementById('cidade')?.value || '');
+        const bairroValor = sanitizeValue(document.getElementById('bairro')?.value || '');
         const payload = {
-          matricula: document.getElementById('matriculaSelect').value || null,
-          email: (sanitizeValue(document.getElementById('email')?.value || '').toLowerCase()) || null,
-          whatsapp: normalizeWhats(document.getElementById('whatsapp').value || '') || null,
-          telefonealternativo: sanitizeValue(document.getElementById('telefonealternativo')?.value || '') || null,
-          endereco: {
-            cep: document.getElementById('cep').value || null,
-            logradouro: document.getElementById('logradouro').value || null,
-            numero: document.getElementById('numero').value || null,
-            complemento: document.getElementById('complemento').value || null,
-            bairro: document.getElementById('bairro').value || null,
-            cidade: document.getElementById('cidade').value || null,
-            uf: document.getElementById('uf').value || null,
-          },
-          ds: document.getElementById('dsSelect').value || null,
-          unidade: document.getElementById('unidadeSelect').value || null,
-          turno: document.getElementById('turnoSelect').value || null,
-          regime: document.getElementById('regimeSelect').value || null,
-          grupo: grupoAtual || null,
+          whatsapp: normalizeWhats(document.getElementById('whatsapp')?.value || '') || null,
+          nascimento: null,
+          cidade: cidadeValor ? cidadeValor.toUpperCase() : null,
+          telefone_2: onlyDigits(telefoneAlternativo) || null,
+          numero: Number.isFinite(numeroParsed) ? numeroParsed : null,
+          regime: sanitizeValue(document.getElementById('regimeSelect')?.value || '') || null,
+          bairro: bairroValor ? bairroValor.toUpperCase() : null,
+          unidade: sanitizeValue(document.getElementById('unidadeSelect')?.value || '') || null,
+          nome: sanitizeValue(document.getElementById('servidorHidden')?.value || DATA.nome) || null,
+          turno: sanitizeValue(document.getElementById('turnoSelect')?.value || '') || null,
+          ds: sanitizeValue(document.getElementById('dsSelect')?.value || document.getElementById('dsHidden')?.value || '') || null,
+          cep: cepNumeros || cepValor || null,
+          protocolo: null,
+          uf: sanitizeUF(document.getElementById('uf')?.value || '') || null,
+          complemento: sanitizeValue(document.getElementById('complemento')?.value || '') || null,
+          logradouro: sanitizeValue(document.getElementById('logradouro')?.value || '') || null,
+          matricula: sanitizeValue(document.getElementById('matriculaSelect')?.value || '') || null,
+          cpf: onlyDigits(document.getElementById('cpfHidden')?.value || '') || null,
+          email: sanitizeValue(document.getElementById('email')?.value || '').toLowerCase() || null,
         };
-        console.log('Payload atualização cadastral:', payload);
-        setStatus('Dados de atualização enviados.', true);
-        showFormFeedbackPopup('success');
+
+        setStatus('Enviando dados...', true);
+        try {
+          const response = await fetch('http://webhook-n8n-automacao.recife/webhook/atualizar-cadastro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!response.ok) throw new Error('Erro ao enviar dados');
+
+          setStatus('Dados de atualização enviados.', true);
+          showFormFeedbackPopup('success');
+        } catch (error) {
+          console.error('Erro ao enviar atualização cadastral:', error);
+          setStatus('Falha ao enviar dados. Tente novamente.', false);
+          showFormFeedbackPopup('error', { invalid: ['Falha ao enviar dados ao servidor.'] });
+        }
       });
 
       document.getElementById('btnNovaSolicitacao').addEventListener('click', () => {
