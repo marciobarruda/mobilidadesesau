@@ -1650,7 +1650,7 @@
           const emailVal = sanitizeValue(emailEl.value);
           emailEl.value = emailVal;
           if (emailVal && !isEmail(emailVal)) {
-            invalid.push('E-mail (formato inválido)');
+            invalid.push('E-mail (ex.: servidor@recife.pe.gov.br)');
             markInvalid(emailEl);
           } else if (emailVal) {
             markValid(emailEl);
@@ -1663,10 +1663,10 @@
           const normalized = normalizeWhats(trimmed);
           whatsappEl.value = normalized;
           if (trimmed && !normalized) {
-            invalid.push('WhatsApp (utilize apenas números)');
+            invalid.push('WhatsApp (somente números, ex.: 81999999999)');
             markInvalid(whatsappEl);
           } else if (normalized && !isWhats(normalized)) {
-            invalid.push('WhatsApp (informe 11 dígitos numéricos)');
+            invalid.push('WhatsApp (11 dígitos numéricos, ex.: 81999999999)');
             markInvalid(whatsappEl);
           } else if (normalized) {
             markValid(whatsappEl);
@@ -1675,7 +1675,7 @@
 
         const cepEl = document.getElementById('cep');
         if (cepEl && sanitizeValue(cepEl.value) && !isCEP(cepEl.value)) {
-          invalid.push('CEP (formato inválido)');
+          invalid.push('CEP (use 00000-000 ou somente números, ex.: 50000999)');
           markInvalid(cepEl);
         }
 
@@ -1683,7 +1683,7 @@
         if (ufEl) {
           ufEl.value = sanitizeUF(ufEl.value);
           if (sanitizeValue(ufEl.value) && !isUF(ufEl.value)) {
-            invalid.push('UF (utilize duas letras)');
+            invalid.push('UF (2 letras, ex.: PE)');
             markInvalid(ufEl);
           }
         }
