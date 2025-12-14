@@ -791,6 +791,21 @@
       </div>
     </div>
 
+    <!-- Modal de Confirmação de Envio do Comprovante -->
+    <div class="modal fade" id="modalEmailConfirmacao" tabindex="-1" aria-labelledby="modalEmailConfirmacaoTitulo" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center py-4">
+            <h5 class="mb-3" id="modalEmailConfirmacaoTitulo">Comprovante enviado por e-mail</h5>
+            <p class="mb-3">O comprovante da solicitação foi enviado para o e-mail informado pelo usuário.</p>
+            <p class="text-muted mb-0">
+              Este aviso será fechado automaticamente em <strong><span id="emailCountdown">5</span>s</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal de Sucesso -->
     <div class="modal fade" id="modalSucesso" tabindex="-1" aria-labelledby="modalSucessoTitulo" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -981,12 +996,43 @@
         protocolo: sanitizeValue(BIND?.dadosComuns?.recordId) || null,
         printMode: 'print',
         pendingFocusId: null,
-        lastPayload: null
+        lastPayload: null,
+        shouldShowEmailModal: false
       };
 
       const modalUnidade = new bootstrap.Modal(document.getElementById('modalUnidade'));
       const modalAlerta = new bootstrap.Modal(document.getElementById('modalAlerta'));
       const modalSucesso = new bootstrap.Modal(document.getElementById('modalSucesso'));
+      const modalEmailConfirmacao = new bootstrap.Modal(document.getElementById('modalEmailConfirmacao'));
+      const emailCountdownEl = document.getElementById('emailCountdown');
+      const modalEmailConfirmacaoEl = document.getElementById('modalEmailConfirmacao');
+      let emailCountdownTimer = null;
+
+      function resetEmailCountdown() {
+        if (emailCountdownTimer) {
+          clearInterval(emailCountdownTimer);
+          emailCountdownTimer = null;
+        }
+      }
+
+      function showEmailConfirmationModal() {
+        resetEmailCountdown();
+        let remaining = 5;
+        if (emailCountdownEl) emailCountdownEl.textContent = remaining;
+        modalEmailConfirmacao.show();
+        emailCountdownTimer = setInterval(() => {
+          remaining -= 1;
+          if (emailCountdownEl) emailCountdownEl.textContent = Math.max(remaining, 0);
+          if (remaining <= 0) {
+            resetEmailCountdown();
+            modalEmailConfirmacao.hide();
+          }
+        }, 1000);
+      }
+
+      if (modalEmailConfirmacaoEl) {
+        modalEmailConfirmacaoEl.addEventListener('hidden.bs.modal', resetEmailCountdown);
+      }
 
       async function fillByCEP(cep) {
         if (!isCEP(cep)) return;
@@ -1545,6 +1591,7 @@
       function openSuccessModal(payload) {
         fillResumo(payload);
         state.lastPayload = payload;
+        state.shouldShowEmailModal = false;
         modalSucesso.show();
       }
 
@@ -2138,6 +2185,19 @@
         document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
         document.getElementById('btnImprimir').addEventListener('click', () => {
           preparePrintArea();
+        });
+
+        document.querySelectorAll('#modalSucesso [data-bs-dismiss="modal"]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.shouldShowEmailModal = true;
+          });
+        });
+
+        document.getElementById('modalSucesso').addEventListener('hidden.bs.modal', () => {
+          if (state.shouldShowEmailModal) {
+            state.shouldShowEmailModal = false;
+            showEmailConfirmationModal();
+          }
         });
 
         window.addEventListener('afterprint', afterPrintCleanup);
