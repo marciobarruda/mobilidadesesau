@@ -526,8 +526,8 @@
   <body>
     <header class="site-header">
       <div class="container">
-        <span class="badge-open">Secretaria de Saúde — SESAU • Prefeitura do Recife</span>
-        <h1 class="display-6 h1-title mt-3 mb-2">Formulário — Mobilidade Interna</h1>
+        <span class="badge-open">Secretaria de Saúde • SESAU • Prefeitura do Recife</span>
+        <h1 class="display-6 h1-title mt-3 mb-2">Formulário • Mobilidade Interna</h1>
         <p class="lead mb-0">
           Preencha os dados para cadastrar ou atualizar sua solicitação de mobilidade.
         </p>
@@ -538,7 +538,7 @@
       <div class="d-flex justify-content-end mb-3">
         <div class="solicitacao-box" role="status" aria-live="polite">
           <span class="solicitacao-label">Solicitação</span>
-          <span class="solicitacao-value" id="numeroSolicitacaoDisplay">—</span>
+          <span class="solicitacao-value" id="numeroSolicitacaoDisplay">•</span>
         </div>
       </div>
       <!-- Identificação -->
@@ -1692,7 +1692,7 @@
           sanitizeValue(payload.numeroSolicitacao) || fallbackNumero || state.protocolo || `22${Date.now().toString().slice(-5)}`;
         state.protocolo = numeroSolicitacao || null;
         const solicitacaoDisplay = document.getElementById('numeroSolicitacaoDisplay');
-        if (solicitacaoDisplay) solicitacaoDisplay.textContent = numeroSolicitacao || '—';
+        if (solicitacaoDisplay) solicitacaoDisplay.textContent = numeroSolicitacao || '•';
 
         const prefsRows = payload.preferencias
           .map(
@@ -2116,7 +2116,7 @@
             return;
           }
 
-          const numero = sanitizeValue(state.protocolo) || '—';
+          const numero = sanitizeValue(state.protocolo) || '•';
           const table = resumoContainer ? resumoContainer.querySelector('table') : null;
 
           const headers = table
@@ -2200,7 +2200,7 @@
             doc.text('NÚMERO DA SOLICITAÇÃO', badgeX + 18, badgeY + 24);
             doc.setFontSize(22);
             doc.setTextColor(17, 24, 39);
-            doc.text(numero || '—', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
+            doc.text(numero || '•', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
           };
 
           drawCardBase();
@@ -2227,12 +2227,12 @@
           currentY += 6;
           const infoRows = [
             [
-              { label: 'Nome do servidor', value: nomeServidor || '—' },
-              { label: 'CPF', value: cpfServidor || '—' }
+              { label: 'Nome do servidor', value: nomeServidor || '•' },
+              { label: 'CPF', value: cpfServidor || '•' }
             ],
             [
-              { label: 'Matrícula', value: matricula || '—' },
-              { label: 'Cargo', value: cargoServidor || '—' }
+              { label: 'Matrícula', value: matricula || '•' },
+              { label: 'Cargo', value: cargoServidor || '•' }
             ],
             [
               { label: 'Data de emissão', value: dataEmissao },
@@ -2255,7 +2255,7 @@
               doc.setFont('helvetica', 'normal');
               doc.setFontSize(11);
               doc.setTextColor(31, 41, 55);
-              doc.text(item.value || '—', x, y + 16);
+              doc.text(item.value || '•', x, y + 16);
             });
           });
 
@@ -2347,7 +2347,7 @@
           doc.setTextColor(107, 114, 128);
           doc.text('Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.', contentX, footerY);
 
-          const safeNumero = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
+          const safeNumero = numero && numero !== '•' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
           doc.save(`solicitacao-${safeNumero}.pdf`);
         } catch (error) {
           console.error('Erro ao gerar PDF:', error);
@@ -2502,7 +2502,7 @@
         const numeroSolicitacao = safeValue(dc.recordId);
         if (numeroSolicitacao) state.protocolo = numeroSolicitacao;
         const solicitacaoEl = document.getElementById('numeroSolicitacaoDisplay');
-        if (solicitacaoEl) solicitacaoEl.textContent = numeroSolicitacao || '—';
+        if (solicitacaoEl) solicitacaoEl.textContent = numeroSolicitacao || '•';
         applyUppercaseBehaviour();
         applyNumericBehaviour();
         bindPreferencePrerequisiteListeners();
