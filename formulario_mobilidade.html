@@ -838,7 +838,11 @@
           body: JSON.stringify(body || {})
         });
         if (!res.ok) throw new Error('Erro de rede');
-        return res.json();
+        try {
+          return await res.json();
+        } catch (err) {
+          return null;
+        }
       };
       const toBRDate = (d) => {
         if (!d) return '';
@@ -858,6 +862,39 @@
         if (val === null || val === undefined) return '';
         const str = String(val).trim();
         return str === 'undefined' || str === 'null' ? '' : str;
+      };
+
+      const normalizeDateValue = (value) => {
+        if (!value) return null;
+        if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+        const str = String(value).trim();
+        if (!str) return null;
+        const direct = new Date(str);
+        if (!Number.isNaN(direct.getTime())) return direct;
+        const parts = str.split(/[\/]/);
+        if (parts.length === 3) {
+          const [d, m, y] = parts.map((p) => Number(p));
+          if (y && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+            const dt = new Date(y, m - 1, d);
+            return Number.isNaN(dt.getTime()) ? null : dt;
+          }
+        }
+        return null;
+      };
+
+      const formatDateISO = (value) => {
+        const dt = normalizeDateValue(value);
+        if (!dt) return null;
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
+      };
+
+      const formatDateTimeISO = (value) => {
+        const dt = normalizeDateValue(value) || new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const date = `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
+        const time = `${pad(dt.getHours())}:${pad(dt.getMinutes())}:${pad(dt.getSeconds())}`;
+        return `${date} ${time}`;
       };
 
       const formatCPF = (value) => {
@@ -889,6 +926,9 @@
         }
         return comprovanteLogoDataUrlPromise;
       };
+
+      const WEBHOOK_MOBILIDADE_URL =
+        'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/mobilidade-html';
 
       const BIND = {
         dadosComuns: {
@@ -1508,6 +1548,38 @@
         modalSucesso.show();
       }
 
+      async function enviarFormulario() {
+        const validation = validateForm();
+        if (!validation.isValid) {
+          openAlertModal(validation.errors);
+          return;
+        }
+
+        const payload = collectPayload();
+        const webhookPayload = buildWebhookPayload(payload);
+        const btnEnviar = document.getElementById('btnEnviar');
+        const originalText = btnEnviar?.textContent;
+
+        try {
+          if (btnEnviar) {
+            btnEnviar.textContent = 'Enviando...';
+            btnEnviar.setAttribute('aria-busy', 'true');
+            btnEnviar.disabled = true;
+          }
+          await postJSON(WEBHOOK_MOBILIDADE_URL, webhookPayload);
+          openSuccessModal(payload);
+        } catch (err) {
+          console.error('Erro ao enviar formulário de mobilidade:', err);
+          alert('Não foi possível enviar o formulário. Tente novamente mais tarde.');
+        } finally {
+          if (btnEnviar) {
+            btnEnviar.textContent = originalText || 'Enviar formulário';
+            btnEnviar.removeAttribute('aria-busy');
+            btnEnviar.disabled = false;
+          }
+        }
+      }
+
       function collectPayload() {
         const cpf = safeValue(BIND?.dadosComuns?.cpf);
         const numeroSolicitacao = safeValue(BIND?.dadosComuns?.recordId);
@@ -1553,6 +1625,42 @@
             imported: !!p.imported
           }))
         };
+      }
+
+      function buildWebhookPayload(payload) {
+        const nowDateTime = formatDateTimeISO(new Date());
+        const inseridoNoBanco = new Date().toISOString();
+        const status = 'AGUARDANDO MOBILIDADE';
+        return (payload.preferencias || []).map((pref) => ({
+          data_update: nowDateTime,
+          distrito: pref.distrito || null,
+          solicitacao: formatDateISO(pref.data_solicitacao),
+          prioridade: pref.prioridade ?? null,
+          regime: pref.regime || null,
+          grupo: payload.dadosPessoais.grupo || null,
+          lotacao: pref.unidade || null,
+          turno: pref.turno || null,
+          credenciamento: formatDateISO(pref.data_credenciamento),
+          matricula: payload.matricula || null,
+          nome: payload.dadosPessoais.nome || null,
+          cargo: payload.dadosPessoais.cargo || null,
+          vinculo: payload.dadosPessoais.vinculo || null,
+          nascimento: formatDateISO(payload.dadosPessoais.nascimento),
+          admissao: formatDateISO(payload.dadosPessoais.admissao),
+          distrito_atual: payload.lotacaoAtual.ds || null,
+          lotacao_atual: payload.lotacaoAtual.unidade || null,
+          horario_atual: payload.lotacaoAtual.turno || null,
+          regime_atual: payload.lotacaoAtual.regime || null,
+          wfid: payload.numeroSolicitacao || null,
+          email: payload.endereco.email || null,
+          whatsapp: payload.endereco.whatsapp || null,
+          status_solicitacao: status,
+          cpf: payload.dadosPessoais.cpf || null,
+          categoria_do_cargo: payload.dadosPessoais.cargo || null,
+          ch_de_atuacao_hor_esp: payload.dadosPessoais.carga || null,
+          especialidade_do_cargo: 'NÃO POSSUI',
+          inserido_no_banco: inseridoNoBanco
+        }));
       }
 
       function resetModalUnidade() {
@@ -2025,16 +2133,7 @@
           await loadPreferenciasByMatricula(m);
         });
 
-        document.getElementById('btnEnviar').addEventListener('click', () => {
-          const validation = validateForm();
-          if (!validation.isValid) {
-            openAlertModal(validation.errors);
-            return;
-          }
-          const payload = collectPayload();
-          console.log('Payload formulário mobilidade:', payload);
-          openSuccessModal(payload);
-        });
+        document.getElementById('btnEnviar').addEventListener('click', enviarFormulario);
 
         document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
         document.getElementById('btnImprimir').addEventListener('click', () => {
