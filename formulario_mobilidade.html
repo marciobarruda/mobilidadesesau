@@ -116,6 +116,11 @@
         min-height: 2.5rem;
         line-height: 1;
       }
+      .btn-locked {
+        opacity: 0.65;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
       .btn-icon span[aria-hidden='true'] {
         font-size: 1.05rem;
       }
@@ -882,6 +887,65 @@
         return str === 'undefined' || str === 'null' ? '' : str;
       };
 
+      const FIELD_LABELS = {
+        matricula: 'Matrícula',
+        cep: 'CEP',
+        logradouro: 'Logradouro',
+        numero: 'Número',
+        complemento: 'Complemento',
+        bairro: 'Bairro',
+        cidade: 'Cidade',
+        uf: 'UF',
+        whatsapp: 'WhatsApp',
+        telalt: 'Telefone alternativo',
+        email: 'E-mail',
+        email2: 'Confirme o e-mail',
+        dsSelect: 'Distrito atual',
+        unidadeSelect: 'Lotação atual',
+        turnoSelect: 'Horário atual',
+        regimeSelect: 'Regime de trabalho'
+      };
+
+      const PREFERENCE_PREREQUISITE_IDS = [
+        'matricula',
+        'email',
+        'email2',
+        'dsSelect',
+        'cep',
+        'logradouro',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'uf',
+        'whatsapp',
+        'unidadeSelect',
+        'turnoSelect',
+        'regimeSelect'
+      ];
+
+      const hasValue = (field) => {
+        if (!field) return false;
+        const value = sanitizeValue(field.value);
+        if (!value) return false;
+        const lower = value.toLowerCase();
+        return !(
+          lower.startsWith('selecione') ||
+          lower === 'selecione o distrito...' ||
+          lower === 'selecione a unidade...' ||
+          lower === 'carregando...'
+        );
+      };
+
+      const getFieldLabel = (fieldOrId) => {
+        const field = typeof fieldOrId === 'string' ? document.getElementById(fieldOrId) : fieldOrId;
+        if (field?.dataset?.label) return field.dataset.label;
+        const label = field?.labels?.[0]?.textContent;
+        if (label) return label.trim();
+        const fromMap = field?.id ? FIELD_LABELS[field.id] : FIELD_LABELS[fieldOrId];
+        return fromMap || (field?.id || 'Campo obrigatório');
+      };
+
       const normalizeDateValue = (value) => {
         if (!value) return null;
         if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
@@ -1071,6 +1135,7 @@
           document.getElementById('bairro').value = j.neighborhood || '';
           document.getElementById('cidade').value = j.city || '';
           document.getElementById('uf').value = sanitizeUF(j.state);
+          updateAddBtn();
         } catch (err) {
           console.warn('CEP não encontrado', err);
         }
@@ -1148,15 +1213,52 @@
         });
       }
 
+      function collectPreferencePrerequisiteErrors() {
+        const seen = new Set();
+        const errors = [];
+        PREFERENCE_PREREQUISITE_IDS.forEach((id) => {
+          if (seen.has(id)) return;
+          seen.add(id);
+          const field = document.getElementById(id);
+          if (!hasValue(field)) {
+            errors.push({ fieldId: id, message: getFieldLabel(field || id) });
+          }
+        });
+        return errors;
+      }
+
       function updateAddBtn() {
         const btn = document.getElementById('btnAddLinha');
-        if (state.prefs.length >= state.max) {
+        const missing = collectPreferencePrerequisiteErrors();
+        const reachedLimit = state.prefs.length >= state.max;
+        if (reachedLimit) {
           btn.textContent = 'Limite atingido';
           btn.disabled = true;
-        } else {
-          btn.textContent = 'Adicionar Unidade';
-          btn.disabled = false;
+          btn.classList.add('btn-locked');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.removeAttribute('title');
+          return;
         }
+
+        btn.textContent = 'Adicionar Unidade';
+        btn.disabled = false;
+        btn.classList.toggle('btn-locked', !!missing.length);
+        btn.setAttribute('aria-disabled', missing.length ? 'true' : 'false');
+        if (missing.length) {
+          btn.title = 'Preencha os campos obrigatórios antes de adicionar uma unidade.';
+        } else {
+          btn.removeAttribute('title');
+        }
+      }
+
+      function bindPreferencePrerequisiteListeners() {
+        const handler = () => updateAddBtn();
+        PREFERENCE_PREREQUISITE_IDS.forEach((id) => {
+          const field = document.getElementById(id);
+          if (!field) return;
+          const eventName = field.tagName === 'SELECT' ? 'change' : 'input';
+          field.addEventListener(eventName, handler);
+        });
       }
 
       function mapPreferencias(importedPrefs = []) {
@@ -1378,7 +1480,7 @@
         requiredFields.forEach((field) => {
           if (field.disabled || field.readOnly) return;
           if (!field.value || !field.value.toString().trim()) {
-            errors.push({ fieldId: field.id, message: field.labels?.[0]?.textContent || field.id });
+            errors.push({ fieldId: field.id, message: getFieldLabel(field) });
             markInvalidField(field);
           }
         });
@@ -2132,6 +2234,7 @@
             await loadUnidades(v, 'unidadeSelect');
             unidadeSelect.disabled = false;
           }
+          updateAddBtn();
         });
         document.getElementById('unidadeSelect').addEventListener('change', async (e) => {
           const unidade = e.target.value;
@@ -2144,6 +2247,7 @@
             await loadTurnos(unidade, 'turnoSelect', ds);
             await loadRegimes(unidade, 'regimeSelect', ds);
           }
+          updateAddBtn();
         });
 
         document.getElementById('mDs').addEventListener('change', async (e) => {
@@ -2176,6 +2280,11 @@
         });
 
         document.getElementById('btnAddLinha').addEventListener('click', () => {
+          const missing = collectPreferencePrerequisiteErrors();
+          if (missing.length) {
+            openAlertModal(missing);
+            return;
+          }
           if (state.prefs.length < state.max) openModalUnidade('create');
         });
 
@@ -2204,6 +2313,7 @@
           if (!m) return;
           fillIdentificacaoFromVinculo(m);
           await loadPreferenciasByMatricula(m);
+          updateAddBtn();
         });
 
         document.getElementById('btnEnviar').addEventListener('click', enviarFormulario);
@@ -2264,6 +2374,7 @@
         if (solicitacaoEl) solicitacaoEl.textContent = numeroSolicitacao || '—';
         applyUppercaseBehaviour();
         applyNumericBehaviour();
+        bindPreferencePrerequisiteListeners();
         updateAddBtn();
         initEvents();
       }
