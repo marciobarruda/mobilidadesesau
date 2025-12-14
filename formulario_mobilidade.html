@@ -1096,8 +1096,7 @@
         return !(
           lower.startsWith('selecione') ||
           lower === 'selecione o distrito...' ||
-          lower === 'selecione a unidade...' ||
-          lower === 'carregando...'
+          lower === 'selecione a unidade...'
         );
       };
 
@@ -1440,7 +1439,7 @@
 
       async function loadUnidades(ds, targetSel, selectedValue = '') {
         const sel = document.getElementById(targetSel);
-        syncChoicesOptions(targetSel, [], 'Carregando...');
+        syncChoicesOptions(targetSel, [], 'Selecione...');
         setChoiceDisabled(targetSel, true);
         const grupo = document.getElementById('grupo').value || null;
         try {
@@ -1464,7 +1463,7 @@
 
       async function loadTurnos(unidade, targetSel, ds, selectedValue = '') {
         const sel = document.getElementById(targetSel);
-        syncChoicesOptions(targetSel, [], 'Carregando...');
+        syncChoicesOptions(targetSel, [], 'Selecione...');
         setChoiceDisabled(targetSel, true);
         const grupo = document.getElementById('grupo').value || null;
         try {
@@ -1488,7 +1487,7 @@
 
       async function loadRegimes(unidade, targetSel, ds, selectedValue = '') {
         const sel = document.getElementById(targetSel);
-        syncChoicesOptions(targetSel, [], 'Carregando...');
+        syncChoicesOptions(targetSel, [], 'Selecione...');
         setChoiceDisabled(targetSel, true);
         const grupo = document.getElementById('grupo').value || null;
         try {
@@ -2380,8 +2379,8 @@
         document.getElementById('unidadeSelect').addEventListener('change', async (e) => {
           const unidade = e.target.value;
           const ds = document.getElementById('dsSelect').value;
-          syncChoicesOptions('turnoSelect', [], 'Carregando...');
-          syncChoicesOptions('regimeSelect', [], 'Carregando...');
+          syncChoicesOptions('turnoSelect', [], 'Selecione a unidade...');
+          syncChoicesOptions('regimeSelect', [], 'Selecione a unidade...');
           if (unidade && ds) {
             await loadTurnos(unidade, 'turnoSelect', ds);
             await loadRegimes(unidade, 'regimeSelect', ds);
@@ -2402,8 +2401,8 @@
         document.getElementById('mUnidade').addEventListener('change', async (e) => {
           const unidade = e.target.value;
           const ds = document.getElementById('mDs').value;
-          syncChoicesOptions('mTurno', [], 'Carregando...');
-          syncChoicesOptions('mRegime', [], 'Carregando...');
+          syncChoicesOptions('mTurno', [], 'Selecione a unidade...');
+          syncChoicesOptions('mRegime', [], 'Selecione a unidade...');
           if (unidade && ds) {
             await loadTurnos(unidade, 'mTurno', ds);
             await loadRegimes(unidade, 'mRegime', ds);
