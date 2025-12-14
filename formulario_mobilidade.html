@@ -986,6 +986,18 @@
       function syncChoicesOptions(id, options = [], placeholderText = 'Selecione...') {
         const el = document.getElementById(id);
         if (!el) return;
+        const instance = choicesInstances[id];
+        if (instance) {
+          instance.clearChoices();
+          instance.removeActiveItems();
+          const prepared = [];
+          if (placeholderText) {
+            prepared.push({ value: '', label: placeholderText, disabled: true, selected: true });
+          }
+          prepared.push(...options.map((value) => ({ value, label: value })));
+          instance.setChoices(prepared, 'value', 'label', true);
+          return;
+        }
         el.innerHTML = '';
         if (placeholderText) {
           const placeholder = document.createElement('option');
@@ -1001,16 +1013,6 @@
           option.textContent = value;
           el.appendChild(option);
         });
-        const instance = choicesInstances[id];
-        if (instance) {
-          instance.clearChoices();
-          const prepared = [];
-          if (placeholderText) {
-            prepared.push({ value: '', label: placeholderText, disabled: true, selected: true });
-          }
-          prepared.push(...options.map((value) => ({ value, label: value })));
-          instance.setChoices(prepared, 'value', 'label', true);
-        }
       }
 
       function setChoiceDisabled(id, disabled) {
