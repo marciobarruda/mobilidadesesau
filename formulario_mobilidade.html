@@ -846,6 +846,9 @@
       referrerpolicy="no-referrer"
     ></script>
     <script>
+      const PORTAL_REDIRECT_URL =
+        'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/portal-sesau-servidores';
+
       const postJSON = async (url, body) => {
         const res = await fetch(url, {
           method: 'POST',
@@ -1007,12 +1010,30 @@
       const emailCountdownEl = document.getElementById('emailCountdown');
       const modalEmailConfirmacaoEl = document.getElementById('modalEmailConfirmacao');
       let emailCountdownTimer = null;
+      let emailRedirectTimer = null;
+      let emailRedirectScheduled = false;
 
       function resetEmailCountdown() {
         if (emailCountdownTimer) {
           clearInterval(emailCountdownTimer);
           emailCountdownTimer = null;
         }
+        if (emailRedirectTimer) {
+          clearTimeout(emailRedirectTimer);
+          emailRedirectTimer = null;
+        }
+        emailRedirectScheduled = false;
+      }
+
+      function navigateAfterEmailModal() {
+        if (emailRedirectScheduled) return;
+        emailRedirectScheduled = true;
+        try {
+          window.close();
+        } catch (err) {}
+        setTimeout(() => {
+          window.location.href = PORTAL_REDIRECT_URL;
+        }, 150);
       }
 
       function showEmailConfirmationModal() {
@@ -1024,14 +1045,19 @@
           remaining -= 1;
           if (emailCountdownEl) emailCountdownEl.textContent = Math.max(remaining, 0);
           if (remaining <= 0) {
-            resetEmailCountdown();
             modalEmailConfirmacao.hide();
           }
         }, 1000);
+        emailRedirectTimer = setTimeout(() => {
+          modalEmailConfirmacao.hide();
+        }, remaining * 1000);
       }
 
       if (modalEmailConfirmacaoEl) {
-        modalEmailConfirmacaoEl.addEventListener('hidden.bs.modal', resetEmailCountdown);
+        modalEmailConfirmacaoEl.addEventListener('hidden.bs.modal', () => {
+          resetEmailCountdown();
+          navigateAfterEmailModal();
+        });
       }
 
       async function fillByCEP(cep) {
@@ -2182,9 +2208,15 @@
 
         document.getElementById('btnEnviar').addEventListener('click', enviarFormulario);
 
-        document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
+        document.getElementById('btnSalvarPDF').addEventListener('click', async () => {
+          await gerarPdfModal();
+          state.shouldShowEmailModal = true;
+          modalSucesso.hide();
+        });
         document.getElementById('btnImprimir').addEventListener('click', () => {
           preparePrintArea();
+          state.shouldShowEmailModal = true;
+          modalSucesso.hide();
         });
 
         document.querySelectorAll('#modalSucesso [data-bs-dismiss="modal"]').forEach((btn) => {
