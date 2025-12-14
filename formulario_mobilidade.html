@@ -18,6 +18,10 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+    />
     <style>
       :root {
         --brand-primary: #0053a4;
@@ -155,6 +159,9 @@
       .modal-branding img {
         height: 48px;
         width: auto;
+      }
+      .choices__list--dropdown .choices__item--selectable {
+        padding-right: 2.5rem;
       }
       .resumo-card {
         border: 1px solid rgba(0, 83, 164, 0.12);
@@ -529,7 +536,6 @@
                 data-numeric="true"
                 aria-required="true"
               />
-              <div class="small-note">Autopreenche via BrasilAPI.</div>
             </div>
             <div class="col-12 col-md-6 col-lg-5">
               <label class="form-label" for="logradouro">Logradouro</label>
@@ -850,6 +856,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
       const PORTAL_REDIRECT_URL =
         'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/portal-sesau-servidores';
@@ -872,6 +879,95 @@
         const dt = d instanceof Date ? d : new Date(d);
         return Number.isNaN(dt.getTime()) ? '' : dt.toLocaleDateString('pt-BR');
       };
+
+      const SEARCHABLE_SELECT_IDS = [
+        'matricula',
+        'dsSelect',
+        'unidadeSelect',
+        'turnoSelect',
+        'regimeSelect',
+        'mDs',
+        'mUnidade',
+        'mTurno',
+        'mRegime'
+      ];
+      const choicesInstances = {};
+
+      function createChoicesInstance(el) {
+        return new Choices(el, {
+          searchEnabled: true,
+          shouldSort: false,
+          itemSelectText: '',
+          searchPlaceholderValue: 'Digite para buscar',
+          noResultsText: 'Nenhum resultado encontrado',
+          noChoicesText: 'Nenhuma opção disponível',
+          allowHTML: false
+        });
+      }
+
+      function initSearchableSelects() {
+        SEARCHABLE_SELECT_IDS.forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const instance = createChoicesInstance(el);
+          choicesInstances[id] = instance;
+          if (el.disabled) instance.disable();
+        });
+      }
+
+      function syncChoicesOptions(id, options = [], placeholderText = 'Selecione...') {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerHTML = '';
+        if (placeholderText) {
+          const placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.textContent = placeholderText;
+          placeholder.disabled = true;
+          placeholder.selected = true;
+          el.appendChild(placeholder);
+        }
+        options.forEach((value) => {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = value;
+          el.appendChild(option);
+        });
+        const instance = choicesInstances[id];
+        if (instance) {
+          instance.clearChoices();
+          const prepared = [];
+          if (placeholderText) {
+            prepared.push({ value: '', label: placeholderText, disabled: true, selected: true });
+          }
+          prepared.push(...options.map((value) => ({ value, label: value })));
+          instance.setChoices(prepared, 'value', 'label', true);
+        }
+      }
+
+      function setChoiceDisabled(id, disabled) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.disabled = disabled;
+        const instance = choicesInstances[id];
+        if (instance) {
+          if (disabled) instance.disable();
+          else instance.enable();
+        }
+      }
+
+      function setChoiceValue(id, value) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.value = value || '';
+        const instance = choicesInstances[id];
+        if (!instance) return;
+        if (!value) {
+          instance.removeActiveItems();
+        } else {
+          instance.setChoiceByValue(value);
+        }
+      }
       const todayBR = () => toBRDate(new Date());
       const isCEP = (v) => /^(\d{5}\-?\d{3})$/.test((v || '').trim());
       const sanitizeUF = (v) => (v || '').toUpperCase().slice(0, 2);
@@ -1276,88 +1372,73 @@
 
       async function loadUnidades(ds, targetSel, selectedValue = '') {
         const sel = document.getElementById(targetSel);
-        sel.innerHTML = '<option>Carregando...</option>';
-        sel.disabled = true;
+        syncChoicesOptions(targetSel, [], 'Carregando...');
+        setChoiceDisabled(targetSel, true);
         const grupo = document.getElementById('grupo').value || null;
         try {
           const data = await postJSON(
             'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/unidades',
             { ds, grupo }
           );
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
           const unidadesOrdenadas = (data || [])
             .map((u) => sanitizeValue(u?.unidade))
             .filter((texto) => !!texto)
             .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
-          unidadesOrdenadas.forEach((unidade) => {
-            const option = document.createElement('option');
-            option.value = unidade;
-            option.textContent = unidade;
-            sel.appendChild(option);
-          });
-          sel.disabled = false;
-          if (selectedValue) sel.value = selectedValue;
+          syncChoicesOptions(targetSel, unidadesOrdenadas, 'Selecione...');
+          setChoiceDisabled(targetSel, false);
+          if (selectedValue) setChoiceValue(targetSel, selectedValue);
         } catch (err) {
           console.error(err);
-          sel.innerHTML = '<option>Falha ao carregar</option>';
+          syncChoicesOptions(targetSel, [], 'Falha ao carregar');
+          setChoiceDisabled(targetSel, true);
         }
       }
 
       async function loadTurnos(unidade, targetSel, ds, selectedValue = '') {
         const sel = document.getElementById(targetSel);
-        sel.innerHTML = '<option>Carregando...</option>';
-        sel.disabled = true;
+        syncChoicesOptions(targetSel, [], 'Carregando...');
+        setChoiceDisabled(targetSel, true);
         const grupo = document.getElementById('grupo').value || null;
         try {
           const data = await postJSON(
             'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/turnos',
             { unidade, ds, grupo }
           );
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
           const turnosOrdenados = (data || [])
             .map((t) => sanitizeValue(t?.turno))
             .filter((texto) => !!texto)
             .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
-          turnosOrdenados.forEach((turno) => {
-            const option = document.createElement('option');
-            option.value = turno;
-            option.textContent = turno;
-            sel.appendChild(option);
-          });
-          sel.disabled = false;
-          if (selectedValue) sel.value = selectedValue;
+          syncChoicesOptions(targetSel, turnosOrdenados, 'Selecione...');
+          setChoiceDisabled(targetSel, false);
+          if (selectedValue) setChoiceValue(targetSel, selectedValue);
         } catch (err) {
           console.error(err);
-          sel.innerHTML = '<option>Falha ao carregar</option>';
+          syncChoicesOptions(targetSel, [], 'Falha ao carregar');
+          setChoiceDisabled(targetSel, true);
         }
       }
 
       async function loadRegimes(unidade, targetSel, ds, selectedValue = '') {
         const sel = document.getElementById(targetSel);
-        sel.innerHTML = '<option>Carregando...</option>';
-        sel.disabled = true;
+        syncChoicesOptions(targetSel, [], 'Carregando...');
+        setChoiceDisabled(targetSel, true);
         const grupo = document.getElementById('grupo').value || null;
         try {
           const data = await postJSON(
             'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/regimes',
             { unidade, ds, grupo }
           );
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
           const regimesOrdenados = (data || [])
             .map((r) => sanitizeValue(r?.regime))
             .filter((texto) => !!texto)
             .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
-          regimesOrdenados.forEach((regime) => {
-            const option = document.createElement('option');
-            option.value = regime;
-            option.textContent = regime;
-            sel.appendChild(option);
-          });
-          sel.disabled = false;
-          if (selectedValue) sel.value = selectedValue;
+          syncChoicesOptions(targetSel, regimesOrdenados, 'Selecione...');
+          setChoiceDisabled(targetSel, false);
+          if (selectedValue) setChoiceValue(targetSel, selectedValue);
         } catch (err) {
           console.error(err);
-          sel.innerHTML = '<option>Falha ao carregar</option>';
+          syncChoicesOptions(targetSel, [], 'Falha ao carregar');
+          setChoiceDisabled(targetSel, true);
         }
       }
 
@@ -1394,20 +1475,18 @@
 
       function populateMatriculas() {
         const sel = document.getElementById('matricula');
-        sel.innerHTML = '';
         const opts = [
           safeValue(BIND.vinculos?.[0]?.matricula),
           safeValue(BIND.vinculos?.[1]?.matricula)
         ]
           .filter((valor) => !!valor)
           .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
-        if (!opts.length) {
-          sel.innerHTML = '<option disabled selected>Sem matrículas disponíveis</option>';
-          sel.disabled = true;
-          return;
-        }
-        sel.insertAdjacentHTML('beforeend', '<option value="" disabled selected>Selecione...</option>');
-        opts.forEach((v) => sel.insertAdjacentHTML('beforeend', `<option>${v}</option>`));
+        syncChoicesOptions(
+          'matricula',
+          opts,
+          opts.length ? 'Selecione...' : 'Sem matrículas disponíveis'
+        );
+        setChoiceDisabled('matricula', !opts.length);
       }
 
       function populateEnderecoContato() {
@@ -1840,13 +1919,14 @@
 
       function resetModalUnidade() {
         ['mDs', 'mUnidade', 'mTurno', 'mRegime'].forEach((id) => {
-          const el = document.getElementById(id);
-          el.value = '';
+          setChoiceValue(id, '');
           if (id !== 'mDs') {
-            el.innerHTML = `<option>${id === 'mUnidade' ? 'Selecione o distrito...' : 'Selecione a unidade...'}</option>`;
-            el.disabled = true;
+            const placeholder = id === 'mUnidade' ? 'Selecione o distrito...' : 'Selecione a unidade...';
+            syncChoicesOptions(id, [], placeholder);
+            setChoiceDisabled(id, true);
+          } else {
+            setChoiceDisabled(id, false);
           }
-          el.disabled = id !== 'mDs';
         });
         document.getElementById('btnModalConfirmar').classList.remove('d-none');
         document.getElementById('btnModalCancelar').textContent = 'Cancelar';
@@ -2218,31 +2298,22 @@
 
         document.getElementById('dsSelect').addEventListener('change', async (e) => {
           const v = e.target.value;
-          const unidadeSelect = document.getElementById('unidadeSelect');
-          const turnoSelect = document.getElementById('turnoSelect');
-          const regimeSelect = document.getElementById('regimeSelect');
-          unidadeSelect.innerHTML = '<option>Selecione o distrito...</option>';
-          unidadeSelect.value = '';
-          unidadeSelect.disabled = true;
-          turnoSelect.innerHTML = '<option>Selecione a unidade...</option>';
-          turnoSelect.value = '';
-          regimeSelect.innerHTML = '<option>Selecione a unidade...</option>';
-          regimeSelect.value = '';
-          turnoSelect.disabled = true;
-          regimeSelect.disabled = true;
+          syncChoicesOptions('unidadeSelect', [], 'Selecione o distrito...');
+          setChoiceDisabled('unidadeSelect', true);
+          syncChoicesOptions('turnoSelect', [], 'Selecione a unidade...');
+          setChoiceDisabled('turnoSelect', true);
+          syncChoicesOptions('regimeSelect', [], 'Selecione a unidade...');
+          setChoiceDisabled('regimeSelect', true);
           if (v) {
             await loadUnidades(v, 'unidadeSelect');
-            unidadeSelect.disabled = false;
           }
           updateAddBtn();
         });
         document.getElementById('unidadeSelect').addEventListener('change', async (e) => {
           const unidade = e.target.value;
           const ds = document.getElementById('dsSelect').value;
-          const turnoSelect = document.getElementById('turnoSelect');
-          const regimeSelect = document.getElementById('regimeSelect');
-          turnoSelect.innerHTML = '<option>Carregando...</option>';
-          regimeSelect.innerHTML = '<option>Carregando...</option>';
+          syncChoicesOptions('turnoSelect', [], 'Carregando...');
+          syncChoicesOptions('regimeSelect', [], 'Carregando...');
           if (unidade && ds) {
             await loadTurnos(unidade, 'turnoSelect', ds);
             await loadRegimes(unidade, 'regimeSelect', ds);
@@ -2252,27 +2323,19 @@
 
         document.getElementById('mDs').addEventListener('change', async (e) => {
           const v = e.target.value;
-          const turnoSelect = document.getElementById('mTurno');
-          const regimeSelect = document.getElementById('mRegime');
-          const unidadeModal = document.getElementById('mUnidade');
-          unidadeModal.innerHTML = '<option>Selecione o distrito...</option>';
-          unidadeModal.value = '';
-          unidadeModal.disabled = true;
-          turnoSelect.innerHTML = '<option>Selecione a unidade...</option>';
-          turnoSelect.value = '';
-          regimeSelect.innerHTML = '<option>Selecione a unidade...</option>';
-          regimeSelect.value = '';
-          turnoSelect.disabled = true;
-          regimeSelect.disabled = true;
+          syncChoicesOptions('mUnidade', [], 'Selecione o distrito...');
+          setChoiceDisabled('mUnidade', true);
+          syncChoicesOptions('mTurno', [], 'Selecione a unidade...');
+          setChoiceDisabled('mTurno', true);
+          syncChoicesOptions('mRegime', [], 'Selecione a unidade...');
+          setChoiceDisabled('mRegime', true);
           if (v) await loadUnidades(v, 'mUnidade');
         });
         document.getElementById('mUnidade').addEventListener('change', async (e) => {
           const unidade = e.target.value;
           const ds = document.getElementById('mDs').value;
-          const turnoSelect = document.getElementById('mTurno');
-          const regimeSelect = document.getElementById('mRegime');
-          turnoSelect.innerHTML = '<option>Carregando...</option>';
-          regimeSelect.innerHTML = '<option>Carregando...</option>';
+          syncChoicesOptions('mTurno', [], 'Carregando...');
+          syncChoicesOptions('mRegime', [], 'Carregando...');
           if (unidade && ds) {
             await loadTurnos(unidade, 'mTurno', ds);
             await loadRegimes(unidade, 'mRegime', ds);
@@ -2363,6 +2426,7 @@
       }
 
       function init() {
+        initSearchableSelects();
         populateMatriculas();
         populateEnderecoContato();
         const dc = BIND.dadosComuns || {};
