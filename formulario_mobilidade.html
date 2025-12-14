@@ -1157,17 +1157,23 @@
         if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
         const str = String(value).trim();
         if (!str) return null;
-        const direct = new Date(str);
-        if (!Number.isNaN(direct.getTime())) return direct;
-        const parts = str.split(/[\/]/);
-        if (parts.length === 3) {
-          const [d, m, y] = parts.map((p) => Number(p));
+        const slashParts = str.includes('/') ? str.split('/') : null;
+        if (slashParts && slashParts.length === 3) {
+          const [d, m, y] = slashParts.map((p) => Number(p));
           if (y && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
             const dt = new Date(y, m - 1, d);
             return Number.isNaN(dt.getTime()) ? null : dt;
           }
         }
-        return null;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+          const [y, m, d] = str.split('-').map((p) => Number(p));
+          if (y && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+            const dt = new Date(y, m - 1, d);
+            return Number.isNaN(dt.getTime()) ? null : dt;
+          }
+        }
+        const direct = new Date(str);
+        return Number.isNaN(direct.getTime()) ? null : direct;
       };
 
       const formatDateISO = (value) => {
