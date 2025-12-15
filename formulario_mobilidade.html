@@ -1058,6 +1058,15 @@
         }
       }
 
+      function refreshTooltips(selector = '[data-bs-toggle="tooltip"]') {
+        if (!window.bootstrap?.Tooltip) return;
+        if (!state.tooltips) state.tooltips = [];
+        state.tooltips.forEach((t) => t.dispose());
+        state.tooltips = Array.from(document.querySelectorAll(selector)).map(
+          (el) => new bootstrap.Tooltip(el)
+        );
+      }
+
       function setChoiceValue(id, value) {
         const el = document.getElementById(id);
         if (!el) return;
@@ -1276,7 +1285,8 @@
         printMode: 'print',
         pendingFocusId: null,
         lastPayload: null,
-        shouldShowEmailModal: false
+        shouldShowEmailModal: false,
+        tooltips: []
       };
 
       const modalUnidade = new bootstrap.Modal(document.getElementById('modalUnidade'));
@@ -1393,6 +1403,8 @@
           viewBtn.innerHTML = "<span aria-hidden='true'>👁️</span><span class='visually-hidden'>Visualizar</span>";
           viewBtn.setAttribute('aria-label', 'Visualizar unidade');
           viewBtn.title = 'Visualizar unidade';
+          viewBtn.dataset.bsToggle = 'tooltip';
+          viewBtn.dataset.bsTitle = 'Visualizar';
           viewBtn.addEventListener('click', () => openModalUnidade('view', idx));
 
           const editBtn = document.createElement('button');
@@ -1401,6 +1413,8 @@
           editBtn.innerHTML = "<span aria-hidden='true'>✏️</span><span class='visually-hidden'>Editar</span>";
           editBtn.setAttribute('aria-label', 'Editar unidade');
           editBtn.title = 'Editar unidade';
+          editBtn.dataset.bsToggle = 'tooltip';
+          editBtn.dataset.bsTitle = 'Editar';
           editBtn.disabled = !!row.imported;
           editBtn.addEventListener('click', () => {
             if (!row.imported) openModalUnidade('edit', idx);
@@ -1412,6 +1426,8 @@
           deleteBtn.innerHTML = "<span aria-hidden='true'>🗑️</span><span class='visually-hidden'>Excluir</span>";
           deleteBtn.setAttribute('aria-label', 'Excluir unidade');
           deleteBtn.title = 'Excluir unidade';
+          deleteBtn.dataset.bsToggle = 'tooltip';
+          deleteBtn.dataset.bsTitle = 'Excluir';
           deleteBtn.addEventListener('click', () => {
             state.prefs.splice(idx, 1);
             updateAddBtn();
@@ -1423,6 +1439,8 @@
           tr.append(priorityCell, distritoCell, lotacaoCell, dataSolicCell, dataCredCell, actionsCell);
           tbody.appendChild(tr);
         });
+
+        refreshTooltips('.actions-wrapper [data-bs-toggle="tooltip"]');
       }
 
       function collectPreferencePrerequisiteErrors() {
@@ -2080,8 +2098,7 @@
           const unidade = pref?.unidade || '';
           const turno = pref?.turno || '';
           const regime = pref?.regime || '';
-          const dsSelect = document.getElementById('mDs');
-          dsSelect.value = ds;
+          setChoiceValue('mDs', ds);
 
           if (ds) {
             await loadUnidades(ds, 'mUnidade', unidade);
@@ -2091,9 +2108,12 @@
             }
           }
 
+          setChoiceValue('mUnidade', unidade);
+          setChoiceValue('mTurno', turno);
+          setChoiceValue('mRegime', regime);
+
           ['mDs', 'mUnidade', 'mTurno', 'mRegime'].forEach((id) => {
-            const el = document.getElementById(id);
-            el.disabled = mode === 'view';
+            setChoiceDisabled(id, mode === 'view');
           });
         }
 
