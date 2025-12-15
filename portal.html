@@ -903,7 +903,7 @@
         <p id="decisionRedirectMessage" class="decision-redirect-message"></p>
         <p id="decisionRedirectCountdown" class="decision-redirect-countdown"></p>
         <div class="decision-redirect-actions">
-          <button type="button" class="btn btn-primary" id="decisionRedirectNow">Ir agora</button>
+          <button type="button" class="btn btn-primary" id="decisionRedirectNow">Fechar agora</button>
         </div>
       </div>
     </div>
@@ -1370,8 +1370,6 @@
 
       let redirectCountdownTimer = null;
       let redirectInterval = null;
-      const REDIRECT_URL = 'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/portal-sesau-servidores';
-
       const limparTemporizadoresRedirect = () => {
         if (redirectCountdownTimer) {
           clearTimeout(redirectCountdownTimer);
@@ -1383,16 +1381,12 @@
         }
       };
 
-      const executarRedirecionamento = (imediato = false) => {
+      const executarFechamentoFluxo = () => {
         const modal = document.getElementById('decisionRedirectModal');
         if (modal) modal.classList.remove('active');
         modal?.setAttribute('aria-hidden', 'true');
         limparTemporizadoresRedirect();
-        if (imediato) {
-          window.location.assign(REDIRECT_URL);
-          return;
-        }
-        window.location.href = REDIRECT_URL;
+        fecharModal();
       };
 
       const abrirModalRedirecionamento = (acao) => {
@@ -1408,21 +1402,21 @@
         const isRenovar = acao === 'renovar';
         title.textContent = isRenovar ? 'Você optou por renovar seus pedidos.' : 'Você optou por não renovar os seus pedidos.';
         message.textContent = isRenovar
-          ? 'Sua escolha será registrada e você será redirecionado para continuar o processo.'
-          : 'Esta escolha é irreversível. Você será redirecionado para finalizar.';
+          ? 'Sua escolha foi registrada. Este aviso será fechado automaticamente.'
+          : 'Esta escolha é irreversível. Este aviso será fechado automaticamente.';
 
         let remaining = 5;
-        countdownEl.textContent = `Redirecionando em ${remaining}s...`;
+        countdownEl.textContent = `Fechando em ${remaining}s...`;
 
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
 
         redirectInterval = setInterval(() => {
           remaining -= 1;
-          countdownEl.textContent = `Redirecionando em ${Math.max(remaining, 0)}s...`;
+          countdownEl.textContent = `Fechando em ${Math.max(remaining, 0)}s...`;
         }, 1000);
 
-        redirectCountdownTimer = setTimeout(() => executarRedirecionamento(false), remaining * 1000);
+        redirectCountdownTimer = setTimeout(executarFechamentoFluxo, remaining * 1000);
       };
 
       const enviarRenovacao = async (acao) => {
@@ -1983,8 +1977,8 @@
       document.getElementById('btnNaoRenovarPedido').addEventListener('click', () => enviarRenovacao('nao_renovar'));
       document.getElementById('btnImprimir').addEventListener('click', () => window.print());
       document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
-      document.getElementById('decisionRedirectClose').addEventListener('click', () => executarRedirecionamento(true));
-      document.getElementById('decisionRedirectNow').addEventListener('click', () => executarRedirecionamento(true));
+      document.getElementById('decisionRedirectClose').addEventListener('click', executarFechamentoFluxo);
+      document.getElementById('decisionRedirectNow').addEventListener('click', executarFechamentoFluxo);
       document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
       document.getElementById('formFeedbackClose').addEventListener('click', closeFormFeedback);
       document.getElementById('formFeedback').addEventListener('click', (e) => {
@@ -2205,9 +2199,9 @@
         display: block;
         background: transparent !important;
         border-radius: 0;
-        box-shadow: none;
-        filter: none;
-        mix-blend-mode: multiply;
+        box-shadow: none !important;
+        filter: none !important;
+        mix-blend-mode: normal !important;
       }
 
       .susi-chat-modal {
