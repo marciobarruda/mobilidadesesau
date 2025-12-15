@@ -1430,6 +1430,7 @@
           deleteBtn.dataset.bsTitle = 'Excluir';
           deleteBtn.addEventListener('click', () => {
             state.prefs.splice(idx, 1);
+            renumberPriorities();
             updateAddBtn();
             renderPrefs();
           });
@@ -1441,6 +1442,14 @@
         });
 
         refreshTooltips('.actions-wrapper [data-bs-toggle="tooltip"]');
+      }
+
+      function renumberPriorities() {
+        state.prefs
+          .sort((a, b) => (Number(a.prioridade) || 999) - (Number(b.prioridade) || 999))
+          .forEach((pref, idx) => {
+            pref.prioridade = idx + 1;
+          });
       }
 
       function collectPreferencePrerequisiteErrors() {
@@ -2510,6 +2519,7 @@
           const pref = buildPreferenceFromModal();
           if (!pref) return;
           state.prefs.push(pref);
+          renumberPriorities();
           closeModalUnidade();
           updateAddBtn();
           renderPrefs();
