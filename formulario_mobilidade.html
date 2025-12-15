@@ -18,6 +18,10 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+    />
     <style>
       :root {
         --brand-primary: #0053a4;
@@ -79,7 +83,7 @@
       }
       .card {
         border-radius: 4px;
-        overflow: hidden;
+        overflow: visible;
       }
       .card-programa {
         border: 1px solid rgba(0, 83, 164, 0.08);
@@ -116,6 +120,11 @@
         min-height: 2.5rem;
         line-height: 1;
       }
+      .btn-locked {
+        opacity: 0.65;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
       .btn-icon span[aria-hidden='true'] {
         font-size: 1.05rem;
       }
@@ -150,6 +159,77 @@
       .modal-branding img {
         height: 48px;
         width: auto;
+      }
+      .choices {
+        width: 100%;
+        margin-bottom: 0;
+        position: relative;
+      }
+      .choices.is-open {
+        overflow: visible;
+      }
+      .choices__inner {
+        border-radius: 0.375rem;
+        border: 1px solid var(--border-color);
+        background-color: #fff;
+        min-height: calc(2.25rem + 2px);
+        padding: 0.375rem 0.75rem;
+        display: flex;
+        align-items: center;
+        box-shadow: none;
+      }
+      .choices__placeholder {
+        color: var(--text-muted);
+        opacity: 1;
+      }
+      .choices__list--single {
+        padding: 0;
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+      .choices__list--single .choices__item {
+        padding: 0;
+        width: 100%;
+        white-space: normal;
+        line-height: 1.35;
+      }
+      .choices[data-type*='select-one']::after {
+        border-color: var(--text-muted) transparent transparent transparent;
+        right: 0.9rem;
+      }
+      .choices__list--dropdown {
+        border-radius: 0.375rem;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 12px 24px rgba(0, 35, 79, 0.16);
+        margin-top: 0.15rem;
+        position: absolute;
+        width: 100%;
+        z-index: 1040;
+        max-height: 260px;
+        overflow-y: auto;
+      }
+      .choices__list[aria-expanded] {
+        max-height: 260px;
+        overflow-y: auto;
+      }
+      .choices__list--dropdown .choices__item--selectable {
+        padding: 0.55rem 0.75rem;
+        white-space: normal;
+      }
+      .choices__input {
+        padding: 0.35rem 0.75rem;
+        margin-bottom: 0.35rem;
+        border-radius: 0.375rem;
+        border: 1px solid var(--border-color);
+      }
+      .choices__list--dropdown .choices__input {
+        background-color: #f8fafc;
+      }
+      .choices.is-focused .choices__inner,
+      .choices.is-open .choices__inner {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
       }
       .resumo-card {
         border: 1px solid rgba(0, 83, 164, 0.12);
@@ -446,8 +526,8 @@
   <body>
     <header class="site-header">
       <div class="container">
-        <span class="badge-open">Secretaria de Saúde — SESAU • Prefeitura do Recife</span>
-        <h1 class="display-6 h1-title mt-3 mb-2">Formulário — Mobilidade Interna</h1>
+        <span class="badge-open">Secretaria de Saúde • SESAU • Prefeitura do Recife</span>
+        <h1 class="display-6 h1-title mt-3 mb-2">Formulário • Mobilidade Interna</h1>
         <p class="lead mb-0">
           Preencha os dados para cadastrar ou atualizar sua solicitação de mobilidade.
         </p>
@@ -458,7 +538,7 @@
       <div class="d-flex justify-content-end mb-3">
         <div class="solicitacao-box" role="status" aria-live="polite">
           <span class="solicitacao-label">Solicitação</span>
-          <span class="solicitacao-value" id="numeroSolicitacaoDisplay">—</span>
+          <span class="solicitacao-value" id="numeroSolicitacaoDisplay">•</span>
         </div>
       </div>
       <!-- Identificação -->
@@ -524,7 +604,6 @@
                 data-numeric="true"
                 aria-required="true"
               />
-              <div class="small-note">Autopreenche via BrasilAPI.</div>
             </div>
             <div class="col-12 col-md-6 col-lg-5">
               <label class="form-label" for="logradouro">Logradouro</label>
@@ -791,6 +870,21 @@
       </div>
     </div>
 
+    <!-- Modal de Confirmação de Envio do Comprovante -->
+    <div class="modal fade" id="modalEmailConfirmacao" tabindex="-1" aria-labelledby="modalEmailConfirmacaoTitulo" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center py-4">
+            <h5 class="mb-3" id="modalEmailConfirmacaoTitulo">Comprovante enviado por e-mail</h5>
+            <p class="mb-3">O comprovante da solicitação foi enviado para o e-mail informado pelo usuário.</p>
+            <p class="text-muted mb-0">
+              Este aviso será fechado automaticamente em <strong><span id="emailCountdown">5</span>s</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal de Sucesso -->
     <div class="modal fade" id="modalSucesso" tabindex="-1" aria-labelledby="modalSucessoTitulo" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -830,7 +924,11 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
+      const PORTAL_REDIRECT_URL =
+        'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/portal-sesau-servidores';
+
       const postJSON = async (url, body) => {
         const res = await fetch(url, {
           method: 'POST',
@@ -838,13 +936,149 @@
           body: JSON.stringify(body || {})
         });
         if (!res.ok) throw new Error('Erro de rede');
-        return res.json();
+        try {
+          return await res.json();
+        } catch (err) {
+          return null;
+        }
       };
       const toBRDate = (d) => {
         if (!d) return '';
-        const dt = d instanceof Date ? d : new Date(d);
-        return Number.isNaN(dt.getTime()) ? '' : dt.toLocaleDateString('pt-BR');
+
+        const parseDate = (value) => {
+          if (!value) return null;
+          if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+
+          const str = String(value).trim();
+          if (!str) return null;
+
+          const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+          if (isoMatch) {
+            const [, y, m, d] = isoMatch.map((n) => Number(n));
+            const dt = new Date(y, m - 1, d);
+            return Number.isNaN(dt.getTime()) ? null : dt;
+          }
+
+          const slashParts = str.split(/[\/]/);
+          if (slashParts.length === 3) {
+            const [p1, p2, p3] = slashParts.map((p) => Number(p));
+            const [day, month, year] = [p1, p2, p3];
+            if (year && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+              const dt = new Date(year, month - 1, day);
+              return Number.isNaN(dt.getTime()) ? null : dt;
+            }
+          }
+
+          const fallback = new Date(str);
+          return Number.isNaN(fallback.getTime()) ? null : fallback;
+        };
+
+        const dt = parseDate(d);
+        if (!dt) return '';
+
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${pad(dt.getDate())}/${pad(dt.getMonth() + 1)}/${dt.getFullYear()}`;
       };
+
+      const SEARCHABLE_SELECT_IDS = [
+        'matricula',
+        'dsSelect',
+        'unidadeSelect',
+        'turnoSelect',
+        'regimeSelect',
+        'mDs',
+        'mUnidade',
+        'mTurno',
+        'mRegime'
+      ];
+      const choicesInstances = {};
+
+      function createChoicesInstance(el) {
+        return new Choices(el, {
+          searchEnabled: true,
+          shouldSort: false,
+          itemSelectText: '',
+          searchPlaceholderValue: 'Digite para buscar',
+          noResultsText: 'Nenhum resultado encontrado',
+          noChoicesText: 'Nenhuma opção disponível',
+          allowHTML: false
+        });
+      }
+
+      function initSearchableSelects() {
+        SEARCHABLE_SELECT_IDS.forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const instance = createChoicesInstance(el);
+          choicesInstances[id] = instance;
+          if (el.disabled) instance.disable();
+        });
+      }
+
+      function syncChoicesOptions(id, options = [], placeholderText = 'Selecione...') {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const instance = choicesInstances[id];
+        if (instance) {
+          instance.clearChoices();
+          instance.removeActiveItems();
+          const prepared = [];
+          if (placeholderText) {
+            prepared.push({ value: '', label: placeholderText, disabled: true, selected: true });
+          }
+          prepared.push(...options.map((value) => ({ value, label: value })));
+          instance.setChoices(prepared, 'value', 'label', true);
+          return;
+        }
+        el.innerHTML = '';
+        if (placeholderText) {
+          const placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.textContent = placeholderText;
+          placeholder.disabled = true;
+          placeholder.selected = true;
+          el.appendChild(placeholder);
+        }
+        options.forEach((value) => {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = value;
+          el.appendChild(option);
+        });
+      }
+
+      function setChoiceDisabled(id, disabled) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.disabled = disabled;
+        const instance = choicesInstances[id];
+        if (instance) {
+          if (disabled) instance.disable();
+          else instance.enable();
+        }
+      }
+
+      function refreshTooltips(selector = '[data-bs-toggle="tooltip"]') {
+        if (!window.bootstrap?.Tooltip) return;
+        if (!state.tooltips) state.tooltips = [];
+        state.tooltips.forEach((t) => t.dispose());
+        state.tooltips = Array.from(document.querySelectorAll(selector)).map(
+          (el) => new bootstrap.Tooltip(el)
+        );
+      }
+
+      function setChoiceValue(id, value) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.value = value || '';
+        const instance = choicesInstances[id];
+        if (!instance) return;
+        if (!value) {
+          instance.removeActiveItems();
+        } else {
+          instance.setChoiceByValue(value);
+        }
+      }
       const todayBR = () => toBRDate(new Date());
       const isCEP = (v) => /^(\d{5}\-?\d{3})$/.test((v || '').trim());
       const sanitizeUF = (v) => (v || '').toUpperCase().slice(0, 2);
@@ -858,6 +1092,112 @@
         if (val === null || val === undefined) return '';
         const str = String(val).trim();
         return str === 'undefined' || str === 'null' ? '' : str;
+      };
+
+      const FIELD_LABELS = {
+        matricula: 'Matrícula',
+        cep: 'CEP',
+        logradouro: 'Logradouro',
+        numero: 'Número',
+        complemento: 'Complemento',
+        bairro: 'Bairro',
+        cidade: 'Cidade',
+        uf: 'UF',
+        whatsapp: 'WhatsApp',
+        telalt: 'Telefone alternativo',
+        email: 'E-mail',
+        email2: 'Confirme o e-mail',
+        dsSelect: 'Distrito atual',
+        unidadeSelect: 'Lotação atual',
+        turnoSelect: 'Horário atual',
+        regimeSelect: 'Regime de trabalho'
+      };
+
+      const PREFERENCE_PREREQUISITE_IDS = [
+        'matricula',
+        'email',
+        'email2',
+        'dsSelect',
+        'cep',
+        'logradouro',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'uf',
+        'whatsapp',
+        'unidadeSelect',
+        'turnoSelect',
+        'regimeSelect'
+      ];
+
+      const hasValue = (field) => {
+        if (!field) return false;
+        const value = sanitizeValue(field.value);
+        if (!value) return false;
+        const lower = value.toLowerCase();
+        return !(
+          lower.startsWith('selecione') ||
+          lower === 'selecione o distrito...' ||
+          lower === 'selecione a unidade...'
+        );
+      };
+
+      const isPlaceholderOption = (texto) => {
+        const lower = sanitizeValue(texto).toLowerCase();
+        return (
+          lower.startsWith('selecione') ||
+          lower === 'selecione o distrito...' ||
+          lower === 'selecione a unidade...'
+        );
+      };
+
+      const getFieldLabel = (fieldOrId) => {
+        const field = typeof fieldOrId === 'string' ? document.getElementById(fieldOrId) : fieldOrId;
+        if (field?.dataset?.label) return field.dataset.label;
+        const label = field?.labels?.[0]?.textContent;
+        if (label) return label.trim();
+        const fromMap = field?.id ? FIELD_LABELS[field.id] : FIELD_LABELS[fieldOrId];
+        return fromMap || (field?.id || 'Campo obrigatório');
+      };
+
+      const normalizeDateValue = (value) => {
+        if (!value) return null;
+        if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+        const str = String(value).trim();
+        if (!str) return null;
+        const slashParts = str.includes('/') ? str.split('/') : null;
+        if (slashParts && slashParts.length === 3) {
+          const [d, m, y] = slashParts.map((p) => Number(p));
+          if (y && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+            const dt = new Date(y, m - 1, d);
+            return Number.isNaN(dt.getTime()) ? null : dt;
+          }
+        }
+        if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+          const [y, m, d] = str.split('-').map((p) => Number(p));
+          if (y && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+            const dt = new Date(y, m - 1, d);
+            return Number.isNaN(dt.getTime()) ? null : dt;
+          }
+        }
+        const direct = new Date(str);
+        return Number.isNaN(direct.getTime()) ? null : direct;
+      };
+
+      const formatDateISO = (value) => {
+        const dt = normalizeDateValue(value);
+        if (!dt) return null;
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
+      };
+
+      const formatDateTimeISO = (value) => {
+        const dt = normalizeDateValue(value) || new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const date = `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
+        const time = `${pad(dt.getHours())}:${pad(dt.getMinutes())}:${pad(dt.getSeconds())}`;
+        return `${date} ${time}`;
       };
 
       const formatCPF = (value) => {
@@ -889,6 +1229,9 @@
         }
         return comprovanteLogoDataUrlPromise;
       };
+
+      const WEBHOOK_MOBILIDADE_URL =
+        'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/mobilidade-html';
 
       const BIND = {
         dadosComuns: {
@@ -941,12 +1284,67 @@
         protocolo: sanitizeValue(BIND?.dadosComuns?.recordId) || null,
         printMode: 'print',
         pendingFocusId: null,
-        lastPayload: null
+        lastPayload: null,
+        shouldShowEmailModal: false,
+        tooltips: []
       };
 
       const modalUnidade = new bootstrap.Modal(document.getElementById('modalUnidade'));
       const modalAlerta = new bootstrap.Modal(document.getElementById('modalAlerta'));
       const modalSucesso = new bootstrap.Modal(document.getElementById('modalSucesso'));
+      const modalEmailConfirmacao = new bootstrap.Modal(document.getElementById('modalEmailConfirmacao'));
+      const emailCountdownEl = document.getElementById('emailCountdown');
+      const modalEmailConfirmacaoEl = document.getElementById('modalEmailConfirmacao');
+      let emailCountdownTimer = null;
+      let emailRedirectTimer = null;
+      let emailRedirectScheduled = false;
+
+      function resetEmailCountdown() {
+        if (emailCountdownTimer) {
+          clearInterval(emailCountdownTimer);
+          emailCountdownTimer = null;
+        }
+        if (emailRedirectTimer) {
+          clearTimeout(emailRedirectTimer);
+          emailRedirectTimer = null;
+        }
+        emailRedirectScheduled = false;
+      }
+
+      function navigateAfterEmailModal() {
+        if (emailRedirectScheduled) return;
+        emailRedirectScheduled = true;
+        try {
+          window.close();
+        } catch (err) {}
+        setTimeout(() => {
+          window.location.href = PORTAL_REDIRECT_URL;
+        }, 150);
+      }
+
+      function showEmailConfirmationModal() {
+        resetEmailCountdown();
+        let remaining = 5;
+        if (emailCountdownEl) emailCountdownEl.textContent = remaining;
+        modalEmailConfirmacao.show();
+        emailCountdownTimer = setInterval(() => {
+          remaining -= 1;
+          if (emailCountdownEl) emailCountdownEl.textContent = Math.max(remaining, 0);
+          if (remaining <= 0) {
+            modalEmailConfirmacao.hide();
+          }
+        }, 1000);
+        emailRedirectTimer = setTimeout(() => {
+          modalEmailConfirmacao.hide();
+        }, remaining * 1000);
+      }
+
+      if (modalEmailConfirmacaoEl) {
+        modalEmailConfirmacaoEl.addEventListener('hidden.bs.modal', () => {
+          resetEmailCountdown();
+          navigateAfterEmailModal();
+        });
+      }
 
       async function fillByCEP(cep) {
         if (!isCEP(cep)) return;
@@ -959,6 +1357,7 @@
           document.getElementById('bairro').value = j.neighborhood || '';
           document.getElementById('cidade').value = j.city || '';
           document.getElementById('uf').value = sanitizeUF(j.state);
+          updateAddBtn();
         } catch (err) {
           console.warn('CEP não encontrado', err);
         }
@@ -1004,6 +1403,8 @@
           viewBtn.innerHTML = "<span aria-hidden='true'>👁️</span><span class='visually-hidden'>Visualizar</span>";
           viewBtn.setAttribute('aria-label', 'Visualizar unidade');
           viewBtn.title = 'Visualizar unidade';
+          viewBtn.dataset.bsToggle = 'tooltip';
+          viewBtn.dataset.bsTitle = 'Visualizar';
           viewBtn.addEventListener('click', () => openModalUnidade('view', idx));
 
           const editBtn = document.createElement('button');
@@ -1012,6 +1413,8 @@
           editBtn.innerHTML = "<span aria-hidden='true'>✏️</span><span class='visually-hidden'>Editar</span>";
           editBtn.setAttribute('aria-label', 'Editar unidade');
           editBtn.title = 'Editar unidade';
+          editBtn.dataset.bsToggle = 'tooltip';
+          editBtn.dataset.bsTitle = 'Editar';
           editBtn.disabled = !!row.imported;
           editBtn.addEventListener('click', () => {
             if (!row.imported) openModalUnidade('edit', idx);
@@ -1023,8 +1426,11 @@
           deleteBtn.innerHTML = "<span aria-hidden='true'>🗑️</span><span class='visually-hidden'>Excluir</span>";
           deleteBtn.setAttribute('aria-label', 'Excluir unidade');
           deleteBtn.title = 'Excluir unidade';
+          deleteBtn.dataset.bsToggle = 'tooltip';
+          deleteBtn.dataset.bsTitle = 'Excluir';
           deleteBtn.addEventListener('click', () => {
             state.prefs.splice(idx, 1);
+            renumberPriorities();
             updateAddBtn();
             renderPrefs();
           });
@@ -1034,17 +1440,64 @@
           tr.append(priorityCell, distritoCell, lotacaoCell, dataSolicCell, dataCredCell, actionsCell);
           tbody.appendChild(tr);
         });
+
+        refreshTooltips('.actions-wrapper [data-bs-toggle="tooltip"]');
+      }
+
+      function renumberPriorities() {
+        state.prefs
+          .sort((a, b) => (Number(a.prioridade) || 999) - (Number(b.prioridade) || 999))
+          .forEach((pref, idx) => {
+            pref.prioridade = idx + 1;
+          });
+      }
+
+      function collectPreferencePrerequisiteErrors() {
+        const seen = new Set();
+        const errors = [];
+        PREFERENCE_PREREQUISITE_IDS.forEach((id) => {
+          if (seen.has(id)) return;
+          seen.add(id);
+          const field = document.getElementById(id);
+          if (!hasValue(field)) {
+            errors.push({ fieldId: id, message: getFieldLabel(field || id) });
+          }
+        });
+        return errors;
       }
 
       function updateAddBtn() {
         const btn = document.getElementById('btnAddLinha');
-        if (state.prefs.length >= state.max) {
+        const missing = collectPreferencePrerequisiteErrors();
+        const reachedLimit = state.prefs.length >= state.max;
+        if (reachedLimit) {
           btn.textContent = 'Limite atingido';
           btn.disabled = true;
-        } else {
-          btn.textContent = 'Adicionar Unidade';
-          btn.disabled = false;
+          btn.classList.add('btn-locked');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.removeAttribute('title');
+          return;
         }
+
+        btn.textContent = 'Adicionar Unidade';
+        btn.disabled = false;
+        btn.classList.toggle('btn-locked', !!missing.length);
+        btn.setAttribute('aria-disabled', missing.length ? 'true' : 'false');
+        if (missing.length) {
+          btn.title = 'Preencha os campos obrigatórios antes de adicionar uma unidade.';
+        } else {
+          btn.removeAttribute('title');
+        }
+      }
+
+      function bindPreferencePrerequisiteListeners() {
+        const handler = () => updateAddBtn();
+        PREFERENCE_PREREQUISITE_IDS.forEach((id) => {
+          const field = document.getElementById(id);
+          if (!field) return;
+          const eventName = field.tagName === 'SELECT' ? 'change' : 'input';
+          field.addEventListener(eventName, handler);
+        });
       }
 
       function mapPreferencias(importedPrefs = []) {
@@ -1062,88 +1515,73 @@
 
       async function loadUnidades(ds, targetSel, selectedValue = '') {
         const sel = document.getElementById(targetSel);
-        sel.innerHTML = '<option>Carregando...</option>';
-        sel.disabled = true;
+        syncChoicesOptions(targetSel, [], 'Selecione...');
+        setChoiceDisabled(targetSel, true);
         const grupo = document.getElementById('grupo').value || null;
         try {
           const data = await postJSON(
             'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/unidades',
             { ds, grupo }
           );
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
           const unidadesOrdenadas = (data || [])
             .map((u) => sanitizeValue(u?.unidade))
-            .filter((texto) => !!texto)
+            .filter((texto) => !!texto && !isPlaceholderOption(texto))
             .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
-          unidadesOrdenadas.forEach((unidade) => {
-            const option = document.createElement('option');
-            option.value = unidade;
-            option.textContent = unidade;
-            sel.appendChild(option);
-          });
-          sel.disabled = false;
-          if (selectedValue) sel.value = selectedValue;
+          syncChoicesOptions(targetSel, unidadesOrdenadas, 'Selecione...');
+          setChoiceDisabled(targetSel, false);
+          if (selectedValue) setChoiceValue(targetSel, selectedValue);
         } catch (err) {
           console.error(err);
-          sel.innerHTML = '<option>Falha ao carregar</option>';
+          syncChoicesOptions(targetSel, [], 'Falha ao carregar');
+          setChoiceDisabled(targetSel, true);
         }
       }
 
       async function loadTurnos(unidade, targetSel, ds, selectedValue = '') {
         const sel = document.getElementById(targetSel);
-        sel.innerHTML = '<option>Carregando...</option>';
-        sel.disabled = true;
+        syncChoicesOptions(targetSel, [], 'Selecione...');
+        setChoiceDisabled(targetSel, true);
         const grupo = document.getElementById('grupo').value || null;
         try {
           const data = await postJSON(
             'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/turnos',
             { unidade, ds, grupo }
           );
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
           const turnosOrdenados = (data || [])
             .map((t) => sanitizeValue(t?.turno))
-            .filter((texto) => !!texto)
+            .filter((texto) => !!texto && !isPlaceholderOption(texto))
             .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
-          turnosOrdenados.forEach((turno) => {
-            const option = document.createElement('option');
-            option.value = turno;
-            option.textContent = turno;
-            sel.appendChild(option);
-          });
-          sel.disabled = false;
-          if (selectedValue) sel.value = selectedValue;
+          syncChoicesOptions(targetSel, turnosOrdenados, 'Selecione...');
+          setChoiceDisabled(targetSel, false);
+          if (selectedValue) setChoiceValue(targetSel, selectedValue);
         } catch (err) {
           console.error(err);
-          sel.innerHTML = '<option>Falha ao carregar</option>';
+          syncChoicesOptions(targetSel, [], 'Falha ao carregar');
+          setChoiceDisabled(targetSel, true);
         }
       }
 
       async function loadRegimes(unidade, targetSel, ds, selectedValue = '') {
         const sel = document.getElementById(targetSel);
-        sel.innerHTML = '<option>Carregando...</option>';
-        sel.disabled = true;
+        syncChoicesOptions(targetSel, [], 'Selecione...');
+        setChoiceDisabled(targetSel, true);
         const grupo = document.getElementById('grupo').value || null;
         try {
           const data = await postJSON(
             'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/regimes',
             { unidade, ds, grupo }
           );
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
           const regimesOrdenados = (data || [])
             .map((r) => sanitizeValue(r?.regime))
-            .filter((texto) => !!texto)
+            .filter((texto) => !!texto && !isPlaceholderOption(texto))
             .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
-          regimesOrdenados.forEach((regime) => {
-            const option = document.createElement('option');
-            option.value = regime;
-            option.textContent = regime;
-            sel.appendChild(option);
-          });
-          sel.disabled = false;
-          if (selectedValue) sel.value = selectedValue;
+          syncChoicesOptions(targetSel, regimesOrdenados, 'Selecione...');
+          setChoiceDisabled(targetSel, false);
+          if (selectedValue) setChoiceValue(targetSel, selectedValue);
         } catch (err) {
           console.error(err);
-          sel.innerHTML = '<option>Falha ao carregar</option>';
+          syncChoicesOptions(targetSel, [], 'Falha ao carregar');
+          setChoiceDisabled(targetSel, true);
         }
       }
 
@@ -1180,20 +1618,18 @@
 
       function populateMatriculas() {
         const sel = document.getElementById('matricula');
-        sel.innerHTML = '';
         const opts = [
           safeValue(BIND.vinculos?.[0]?.matricula),
           safeValue(BIND.vinculos?.[1]?.matricula)
         ]
           .filter((valor) => !!valor)
           .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
-        if (!opts.length) {
-          sel.innerHTML = '<option disabled selected>Sem matrículas disponíveis</option>';
-          sel.disabled = true;
-          return;
-        }
-        sel.insertAdjacentHTML('beforeend', '<option value="" disabled selected>Selecione...</option>');
-        opts.forEach((v) => sel.insertAdjacentHTML('beforeend', `<option>${v}</option>`));
+        syncChoicesOptions(
+          'matricula',
+          opts,
+          opts.length ? 'Selecione...' : 'Sem matrículas disponíveis'
+        );
+        setChoiceDisabled('matricula', !opts.length);
       }
 
       function populateEnderecoContato() {
@@ -1266,7 +1702,7 @@
         requiredFields.forEach((field) => {
           if (field.disabled || field.readOnly) return;
           if (!field.value || !field.value.toString().trim()) {
-            errors.push({ fieldId: field.id, message: field.labels?.[0]?.textContent || field.id });
+            errors.push({ fieldId: field.id, message: getFieldLabel(field) });
             markInvalidField(field);
           }
         });
@@ -1332,7 +1768,7 @@
           sanitizeValue(payload.numeroSolicitacao) || fallbackNumero || state.protocolo || `22${Date.now().toString().slice(-5)}`;
         state.protocolo = numeroSolicitacao || null;
         const solicitacaoDisplay = document.getElementById('numeroSolicitacaoDisplay');
-        if (solicitacaoDisplay) solicitacaoDisplay.textContent = numeroSolicitacao || '—';
+        if (solicitacaoDisplay) solicitacaoDisplay.textContent = numeroSolicitacao || '•';
 
         const prefsRows = payload.preferencias
           .map(
@@ -1505,7 +1941,40 @@
       function openSuccessModal(payload) {
         fillResumo(payload);
         state.lastPayload = payload;
+        state.shouldShowEmailModal = false;
         modalSucesso.show();
+      }
+
+      async function enviarFormulario() {
+        const validation = validateForm();
+        if (!validation.isValid) {
+          openAlertModal(validation.errors);
+          return;
+        }
+
+        const payload = collectPayload();
+        const webhookPayload = buildWebhookPayload(payload);
+        const btnEnviar = document.getElementById('btnEnviar');
+        const originalText = btnEnviar?.textContent;
+
+        try {
+          if (btnEnviar) {
+            btnEnviar.textContent = 'Enviando...';
+            btnEnviar.setAttribute('aria-busy', 'true');
+            btnEnviar.disabled = true;
+          }
+          await postJSON(WEBHOOK_MOBILIDADE_URL, webhookPayload);
+          openSuccessModal(payload);
+        } catch (err) {
+          console.error('Erro ao enviar formulário de mobilidade:', err);
+          alert('Não foi possível enviar o formulário. Tente novamente mais tarde.');
+        } finally {
+          if (btnEnviar) {
+            btnEnviar.textContent = originalText || 'Enviar formulário';
+            btnEnviar.removeAttribute('aria-busy');
+            btnEnviar.disabled = false;
+          }
+        }
       }
 
       function collectPayload() {
@@ -1555,15 +2024,60 @@
         };
       }
 
+      function buildWebhookPayload(payload) {
+        const nowDateTime = formatDateTimeISO(new Date());
+        const inseridoNoBanco = new Date().toISOString();
+        const status = 'AGUARDANDO MOBILIDADE';
+        return (payload.preferencias || []).map((pref) => ({
+          data_update: nowDateTime,
+          distrito: pref.distrito || null,
+          solicitacao: formatDateISO(pref.data_solicitacao),
+          prioridade: pref.prioridade ?? null,
+          regime: pref.regime || null,
+          grupo: payload.dadosPessoais.grupo || null,
+          lotacao: pref.unidade || null,
+          turno: pref.turno || null,
+          credenciamento: formatDateISO(pref.data_credenciamento),
+          matricula: payload.matricula || null,
+          nome: payload.dadosPessoais.nome || null,
+          cargo: payload.dadosPessoais.cargo || null,
+          vinculo: payload.dadosPessoais.vinculo || null,
+          nascimento: formatDateISO(payload.dadosPessoais.nascimento),
+          admissao: formatDateISO(payload.dadosPessoais.admissao),
+          distrito_atual: payload.lotacaoAtual.ds || null,
+          lotacao_atual: payload.lotacaoAtual.unidade || null,
+          horario_atual: payload.lotacaoAtual.turno || null,
+          regime_atual: payload.lotacaoAtual.regime || null,
+          wfid: payload.numeroSolicitacao || null,
+          email: payload.endereco.email || null,
+          whatsapp: payload.endereco.whatsapp || null,
+          cep: payload.endereco.cep || null,
+          logradouro: payload.endereco.logradouro || null,
+          numero: payload.endereco.numero || null,
+          complemento: payload.endereco.complemento || null,
+          bairro: payload.endereco.bairro || null,
+          cidade: payload.endereco.cidade || null,
+          uf: payload.endereco.uf || null,
+          telalternativo: payload.endereco.telalternativo || null,
+          status_solicitacao: status,
+          cpf: payload.dadosPessoais.cpf || null,
+          categoria_do_cargo: payload.dadosPessoais.cargo || null,
+          ch_de_atuacao_hor_esp: payload.dadosPessoais.carga || null,
+          especialidade_do_cargo: 'NÃO POSSUI',
+          inserido_no_banco: inseridoNoBanco
+        }));
+      }
+
       function resetModalUnidade() {
         ['mDs', 'mUnidade', 'mTurno', 'mRegime'].forEach((id) => {
-          const el = document.getElementById(id);
-          el.value = '';
+          setChoiceValue(id, '');
           if (id !== 'mDs') {
-            el.innerHTML = `<option>${id === 'mUnidade' ? 'Selecione o distrito...' : 'Selecione a unidade...'}</option>`;
-            el.disabled = true;
+            const placeholder = id === 'mUnidade' ? 'Selecione o distrito...' : 'Selecione a unidade...';
+            syncChoicesOptions(id, [], placeholder);
+            setChoiceDisabled(id, true);
+          } else {
+            setChoiceDisabled(id, false);
           }
-          el.disabled = id !== 'mDs';
         });
         document.getElementById('btnModalConfirmar').classList.remove('d-none');
         document.getElementById('btnModalCancelar').textContent = 'Cancelar';
@@ -1593,8 +2107,7 @@
           const unidade = pref?.unidade || '';
           const turno = pref?.turno || '';
           const regime = pref?.regime || '';
-          const dsSelect = document.getElementById('mDs');
-          dsSelect.value = ds;
+          setChoiceValue('mDs', ds);
 
           if (ds) {
             await loadUnidades(ds, 'mUnidade', unidade);
@@ -1604,9 +2117,12 @@
             }
           }
 
+          setChoiceValue('mUnidade', unidade);
+          setChoiceValue('mTurno', turno);
+          setChoiceValue('mRegime', regime);
+
           ['mDs', 'mUnidade', 'mTurno', 'mRegime'].forEach((id) => {
-            const el = document.getElementById(id);
-            el.disabled = mode === 'view';
+            setChoiceDisabled(id, mode === 'view');
           });
         }
 
@@ -1686,7 +2202,7 @@
             return;
           }
 
-          const numero = sanitizeValue(state.protocolo) || '—';
+          const numero = sanitizeValue(state.protocolo) || '•';
           const table = resumoContainer ? resumoContainer.querySelector('table') : null;
 
           const headers = table
@@ -1770,7 +2286,7 @@
             doc.text('NÚMERO DA SOLICITAÇÃO', badgeX + 18, badgeY + 24);
             doc.setFontSize(22);
             doc.setTextColor(17, 24, 39);
-            doc.text(numero || '—', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
+            doc.text(numero || '•', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
           };
 
           drawCardBase();
@@ -1797,12 +2313,12 @@
           currentY += 6;
           const infoRows = [
             [
-              { label: 'Nome do servidor', value: nomeServidor || '—' },
-              { label: 'CPF', value: cpfServidor || '—' }
+              { label: 'Nome do servidor', value: nomeServidor || '•' },
+              { label: 'CPF', value: cpfServidor || '•' }
             ],
             [
-              { label: 'Matrícula', value: matricula || '—' },
-              { label: 'Cargo', value: cargoServidor || '—' }
+              { label: 'Matrícula', value: matricula || '•' },
+              { label: 'Cargo', value: cargoServidor || '•' }
             ],
             [
               { label: 'Data de emissão', value: dataEmissao },
@@ -1825,7 +2341,7 @@
               doc.setFont('helvetica', 'normal');
               doc.setFontSize(11);
               doc.setTextColor(31, 41, 55);
-              doc.text(item.value || '—', x, y + 16);
+              doc.text(item.value || '•', x, y + 16);
             });
           });
 
@@ -1917,7 +2433,7 @@
           doc.setTextColor(107, 114, 128);
           doc.text('Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.', contentX, footerY);
 
-          const safeNumero = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
+          const safeNumero = numero && numero !== '•' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
           doc.save(`solicitacao-${safeNumero}.pdf`);
         } catch (error) {
           console.error('Erro ao gerar PDF:', error);
@@ -1935,59 +2451,44 @@
 
         document.getElementById('dsSelect').addEventListener('change', async (e) => {
           const v = e.target.value;
-          const unidadeSelect = document.getElementById('unidadeSelect');
-          const turnoSelect = document.getElementById('turnoSelect');
-          const regimeSelect = document.getElementById('regimeSelect');
-          unidadeSelect.innerHTML = '<option>Selecione o distrito...</option>';
-          unidadeSelect.value = '';
-          unidadeSelect.disabled = true;
-          turnoSelect.innerHTML = '<option>Selecione a unidade...</option>';
-          turnoSelect.value = '';
-          regimeSelect.innerHTML = '<option>Selecione a unidade...</option>';
-          regimeSelect.value = '';
-          turnoSelect.disabled = true;
-          regimeSelect.disabled = true;
+          syncChoicesOptions('unidadeSelect', [], 'Selecione o distrito...');
+          setChoiceDisabled('unidadeSelect', true);
+          syncChoicesOptions('turnoSelect', [], 'Selecione a unidade...');
+          setChoiceDisabled('turnoSelect', true);
+          syncChoicesOptions('regimeSelect', [], 'Selecione a unidade...');
+          setChoiceDisabled('regimeSelect', true);
           if (v) {
             await loadUnidades(v, 'unidadeSelect');
-            unidadeSelect.disabled = false;
           }
+          updateAddBtn();
         });
         document.getElementById('unidadeSelect').addEventListener('change', async (e) => {
           const unidade = e.target.value;
           const ds = document.getElementById('dsSelect').value;
-          const turnoSelect = document.getElementById('turnoSelect');
-          const regimeSelect = document.getElementById('regimeSelect');
-          turnoSelect.innerHTML = '<option>Carregando...</option>';
-          regimeSelect.innerHTML = '<option>Carregando...</option>';
+          syncChoicesOptions('turnoSelect', [], 'Selecione a unidade...');
+          syncChoicesOptions('regimeSelect', [], 'Selecione a unidade...');
           if (unidade && ds) {
             await loadTurnos(unidade, 'turnoSelect', ds);
             await loadRegimes(unidade, 'regimeSelect', ds);
           }
+          updateAddBtn();
         });
 
         document.getElementById('mDs').addEventListener('change', async (e) => {
           const v = e.target.value;
-          const turnoSelect = document.getElementById('mTurno');
-          const regimeSelect = document.getElementById('mRegime');
-          const unidadeModal = document.getElementById('mUnidade');
-          unidadeModal.innerHTML = '<option>Selecione o distrito...</option>';
-          unidadeModal.value = '';
-          unidadeModal.disabled = true;
-          turnoSelect.innerHTML = '<option>Selecione a unidade...</option>';
-          turnoSelect.value = '';
-          regimeSelect.innerHTML = '<option>Selecione a unidade...</option>';
-          regimeSelect.value = '';
-          turnoSelect.disabled = true;
-          regimeSelect.disabled = true;
+          syncChoicesOptions('mUnidade', [], 'Selecione o distrito...');
+          setChoiceDisabled('mUnidade', true);
+          syncChoicesOptions('mTurno', [], 'Selecione a unidade...');
+          setChoiceDisabled('mTurno', true);
+          syncChoicesOptions('mRegime', [], 'Selecione a unidade...');
+          setChoiceDisabled('mRegime', true);
           if (v) await loadUnidades(v, 'mUnidade');
         });
         document.getElementById('mUnidade').addEventListener('change', async (e) => {
           const unidade = e.target.value;
           const ds = document.getElementById('mDs').value;
-          const turnoSelect = document.getElementById('mTurno');
-          const regimeSelect = document.getElementById('mRegime');
-          turnoSelect.innerHTML = '<option>Carregando...</option>';
-          regimeSelect.innerHTML = '<option>Carregando...</option>';
+          syncChoicesOptions('mTurno', [], 'Selecione a unidade...');
+          syncChoicesOptions('mRegime', [], 'Selecione a unidade...');
           if (unidade && ds) {
             await loadTurnos(unidade, 'mTurno', ds);
             await loadRegimes(unidade, 'mRegime', ds);
@@ -1995,6 +2496,11 @@
         });
 
         document.getElementById('btnAddLinha').addEventListener('click', () => {
+          const missing = collectPreferencePrerequisiteErrors();
+          if (missing.length) {
+            openAlertModal(missing);
+            return;
+          }
           if (state.prefs.length < state.max) openModalUnidade('create');
         });
 
@@ -2013,6 +2519,7 @@
           const pref = buildPreferenceFromModal();
           if (!pref) return;
           state.prefs.push(pref);
+          renumberPriorities();
           closeModalUnidade();
           updateAddBtn();
           renderPrefs();
@@ -2023,22 +2530,33 @@
           if (!m) return;
           fillIdentificacaoFromVinculo(m);
           await loadPreferenciasByMatricula(m);
+          updateAddBtn();
         });
 
-        document.getElementById('btnEnviar').addEventListener('click', () => {
-          const validation = validateForm();
-          if (!validation.isValid) {
-            openAlertModal(validation.errors);
-            return;
-          }
-          const payload = collectPayload();
-          console.log('Payload formulário mobilidade:', payload);
-          openSuccessModal(payload);
-        });
+        document.getElementById('btnEnviar').addEventListener('click', enviarFormulario);
 
-        document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
+        document.getElementById('btnSalvarPDF').addEventListener('click', async () => {
+          await gerarPdfModal();
+          state.shouldShowEmailModal = true;
+          modalSucesso.hide();
+        });
         document.getElementById('btnImprimir').addEventListener('click', () => {
           preparePrintArea();
+          state.shouldShowEmailModal = true;
+          modalSucesso.hide();
+        });
+
+        document.querySelectorAll('#modalSucesso [data-bs-dismiss="modal"]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.shouldShowEmailModal = true;
+          });
+        });
+
+        document.getElementById('modalSucesso').addEventListener('hidden.bs.modal', () => {
+          if (state.shouldShowEmailModal) {
+            state.shouldShowEmailModal = false;
+            showEmailConfirmationModal();
+          }
         });
 
         window.addEventListener('afterprint', afterPrintCleanup);
@@ -2062,6 +2580,7 @@
       }
 
       function init() {
+        initSearchableSelects();
         populateMatriculas();
         populateEnderecoContato();
         const dc = BIND.dadosComuns || {};
@@ -2070,9 +2589,10 @@
         const numeroSolicitacao = safeValue(dc.recordId);
         if (numeroSolicitacao) state.protocolo = numeroSolicitacao;
         const solicitacaoEl = document.getElementById('numeroSolicitacaoDisplay');
-        if (solicitacaoEl) solicitacaoEl.textContent = numeroSolicitacao || '—';
+        if (solicitacaoEl) solicitacaoEl.textContent = numeroSolicitacao || '•';
         applyUppercaseBehaviour();
         applyNumericBehaviour();
+        bindPreferencePrerequisiteListeners();
         updateAddBtn();
         initEvents();
       }
