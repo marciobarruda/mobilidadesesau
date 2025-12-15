@@ -861,12 +861,12 @@
               class="modal-logo"
             />
             <div>
-              <div class="feedback-modal-title">Comprovante de solicitação</div>
-              <div class="feedback-modal-subtitle">Solicitação registrada em banco de dados para a matrícula <strong>{{$json["data"]["vinculos"][0]["matricula"]}}</strong></div>
+              <div class="feedback-modal-title">Pedidos próximos do vencimento</div>
+              <div class="feedback-modal-subtitle">Relação de pedidos com vencimento nos próximos 30 dias</div>
             </div>
           </div>
           <div class="modal-meta">
-            <span class="modal-meta-label">Número da Solicitação</span>
+            <span class="modal-meta-label">Solicitação original</span>
             <span class="modal-meta-value" id="modalNumeroSolicitacao">—</span>
           </div>
         </div>
@@ -1507,9 +1507,7 @@
           const matriculaFromHidden = sanitizeValue(matriculaHidden ? matriculaHidden.value : '');
           const matriculaFromTable = sanitizeValue(rawMatriculaFromTable);
           const matricula = matriculaFromTable || matriculaFromHidden;
-          const subtitleText = matricula
-            ? `Solicitação registrada em banco de dados para a matrícula ${matricula}`
-            : 'Solicitação registrada em banco de dados.';
+          const subtitleText = 'Relação de pedidos com vencimento nos próximos 30 dias';
           const nomeServidorHiddenEl = document.getElementById('servidorHidden');
           const nomeServidor = sanitizeValue(
             (nomeServidorHiddenEl && nomeServidorHiddenEl.value) || DATA.servidor || DATA.nome
@@ -1580,7 +1578,7 @@
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(10);
             doc.setTextColor(0, 74, 173);
-            doc.text('NÚMERO DA SOLICITAÇÃO', badgeX + 18, badgeY + 24);
+            doc.text('SOLICITAÇÃO ORIGINAL', badgeX + 18, badgeY + 24);
             doc.setFontSize(22);
             doc.setTextColor(17, 24, 39);
             doc.text(numero || '—', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
@@ -1595,7 +1593,7 @@
           doc.setFont('helvetica', 'bold');
           doc.setFontSize(20);
           doc.setTextColor(0, 74, 173);
-          doc.text('Comprovante de solicitação', contentX, currentY);
+          doc.text('Pedidos próximos do vencimento', contentX, currentY);
           currentY += 28;
 
           doc.setFont('helvetica', 'normal');
