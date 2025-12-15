@@ -861,12 +861,12 @@
               class="modal-logo"
             />
             <div>
-              <div class="feedback-modal-title">Pedidos próximos do vencimento</div>
-              <div class="feedback-modal-subtitle">Relação de pedidos com vencimento nos próximos 30 dias</div>
+              <div class="feedback-modal-title" id="modalTitle">Comprovante de solicitação</div>
+              <div class="feedback-modal-subtitle" id="modalSubtitle">Unidades selecionadas para a matrícula —</div>
             </div>
           </div>
           <div class="modal-meta">
-            <span class="modal-meta-label">Solicitação original</span>
+            <span class="modal-meta-label">Protocolo da solicitação</span>
             <span class="modal-meta-value" id="modalNumeroSolicitacao">—</span>
           </div>
         </div>
@@ -1308,11 +1308,26 @@
         const contexto = origem === 'renovacoes' ? 'renovacoes' : 'solicitacoes';
         const solicitacoesEndpoint = 'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/comprovante-sesau';
         const renovacoesEndpoint = 'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2';
+        const modalTitleEl = document.getElementById('modalTitle');
+        const modalSubtitleEl = document.getElementById('modalSubtitle');
+        const matriculaLimpa = sanitizeValue(matricula);
 
         window.__modalContext = contexto;
         window.__modalLastData = null;
         window.__modalMatricula = matricula;
         setModalActionsContext(contexto);
+        if (modalTitleEl) {
+          modalTitleEl.textContent =
+            contexto === 'solicitacoes'
+              ? 'Comprovante de solicitação'
+              : 'Pedidos próximos do vencimento';
+        }
+        if (modalSubtitleEl) {
+          modalSubtitleEl.textContent =
+            contexto === 'solicitacoes'
+              ? `Unidades selecionadas para a matrícula ${matriculaLimpa || '—'}`
+              : 'Relação de pedidos com vencimento nos próximos 30 dias';
+        }
         document.getElementById('modalNumeroSolicitacao').textContent = '—';
         modalBody.innerHTML = '<div class="text-muted">Carregando...</div>';
         backdrop.classList.add('active');
@@ -1539,7 +1554,11 @@
           const matriculaFromHidden = sanitizeValue(matriculaHidden ? matriculaHidden.value : '');
           const matriculaFromTable = sanitizeValue(rawMatriculaFromTable);
           const matricula = matriculaFromTable || matriculaFromHidden;
-          const subtitleText = 'Relação de pedidos com vencimento nos próximos 30 dias';
+          const isSolicitacoesContext = (window.__modalContext || 'solicitacoes') === 'solicitacoes';
+          const subtitleText = isSolicitacoesContext
+            ? `Unidades selecionadas para a matrícula ${matricula || '—'}`
+            : 'Relação de pedidos com vencimento nos próximos 30 dias';
+          const tituloDocumento = isSolicitacoesContext ? 'Comprovante de solicitação' : 'Pedidos próximos do vencimento';
           const nomeServidorHiddenEl = document.getElementById('servidorHidden');
           const nomeServidor = sanitizeValue(
             (nomeServidorHiddenEl && nomeServidorHiddenEl.value) || DATA.servidor || DATA.nome
@@ -1610,7 +1629,7 @@
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(10);
             doc.setTextColor(0, 74, 173);
-            doc.text('SOLICITAÇÃO ORIGINAL', badgeX + 18, badgeY + 24);
+            doc.text('PROTOCOLO DA SOLICITAÇÃO', badgeX + 18, badgeY + 24);
             doc.setFontSize(22);
             doc.setTextColor(17, 24, 39);
             doc.text(numero || '—', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
@@ -1625,7 +1644,7 @@
           doc.setFont('helvetica', 'bold');
           doc.setFontSize(20);
           doc.setTextColor(0, 74, 173);
-          doc.text('Pedidos próximos do vencimento', contentX, currentY);
+          doc.text(tituloDocumento, contentX, currentY);
           currentY += 28;
 
           doc.setFont('helvetica', 'normal');
