@@ -894,6 +894,20 @@
       </div>
     </div>
 
+    <div id="decisionRedirectModal" class="decision-redirect-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="decision-redirect-dialog" role="document">
+        <div class="decision-redirect-header">
+          <h2 id="decisionRedirectTitle" class="decision-redirect-title"></h2>
+          <button type="button" class="decision-redirect-close" aria-label="Fechar" id="decisionRedirectClose">&times;</button>
+        </div>
+        <p id="decisionRedirectMessage" class="decision-redirect-message"></p>
+        <p id="decisionRedirectCountdown" class="decision-redirect-countdown"></p>
+        <div class="decision-redirect-actions">
+          <button type="button" class="btn btn-primary" id="decisionRedirectNow">Ir agora</button>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"
@@ -1354,6 +1368,63 @@
         feedback.classList.toggle('text-muted', !msg);
       };
 
+      let redirectCountdownTimer = null;
+      let redirectInterval = null;
+      const REDIRECT_URL = 'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/portal-sesau-servidores';
+
+      const limparTemporizadoresRedirect = () => {
+        if (redirectCountdownTimer) {
+          clearTimeout(redirectCountdownTimer);
+          redirectCountdownTimer = null;
+        }
+        if (redirectInterval) {
+          clearInterval(redirectInterval);
+          redirectInterval = null;
+        }
+      };
+
+      const executarRedirecionamento = (imediato = false) => {
+        const modal = document.getElementById('decisionRedirectModal');
+        if (modal) modal.classList.remove('active');
+        modal?.setAttribute('aria-hidden', 'true');
+        limparTemporizadoresRedirect();
+        if (imediato) {
+          window.location.assign(REDIRECT_URL);
+          return;
+        }
+        window.location.href = REDIRECT_URL;
+      };
+
+      const abrirModalRedirecionamento = (acao) => {
+        const modal = document.getElementById('decisionRedirectModal');
+        const title = document.getElementById('decisionRedirectTitle');
+        const message = document.getElementById('decisionRedirectMessage');
+        const countdownEl = document.getElementById('decisionRedirectCountdown');
+
+        if (!modal || !title || !message || !countdownEl) return;
+
+        limparTemporizadoresRedirect();
+
+        const isRenovar = acao === 'renovar';
+        title.textContent = isRenovar ? 'Você optou por renovar seus pedidos.' : 'Você optou por não renovar os seus pedidos.';
+        message.textContent = isRenovar
+          ? 'Sua escolha será registrada e você será redirecionado para continuar o processo.'
+          : 'Esta escolha é irreversível. Você será redirecionado para finalizar.';
+
+        let remaining = 5;
+        countdownEl.textContent = `Redirecionando em ${remaining}s...`;
+
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+
+        redirectInterval = setInterval(() => {
+          remaining -= 1;
+          countdownEl.textContent = `Redirecionando em ${Math.max(remaining, 0)}s...`;
+        }, 1000);
+
+        redirectCountdownTimer = setTimeout(() => executarRedirecionamento(false), remaining * 1000);
+      };
+
       const enviarRenovacao = async (acao) => {
         const renovarBtn = document.getElementById('btnRenovarPedido');
         const naoRenovarBtn = document.getElementById('btnNaoRenovarPedido');
@@ -1392,6 +1463,8 @@
           });
           if (!response.ok) throw new Error('Erro ao registrar decisão');
           updateModalFeedback('Resposta registrada com sucesso.', false);
+
+          abrirModalRedirecionamento(acao);
         } catch (error) {
           console.error('Erro ao enviar decisão de renovação:', error);
           updateModalFeedback('Não foi possível registrar sua resposta. Tente novamente.', true);
@@ -1910,6 +1983,8 @@
       document.getElementById('btnNaoRenovarPedido').addEventListener('click', () => enviarRenovacao('nao_renovar'));
       document.getElementById('btnImprimir').addEventListener('click', () => window.print());
       document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
+      document.getElementById('decisionRedirectClose').addEventListener('click', () => executarRedirecionamento(true));
+      document.getElementById('decisionRedirectNow').addEventListener('click', () => executarRedirecionamento(true));
       document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
       document.getElementById('formFeedbackClose').addEventListener('click', closeFormFeedback);
       document.getElementById('formFeedback').addEventListener('click', (e) => {
@@ -2006,11 +2081,92 @@
     </div>
 
     <style>
+      .decision-redirect-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(31, 41, 55, 0.75);
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+        z-index: 12000;
+        padding: 1rem;
+      }
+
+      .decision-redirect-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .decision-redirect-dialog {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        max-width: 480px;
+        width: min(90vw, 480px);
+        box-shadow: 0 24px 64px rgba(15, 37, 78, 0.25);
+        border: 1px solid rgba(0, 74, 173, 0.08);
+      }
+
+      .decision-redirect-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .decision-redirect-title {
+        margin: 0;
+        font-size: 1.1rem;
+        color: var(--brand-secondary);
+        font-weight: 700;
+      }
+
+      .decision-redirect-message {
+        margin: 0 0 0.75rem;
+        color: var(--text-strong);
+      }
+
+      .decision-redirect-countdown {
+        margin: 0 0 1rem;
+        color: var(--brand-primary);
+        font-weight: 600;
+      }
+
+      .decision-redirect-close {
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s ease;
+      }
+
+      .decision-redirect-close:hover {
+        background-color: rgba(0, 74, 173, 0.08);
+      }
+
+      .decision-redirect-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+      }
+
       /* Layout geral do widget SUSi */
       .susi-chat-root {
         position: relative;
         z-index: 11000;
         --susi-chat-toggle-height: 176px;
+        isolation: isolate;
       }
 
       .susi-chat-toggle {
@@ -2022,7 +2178,7 @@
         padding: 0;
         border: none;
         border-radius: 0;
-        background: transparent;
+        background: transparent !important;
         box-shadow: none;
         display: inline-flex;
         align-items: flex-end;
@@ -2047,10 +2203,11 @@
         object-fit: contain;
         object-position: bottom center;
         display: block;
-        background: transparent;
+        background: transparent !important;
         border-radius: 0;
         box-shadow: none;
         filter: none;
+        mix-blend-mode: multiply;
       }
 
       .susi-chat-modal {
