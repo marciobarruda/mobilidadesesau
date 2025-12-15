@@ -1306,6 +1306,9 @@
         const backdrop = document.getElementById('modalBackdrop');
         const modalBody = document.getElementById('modalBody');
         const contexto = origem === 'renovacoes' ? 'renovacoes' : 'solicitacoes';
+        const solicitacoesEndpoint = 'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/comprovante-sesau';
+        const renovacoesEndpoint = 'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2';
+
         window.__modalContext = contexto;
         window.__modalLastData = null;
         window.__modalMatricula = matricula;
@@ -1314,26 +1317,55 @@
         modalBody.innerHTML = '<div class="text-muted">Carregando...</div>';
         backdrop.classList.add('active');
         backdrop.setAttribute('aria-hidden', 'false');
+
+        const normalizeList = (response) => {
+          if (Array.isArray(response)) return response;
+          if (response && Array.isArray(response.data)) return response.data;
+          if (response && Array.isArray(response.solicitacoes)) return response.solicitacoes;
+          if (response && Array.isArray(response.pedidos)) return response.pedidos;
+          return [];
+        };
+
+        const endpoint = contexto === 'renovacoes' ? renovacoesEndpoint : solicitacoesEndpoint;
+
         try {
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2', { matricula });
-          if (!Array.isArray(data) || data.length === 0) {
+          const data = await postJSON(endpoint, { matricula });
+          const lista = normalizeList(data);
+          if (!Array.isArray(lista) || lista.length === 0) {
             modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
             return;
           }
-          const numeroSolicitacao = data[0]?.protocolo || '';
+
+          const numeroSolicitacao = sanitizeValue(
+            data?.protocolo || lista[0]?.protocolo || lista[0]?.numero_solicitacao || lista[0]?.numeroSolicitacao || ''
+          );
           document.getElementById('modalNumeroSolicitacao').textContent = numeroSolicitacao || '—';
-          window.__modalLastData = data;
-          const rows = data.map((it) => `
-            <tr>
-              <td class="text-center fw-semibold">${it.prioridade ?? ''}</td>
-              <td>${it.matricula || ''}</td>
-              <td>${it.cargo || ''}</td>
-              <td>${it.distrito || ''}</td>
-              <td>${it.lotacao || ''}</td>
-              <td>${toBRDate(it.data_credenciamento)}</td>
-              <td>${toBRDate(it.data_solicitacao)}</td>
-            </tr>
-          `).join('');
+          window.__modalLastData = lista;
+
+          const prefer = (obj, keys = []) => keys.map((k) => obj?.[k]).find((val) => val !== undefined && val !== null && val !== '');
+          const rows = lista
+            .map((it) => {
+              const prioridade = prefer(it, ['prioridade', 'prioridade_atual', 'prioridadeAtual']);
+              const matriculaValue = prefer(it, ['matricula', 'Matricula']);
+              const cargo = prefer(it, ['cargo', 'Cargo']);
+              const distrito = prefer(it, ['distrito', 'ds', 'Distrito']);
+              const lotacao = prefer(it, ['lotacao', 'lotação', 'Lotacao']);
+              const cred = prefer(it, ['data_credenciamento', 'credenciamento', 'dataCredenciamento']);
+              const solic = prefer(it, ['data_solicitacao', 'dataSolicitacao', 'solicitacao']);
+              return `
+                <tr>
+                  <td class="text-center fw-semibold">${prioridade ?? ''}</td>
+                  <td>${matriculaValue || ''}</td>
+                  <td>${cargo || ''}</td>
+                  <td>${distrito || ''}</td>
+                  <td>${lotacao || ''}</td>
+                  <td>${toBRDate(cred)}</td>
+                  <td>${toBRDate(solic)}</td>
+                </tr>
+              `;
+            })
+            .join('');
+
           modalBody.innerHTML = `
             <div class="table-responsive modal-table-wrapper">
               <table class="table table-sm table-hover align-middle">
