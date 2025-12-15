@@ -957,11 +957,30 @@
         el.classList.add('is-valid');
       };
 
+      const SUCCESS_COUNTDOWN_SECONDS = 10;
+      let formFeedbackIntervalId = null;
+      let lastFeedbackType = null;
+
+      const stopFormFeedbackCountdown = () => {
+        if (formFeedbackIntervalId) {
+          clearInterval(formFeedbackIntervalId);
+          formFeedbackIntervalId = null;
+        }
+      };
+
+      const collapseCadastroForm = () => {
+        const details = document.querySelector('details.collapsible-form');
+        if (details) details.open = false;
+      };
+
       const closeFormFeedback = () => {
+        stopFormFeedbackCountdown();
         const overlay = document.getElementById('formFeedback');
         if (!overlay) return;
         overlay.classList.remove('active');
         overlay.setAttribute('aria-hidden', 'true');
+        if (lastFeedbackType === 'success') collapseCadastroForm();
+        lastFeedbackType = null;
       };
 
       const showFormFeedbackPopup = (type, details = {}) => {
@@ -973,6 +992,8 @@
         if (!overlay || !titleEl || !bodyEl) return;
         overlay.classList.add('active');
         overlay.setAttribute('aria-hidden', 'false');
+        stopFormFeedbackCountdown();
+        lastFeedbackType = type;
 
         titleEl.classList.remove('alert', 'success');
         if (type === 'error') {
@@ -1000,10 +1021,21 @@
         } else {
           titleEl.classList.add('success');
           titleEl.textContent = '✅ Sucesso';
+          const countdownId = 'formSuccessCountdown';
           bodyEl.innerHTML = `
             <div>Os dados de atualização foram enviados com sucesso.</div>
             <div>Este registro não configura um pedido de mobilidade: trata-se exclusivamente de uma atualização cadastral.</div>
+            <div class="mt-2">Fechando em <strong><span id="${countdownId}">${SUCCESS_COUNTDOWN_SECONDS}</span>s</strong>...</div>
           `;
+          let remaining = SUCCESS_COUNTDOWN_SECONDS;
+          formFeedbackIntervalId = setInterval(() => {
+            remaining -= 1;
+            const countdownEl = document.getElementById(countdownId);
+            if (countdownEl) countdownEl.textContent = remaining;
+            if (remaining <= 0) {
+              closeFormFeedback();
+            }
+          }, 1000);
         }
 
         const closeBtn = document.getElementById('formFeedbackClose');
@@ -1260,6 +1292,9 @@
         const backdrop = document.getElementById('modalBackdrop');
         const modalBody = document.getElementById('modalBody');
         const contexto = origem === 'renovacoes' ? 'renovacoes' : 'solicitacoes';
+        window.__modalContext = contexto;
+        window.__modalLastData = null;
+        window.__modalMatricula = matricula;
         setModalActionsContext(contexto);
         document.getElementById('modalNumeroSolicitacao').textContent = '—';
         modalBody.innerHTML = '<div class="text-muted">Carregando...</div>';
@@ -1273,6 +1308,7 @@
           }
           const numeroSolicitacao = data[0]?.protocolo || '';
           document.getElementById('modalNumeroSolicitacao').textContent = numeroSolicitacao || '—';
+          window.__modalLastData = data;
           const rows = data.map((it) => `
             <tr>
               <td class="text-center fw-semibold">${it.prioridade ?? ''}</td>
@@ -1301,12 +1337,68 @@
                 <tbody>${rows}</tbody>
               </table>
             </div>
+            <div id="modalFeedback" class="small mt-3 text-muted"></div>
           `;
         } catch (e) {
           document.getElementById('modalNumeroSolicitacao').textContent = '—';
           modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
         }
       }
+
+      const updateModalFeedback = (msg, isError = false) => {
+        const feedback = document.getElementById('modalFeedback');
+        if (!feedback) return;
+        feedback.textContent = msg || '';
+        feedback.classList.toggle('text-danger', !!isError);
+        feedback.classList.toggle('text-success', !isError && !!msg);
+        feedback.classList.toggle('text-muted', !msg);
+      };
+
+      const enviarRenovacao = async (acao) => {
+        const renovarBtn = document.getElementById('btnRenovarPedido');
+        const naoRenovarBtn = document.getElementById('btnNaoRenovarPedido');
+        const buttons = [renovarBtn, naoRenovarBtn];
+        const toggleButtons = (disabled, label) => {
+          buttons.forEach((btn) => {
+            if (!btn) return;
+            if (label && disabled) {
+              btn.dataset.originalText = btn.textContent;
+              btn.textContent = label;
+            }
+            if (!disabled && btn.dataset.originalText) {
+              btn.textContent = btn.dataset.originalText;
+              delete btn.dataset.originalText;
+            }
+            btn.disabled = disabled;
+          });
+        };
+
+        const payload = {
+          acao,
+          contexto: window.__modalContext || 'solicitacoes',
+          matricula: window.__modalMatricula || null,
+          protocolo: document.getElementById('modalNumeroSolicitacao')?.textContent || null,
+          solicitacoes: window.__modalLastData || [],
+        };
+
+        updateModalFeedback('Enviando sua resposta...', false);
+        toggleButtons(true, 'Enviando...');
+
+        try {
+          const response = await fetch('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/renovacao-mobilidade-sesau', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!response.ok) throw new Error('Erro ao registrar decisão');
+          updateModalFeedback('Resposta registrada com sucesso.', false);
+        } catch (error) {
+          console.error('Erro ao enviar decisão de renovação:', error);
+          updateModalFeedback('Não foi possível registrar sua resposta. Tente novamente.', true);
+        } finally {
+          toggleButtons(false);
+        }
+      };
 
       async function gerarPdfModal() {
         const triggerButton = document.getElementById('btnSalvarPDF');
@@ -1814,6 +1906,8 @@
 
       document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
       document.getElementById('btnFecharRenovacao').addEventListener('click', fecharModal);
+      document.getElementById('btnRenovarPedido').addEventListener('click', () => enviarRenovacao('renovar'));
+      document.getElementById('btnNaoRenovarPedido').addEventListener('click', () => enviarRenovacao('nao_renovar'));
       document.getElementById('btnImprimir').addEventListener('click', () => window.print());
       document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
       document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
