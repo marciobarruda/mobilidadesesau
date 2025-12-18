@@ -1370,10 +1370,8 @@
               const solic = prefer(it, ['data_solicitacao', 'dataSolicitacao', 'solicitacao']);
               return `
                 <tr>
-                  <td class="text-center fw-semibold">
-                    ${prioridade ?? ''}
-                    ${classificacao ? `<div class="small text-muted fw-semibold mb-0">Class ${classificacao}</div>` : ''}
-                  </td>
+                  <td class="text-center fw-semibold">${prioridade ?? ''}</td>
+                  <td class="text-center fw-semibold">${classificacao ?? ''}</td>
                   <td>${matriculaValue || ''}</td>
                   <td>${cargo || ''}</td>
                   <td>${distrito || ''}</td>
@@ -1390,7 +1388,8 @@
               <table class="table table-sm table-hover align-middle">
                 <thead>
                   <tr>
-                    <th class="text-center">Prioridade / Class</th>
+                    <th class="text-center">Prioridade</th>
+                    <th class="text-center">Class</th>
                     <th>Matrícula</th>
                     <th>Cargo</th>
                     <th>Distrito</th>
@@ -1710,7 +1709,7 @@
             const columnStyles = {};
             pdfHeaders.forEach((header, index) => {
               const key = header.toLowerCase();
-              if (key.includes('prioridade') || key.includes('class')) {
+              if (key.includes('prioridade') || key === 'class') {
                 columnStyles[index] = { halign: 'center', cellWidth: 55 };
               } else if (key.includes('distrito')) {
                 columnStyles[index] = { cellWidth: 90 };
