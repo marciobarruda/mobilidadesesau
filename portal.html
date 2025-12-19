@@ -1358,7 +1358,16 @@
           window.__modalLastData = lista;
 
           const prefer = (obj, keys = []) => keys.map((k) => obj?.[k]).find((val) => val !== undefined && val !== null && val !== '');
-          const rows = lista
+          const parsePrioridade = (value) => {
+            const num = Number(value);
+            return Number.isFinite(num) ? num : Infinity;
+          };
+          const orderedLista = [...lista].sort(
+            (a, b) => parsePrioridade(prefer(a, ['prioridade', 'prioridade_atual', 'prioridadeAtual'])) -
+              parsePrioridade(prefer(b, ['prioridade', 'prioridade_atual', 'prioridadeAtual']))
+          );
+
+          const rows = orderedLista
             .map((it) => {
               const prioridade = prefer(it, ['prioridade', 'prioridade_atual', 'prioridadeAtual']);
               const classificacao = prefer(it, ['classificacao', 'classificacao_atual', 'classificacaoAtual', 'class']);
