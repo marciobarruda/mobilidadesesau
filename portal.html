@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SESAU Secretaria de Saúde do Recife</title>
+    <title>Portal do Servidor • SESAU</title>
     <link
       rel="icon"
       href="https://statics.recife.pe.gov.br/images/dynamics/conecta/icons/favicon.png?w=32&h=32&fit=fill&border=2,transparent,shrink"
@@ -589,7 +589,7 @@
     </header>
 
     <main class="container py-4">
-      <div class="user-greeting" id="saudacao">Olá, <strong>{{$json["data"]["dadosComuns"]["nome"]}}!</strong> Este é o seu painel de mobilidade interna.</div>
+      <div class="user-greeting" id="saudacao">Olá, <strong>{{$json["data"]["dadosComuns"]["nome"]}}!</strong> Este é o seu portal do servidor.</div>
 
       <div class="row g-4" id="heroCardsRow">
         <!-- Card 1: Mobilidade Interna -->
@@ -607,7 +607,7 @@
               <div class="card-actions">
                 <form
                   id="novaSolicitacaoForm"
-                  action="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2"
+                  action="https://n8n.homolog.app.emprel.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2"
                   method="post"
                   target="_blank"
                   class="d-inline"
@@ -861,12 +861,12 @@
               class="modal-logo"
             />
             <div>
-              <div class="feedback-modal-title">Comprovante de solicitação</div>
-              <div class="feedback-modal-subtitle">Solicitação registrada em banco de dados para a matrícula <strong>{{$json["data"]["vinculos"][0]["matricula"]}}</strong></div>
+              <div class="feedback-modal-title" id="modalTitle">Comprovante de solicitação</div>
+              <div class="feedback-modal-subtitle" id="modalSubtitle">Unidades selecionadas para a matrícula —</div>
             </div>
           </div>
           <div class="modal-meta">
-            <span class="modal-meta-label">Número da Solicitação</span>
+            <span class="modal-meta-label">Protocolo da solicitação</span>
             <span class="modal-meta-value" id="modalNumeroSolicitacao">—</span>
           </div>
         </div>
@@ -891,6 +891,20 @@
         <button type="button" class="form-feedback-close" id="formFeedbackClose" aria-label="Fechar aviso">×</button>
         <div id="formFeedbackTitle" class="form-feedback-title"></div>
         <div id="formFeedbackBody" class="form-feedback-body"></div>
+      </div>
+    </div>
+
+    <div id="decisionRedirectModal" class="decision-redirect-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="decision-redirect-dialog" role="document">
+        <div class="decision-redirect-header">
+          <h2 id="decisionRedirectTitle" class="decision-redirect-title"></h2>
+          <button type="button" class="decision-redirect-close" aria-label="Fechar" id="decisionRedirectClose">&times;</button>
+        </div>
+        <p id="decisionRedirectMessage" class="decision-redirect-message"></p>
+        <p id="decisionRedirectCountdown" class="decision-redirect-countdown"></p>
+        <div class="decision-redirect-actions">
+          <button type="button" class="btn btn-primary" id="decisionRedirectNow">Fechar agora</button>
+        </div>
       </div>
     </div>
 
@@ -957,11 +971,30 @@
         el.classList.add('is-valid');
       };
 
+      const SUCCESS_COUNTDOWN_SECONDS = 10;
+      let formFeedbackIntervalId = null;
+      let lastFeedbackType = null;
+
+      const stopFormFeedbackCountdown = () => {
+        if (formFeedbackIntervalId) {
+          clearInterval(formFeedbackIntervalId);
+          formFeedbackIntervalId = null;
+        }
+      };
+
+      const collapseCadastroForm = () => {
+        const details = document.querySelector('details.collapsible-form');
+        if (details) details.open = false;
+      };
+
       const closeFormFeedback = () => {
+        stopFormFeedbackCountdown();
         const overlay = document.getElementById('formFeedback');
         if (!overlay) return;
         overlay.classList.remove('active');
         overlay.setAttribute('aria-hidden', 'true');
+        if (lastFeedbackType === 'success') collapseCadastroForm();
+        lastFeedbackType = null;
       };
 
       const showFormFeedbackPopup = (type, details = {}) => {
@@ -973,6 +1006,8 @@
         if (!overlay || !titleEl || !bodyEl) return;
         overlay.classList.add('active');
         overlay.setAttribute('aria-hidden', 'false');
+        stopFormFeedbackCountdown();
+        lastFeedbackType = type;
 
         titleEl.classList.remove('alert', 'success');
         if (type === 'error') {
@@ -1000,10 +1035,21 @@
         } else {
           titleEl.classList.add('success');
           titleEl.textContent = '✅ Sucesso';
+          const countdownId = 'formSuccessCountdown';
           bodyEl.innerHTML = `
             <div>Os dados de atualização foram enviados com sucesso.</div>
             <div>Este registro não configura um pedido de mobilidade: trata-se exclusivamente de uma atualização cadastral.</div>
+            <div class="mt-2">Fechando em <strong><span id="${countdownId}">${SUCCESS_COUNTDOWN_SECONDS}</span>s</strong>...</div>
           `;
+          let remaining = SUCCESS_COUNTDOWN_SECONDS;
+          formFeedbackIntervalId = setInterval(() => {
+            remaining -= 1;
+            const countdownEl = document.getElementById(countdownId);
+            if (countdownEl) countdownEl.textContent = remaining;
+            if (remaining <= 0) {
+              closeFormFeedback();
+            }
+          }, 1000);
         }
 
         const closeBtn = document.getElementById('formFeedbackClose');
@@ -1260,36 +1306,99 @@
         const backdrop = document.getElementById('modalBackdrop');
         const modalBody = document.getElementById('modalBody');
         const contexto = origem === 'renovacoes' ? 'renovacoes' : 'solicitacoes';
+        const solicitacoesEndpoint = 'https://n8n.homolog.app.emprel.gov.br/webhook/comprovante-sesau';
+        const renovacoesEndpoint = 'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2';
+        const modalTitleEl = document.getElementById('modalTitle');
+        const modalSubtitleEl = document.getElementById('modalSubtitle');
+        const matriculaLimpa = sanitizeValue(matricula);
+
+        window.__modalContext = contexto;
+        window.__modalLastData = null;
+        window.__modalMatricula = matricula;
         setModalActionsContext(contexto);
+        if (modalTitleEl) {
+          modalTitleEl.textContent =
+            contexto === 'solicitacoes'
+              ? 'Comprovante de solicitação'
+              : 'Pedidos próximos do vencimento';
+        }
+        if (modalSubtitleEl) {
+          modalSubtitleEl.textContent =
+            contexto === 'solicitacoes'
+              ? `Unidades selecionadas para a matrícula ${matriculaLimpa || '—'}`
+              : 'Relação de pedidos com vencimento nos próximos 30 dias';
+        }
         document.getElementById('modalNumeroSolicitacao').textContent = '—';
         modalBody.innerHTML = '<div class="text-muted">Carregando...</div>';
         backdrop.classList.add('active');
         backdrop.setAttribute('aria-hidden', 'false');
+
+        const normalizeList = (response) => {
+          if (Array.isArray(response)) return response;
+          if (response && Array.isArray(response.data)) return response.data;
+          if (response && Array.isArray(response.solicitacoes)) return response.solicitacoes;
+          if (response && Array.isArray(response.pedidos)) return response.pedidos;
+          return [];
+        };
+
+        const endpoint = contexto === 'renovacoes' ? renovacoesEndpoint : solicitacoesEndpoint;
+
         try {
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2', { matricula });
-          if (!Array.isArray(data) || data.length === 0) {
+          const data = await postJSON(endpoint, { matricula });
+          const lista = normalizeList(data);
+          if (!Array.isArray(lista) || lista.length === 0) {
             modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
             return;
           }
-          const numeroSolicitacao = data[0]?.protocolo || '';
+
+          const numeroSolicitacao = sanitizeValue(
+            data?.protocolo || lista[0]?.protocolo || lista[0]?.numero_solicitacao || lista[0]?.numeroSolicitacao || ''
+          );
           document.getElementById('modalNumeroSolicitacao').textContent = numeroSolicitacao || '—';
-          const rows = data.map((it) => `
-            <tr>
-              <td class="text-center fw-semibold">${it.prioridade ?? ''}</td>
-              <td>${it.matricula || ''}</td>
-              <td>${it.cargo || ''}</td>
-              <td>${it.distrito || ''}</td>
-              <td>${it.lotacao || ''}</td>
-              <td>${toBRDate(it.data_credenciamento)}</td>
-              <td>${toBRDate(it.data_solicitacao)}</td>
-            </tr>
-          `).join('');
+          window.__modalLastData = lista;
+
+          const prefer = (obj, keys = []) => keys.map((k) => obj?.[k]).find((val) => val !== undefined && val !== null && val !== '');
+          const parsePrioridade = (value) => {
+            const num = Number(value);
+            return Number.isFinite(num) ? num : Infinity;
+          };
+          const orderedLista = [...lista].sort(
+            (a, b) => parsePrioridade(prefer(a, ['prioridade', 'prioridade_atual', 'prioridadeAtual'])) -
+              parsePrioridade(prefer(b, ['prioridade', 'prioridade_atual', 'prioridadeAtual']))
+          );
+
+          const rows = orderedLista
+            .map((it) => {
+              const prioridade = prefer(it, ['prioridade', 'prioridade_atual', 'prioridadeAtual']);
+              const classificacao = prefer(it, ['classificacao', 'classificacao_atual', 'classificacaoAtual', 'class']);
+              const matriculaValue = prefer(it, ['matricula', 'Matricula']);
+              const cargo = prefer(it, ['cargo', 'Cargo']);
+              const distrito = prefer(it, ['distrito', 'ds', 'Distrito']);
+              const lotacao = prefer(it, ['lotacao', 'lotação', 'Lotacao']);
+              const cred = prefer(it, ['data_credenciamento', 'credenciamento', 'dataCredenciamento']);
+              const solic = prefer(it, ['data_solicitacao', 'dataSolicitacao', 'solicitacao']);
+              return `
+                <tr>
+                  <td class="text-center fw-semibold">${prioridade ?? ''}</td>
+                  <td class="text-center fw-semibold">${classificacao ?? ''}</td>
+                  <td>${matriculaValue || ''}</td>
+                  <td>${cargo || ''}</td>
+                  <td>${distrito || ''}</td>
+                  <td>${lotacao || ''}</td>
+                  <td>${toBRDate(cred)}</td>
+                  <td>${toBRDate(solic)}</td>
+                </tr>
+              `;
+            })
+            .join('');
+
           modalBody.innerHTML = `
             <div class="table-responsive modal-table-wrapper">
               <table class="table table-sm table-hover align-middle">
                 <thead>
                   <tr>
                     <th class="text-center">Prioridade</th>
+                    <th class="text-center">Class</th>
                     <th>Matrícula</th>
                     <th>Cargo</th>
                     <th>Distrito</th>
@@ -1301,12 +1410,121 @@
                 <tbody>${rows}</tbody>
               </table>
             </div>
+            <div id="modalFeedback" class="small mt-3 text-muted"></div>
           `;
         } catch (e) {
           document.getElementById('modalNumeroSolicitacao').textContent = '—';
           modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
         }
       }
+
+      const updateModalFeedback = (msg, isError = false) => {
+        const feedback = document.getElementById('modalFeedback');
+        if (!feedback) return;
+        feedback.textContent = msg || '';
+        feedback.classList.toggle('text-danger', !!isError);
+        feedback.classList.toggle('text-success', !isError && !!msg);
+        feedback.classList.toggle('text-muted', !msg);
+      };
+
+      let redirectCountdownTimer = null;
+      let redirectInterval = null;
+      const limparTemporizadoresRedirect = () => {
+        if (redirectCountdownTimer) {
+          clearTimeout(redirectCountdownTimer);
+          redirectCountdownTimer = null;
+        }
+        if (redirectInterval) {
+          clearInterval(redirectInterval);
+          redirectInterval = null;
+        }
+      };
+
+      const executarFechamentoFluxo = () => {
+        const modal = document.getElementById('decisionRedirectModal');
+        if (modal) modal.classList.remove('active');
+        modal?.setAttribute('aria-hidden', 'true');
+        limparTemporizadoresRedirect();
+        fecharModal();
+      };
+
+      const abrirModalRedirecionamento = (acao) => {
+        const modal = document.getElementById('decisionRedirectModal');
+        const title = document.getElementById('decisionRedirectTitle');
+        const message = document.getElementById('decisionRedirectMessage');
+        const countdownEl = document.getElementById('decisionRedirectCountdown');
+
+        if (!modal || !title || !message || !countdownEl) return;
+
+        limparTemporizadoresRedirect();
+
+        const isRenovar = acao === 'renovar';
+        title.textContent = isRenovar ? 'Você optou por renovar seus pedidos.' : 'Você optou por não renovar os seus pedidos.';
+        message.textContent = isRenovar
+          ? 'Sua escolha foi registrada. Este aviso será fechado automaticamente.'
+          : 'Esta escolha é irreversível. Este aviso será fechado automaticamente.';
+
+        let remaining = 5;
+        countdownEl.textContent = `Fechando em ${remaining}s...`;
+
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+
+        redirectInterval = setInterval(() => {
+          remaining -= 1;
+          countdownEl.textContent = `Fechando em ${Math.max(remaining, 0)}s...`;
+        }, 1000);
+
+        redirectCountdownTimer = setTimeout(executarFechamentoFluxo, remaining * 1000);
+      };
+
+      const enviarRenovacao = async (acao) => {
+        const renovarBtn = document.getElementById('btnRenovarPedido');
+        const naoRenovarBtn = document.getElementById('btnNaoRenovarPedido');
+        const buttons = [renovarBtn, naoRenovarBtn];
+        const toggleButtons = (disabled, label) => {
+          buttons.forEach((btn) => {
+            if (!btn) return;
+            if (label && disabled) {
+              btn.dataset.originalText = btn.textContent;
+              btn.textContent = label;
+            }
+            if (!disabled && btn.dataset.originalText) {
+              btn.textContent = btn.dataset.originalText;
+              delete btn.dataset.originalText;
+            }
+            btn.disabled = disabled;
+          });
+        };
+
+        const payload = {
+          acao,
+          contexto: window.__modalContext || 'solicitacoes',
+          matricula: window.__modalMatricula || null,
+          protocolo: document.getElementById('modalNumeroSolicitacao')?.textContent || null,
+          solicitacoes: window.__modalLastData || [],
+        };
+
+        updateModalFeedback('Enviando sua resposta...', false);
+        toggleButtons(true, 'Enviando...');
+
+        try {
+          const response = await fetch('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/renovacao-mobilidade-sesau', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!response.ok) throw new Error('Erro ao registrar decisão');
+          updateModalFeedback('Resposta registrada com sucesso.', false);
+
+          abrirModalRedirecionamento(acao);
+        } catch (error) {
+          console.error('Erro ao enviar decisão de renovação:', error);
+          updateModalFeedback('Não foi possível registrar sua resposta. Tente novamente.', true);
+        } finally {
+          toggleButtons(false);
+        }
+      };
 
       async function gerarPdfModal() {
         const triggerButton = document.getElementById('btnSalvarPDF');
@@ -1348,9 +1566,11 @@
           const matriculaFromHidden = sanitizeValue(matriculaHidden ? matriculaHidden.value : '');
           const matriculaFromTable = sanitizeValue(rawMatriculaFromTable);
           const matricula = matriculaFromTable || matriculaFromHidden;
-          const subtitleText = matricula
-            ? `Solicitação registrada em banco de dados para a matrícula ${matricula}`
-            : 'Solicitação registrada em banco de dados.';
+          const isSolicitacoesContext = (window.__modalContext || 'solicitacoes') === 'solicitacoes';
+          const subtitleText = isSolicitacoesContext
+            ? `Unidades selecionadas para a matrícula ${matricula || '—'}`
+            : 'Relação de pedidos com vencimento nos próximos 30 dias';
+          const tituloDocumento = isSolicitacoesContext ? 'Comprovante de solicitação' : 'Pedidos próximos do vencimento';
           const nomeServidorHiddenEl = document.getElementById('servidorHidden');
           const nomeServidor = sanitizeValue(
             (nomeServidorHiddenEl && nomeServidorHiddenEl.value) || DATA.servidor || DATA.nome
@@ -1421,7 +1641,7 @@
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(10);
             doc.setTextColor(0, 74, 173);
-            doc.text('NÚMERO DA SOLICITAÇÃO', badgeX + 18, badgeY + 24);
+            doc.text('PROTOCOLO DA SOLICITAÇÃO', badgeX + 18, badgeY + 24);
             doc.setFontSize(22);
             doc.setTextColor(17, 24, 39);
             doc.text(numero || '—', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
@@ -1436,7 +1656,7 @@
           doc.setFont('helvetica', 'bold');
           doc.setFontSize(20);
           doc.setTextColor(0, 74, 173);
-          doc.text('Comprovante de solicitação', contentX, currentY);
+          doc.text(tituloDocumento, contentX, currentY);
           currentY += 28;
 
           doc.setFont('helvetica', 'normal');
@@ -1498,7 +1718,7 @@
             const columnStyles = {};
             pdfHeaders.forEach((header, index) => {
               const key = header.toLowerCase();
-              if (key.includes('prioridade')) {
+              if (key.includes('prioridade') || key === 'class') {
                 columnStyles[index] = { halign: 'center', cellWidth: 55 };
               } else if (key.includes('distrito')) {
                 columnStyles[index] = { cellWidth: 90 };
@@ -1650,7 +1870,7 @@
           const emailVal = sanitizeValue(emailEl.value);
           emailEl.value = emailVal;
           if (emailVal && !isEmail(emailVal)) {
-            invalid.push('E-mail (formato inválido)');
+            invalid.push('E-mail (ex.: servidor@recife.pe.gov.br)');
             markInvalid(emailEl);
           } else if (emailVal) {
             markValid(emailEl);
@@ -1663,10 +1883,10 @@
           const normalized = normalizeWhats(trimmed);
           whatsappEl.value = normalized;
           if (trimmed && !normalized) {
-            invalid.push('WhatsApp (utilize apenas números)');
+            invalid.push('WhatsApp (somente números, ex.: 81999999999)');
             markInvalid(whatsappEl);
           } else if (normalized && !isWhats(normalized)) {
-            invalid.push('WhatsApp (informe 11 dígitos numéricos)');
+            invalid.push('WhatsApp (11 dígitos numéricos, ex.: 81999999999)');
             markInvalid(whatsappEl);
           } else if (normalized) {
             markValid(whatsappEl);
@@ -1675,7 +1895,7 @@
 
         const cepEl = document.getElementById('cep');
         if (cepEl && sanitizeValue(cepEl.value) && !isCEP(cepEl.value)) {
-          invalid.push('CEP (formato inválido)');
+          invalid.push('CEP (use 00000-000 ou somente números, ex.: 50000999)');
           markInvalid(cepEl);
         }
 
@@ -1683,7 +1903,7 @@
         if (ufEl) {
           ufEl.value = sanitizeUF(ufEl.value);
           if (sanitizeValue(ufEl.value) && !isUF(ufEl.value)) {
-            invalid.push('UF (utilize duas letras)');
+            invalid.push('UF (2 letras, ex.: PE)');
             markInvalid(ufEl);
           }
         }
@@ -1732,7 +1952,7 @@
         }
       });
 
-      document.getElementById('form-cadastro').addEventListener('submit', (e) => {
+      document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
         e.preventDefault();
         const validation = validarFormulario();
         if (!validation.ok) {
@@ -1740,30 +1960,52 @@
           showFormFeedbackPopup('error', validation);
           return;
         }
-        const grupoAtual = sanitizeValue(document.getElementById('grupoHidden')?.value || '');
+
+        const numeroRaw = sanitizeValue(document.getElementById('numero')?.value || '');
+        const numeroParsed = numeroRaw ? Number(numeroRaw.replace(/\D+/g, '')) : null;
+        const telefoneAlternativo = sanitizeValue(document.getElementById('telefonealternativo')?.value || '');
+        const cepValor = sanitizeValue(document.getElementById('cep')?.value || '');
+        const cepNumeros = cepValor.replace(/\D+/g, '');
+        const cidadeValor = sanitizeValue(document.getElementById('cidade')?.value || '');
+        const bairroValor = sanitizeValue(document.getElementById('bairro')?.value || '');
         const payload = {
-          matricula: document.getElementById('matriculaSelect').value || null,
-          email: (sanitizeValue(document.getElementById('email')?.value || '').toLowerCase()) || null,
-          whatsapp: normalizeWhats(document.getElementById('whatsapp').value || '') || null,
-          telefonealternativo: sanitizeValue(document.getElementById('telefonealternativo')?.value || '') || null,
-          endereco: {
-            cep: document.getElementById('cep').value || null,
-            logradouro: document.getElementById('logradouro').value || null,
-            numero: document.getElementById('numero').value || null,
-            complemento: document.getElementById('complemento').value || null,
-            bairro: document.getElementById('bairro').value || null,
-            cidade: document.getElementById('cidade').value || null,
-            uf: document.getElementById('uf').value || null,
-          },
-          ds: document.getElementById('dsSelect').value || null,
-          unidade: document.getElementById('unidadeSelect').value || null,
-          turno: document.getElementById('turnoSelect').value || null,
-          regime: document.getElementById('regimeSelect').value || null,
-          grupo: grupoAtual || null,
+          whatsapp: normalizeWhats(document.getElementById('whatsapp')?.value || '') || null,
+          nascimento: null,
+          cidade: cidadeValor ? cidadeValor.toUpperCase() : null,
+          telefone_2: onlyDigits(telefoneAlternativo) || null,
+          numero: Number.isFinite(numeroParsed) ? numeroParsed : null,
+          regime: sanitizeValue(document.getElementById('regimeSelect')?.value || '') || null,
+          bairro: bairroValor ? bairroValor.toUpperCase() : null,
+          unidade: sanitizeValue(document.getElementById('unidadeSelect')?.value || '') || null,
+          nome: sanitizeValue(document.getElementById('servidorHidden')?.value || DATA.nome) || null,
+          turno: sanitizeValue(document.getElementById('turnoSelect')?.value || '') || null,
+          ds: sanitizeValue(document.getElementById('dsSelect')?.value || document.getElementById('dsHidden')?.value || '') || null,
+          cep: cepNumeros || cepValor || null,
+          protocolo: null,
+          uf: sanitizeUF(document.getElementById('uf')?.value || '') || null,
+          complemento: sanitizeValue(document.getElementById('complemento')?.value || '') || null,
+          logradouro: sanitizeValue(document.getElementById('logradouro')?.value || '') || null,
+          matricula: sanitizeValue(document.getElementById('matriculaSelect')?.value || '') || null,
+          cpf: onlyDigits(document.getElementById('cpfHidden')?.value || '') || null,
+          email: sanitizeValue(document.getElementById('email')?.value || '').toLowerCase() || null,
         };
-        console.log('Payload atualização cadastral:', payload);
-        setStatus('Dados de atualização enviados.', true);
-        showFormFeedbackPopup('success');
+
+        setStatus('Enviando dados...', true);
+        try {
+          const response = await fetch('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/atualizar-cadastro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!response.ok) throw new Error('Erro ao enviar dados');
+
+          setStatus('Dados de atualização enviados.', true);
+          showFormFeedbackPopup('success');
+        } catch (error) {
+          console.error('Erro ao enviar atualização cadastral:', error);
+          setStatus('Falha ao enviar dados. Tente novamente.', false);
+          showFormFeedbackPopup('error', { invalid: ['Falha ao enviar dados ao servidor.'] });
+        }
       });
 
       document.getElementById('btnNovaSolicitacao').addEventListener('click', () => {
@@ -1792,8 +2034,12 @@
 
       document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
       document.getElementById('btnFecharRenovacao').addEventListener('click', fecharModal);
+      document.getElementById('btnRenovarPedido').addEventListener('click', () => enviarRenovacao('renovar'));
+      document.getElementById('btnNaoRenovarPedido').addEventListener('click', () => enviarRenovacao('nao_renovar'));
       document.getElementById('btnImprimir').addEventListener('click', () => window.print());
       document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
+      document.getElementById('decisionRedirectClose').addEventListener('click', executarFechamentoFluxo);
+      document.getElementById('decisionRedirectNow').addEventListener('click', executarFechamentoFluxo);
       document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
       document.getElementById('formFeedbackClose').addEventListener('click', closeFormFeedback);
       document.getElementById('formFeedback').addEventListener('click', (e) => {
@@ -1890,11 +2136,92 @@
     </div>
 
     <style>
+      .decision-redirect-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(31, 41, 55, 0.75);
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+        z-index: 12000;
+        padding: 1rem;
+      }
+
+      .decision-redirect-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .decision-redirect-dialog {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        max-width: 480px;
+        width: min(90vw, 480px);
+        box-shadow: 0 24px 64px rgba(15, 37, 78, 0.25);
+        border: 1px solid rgba(0, 74, 173, 0.08);
+      }
+
+      .decision-redirect-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .decision-redirect-title {
+        margin: 0;
+        font-size: 1.1rem;
+        color: var(--brand-secondary);
+        font-weight: 700;
+      }
+
+      .decision-redirect-message {
+        margin: 0 0 0.75rem;
+        color: var(--text-strong);
+      }
+
+      .decision-redirect-countdown {
+        margin: 0 0 1rem;
+        color: var(--brand-primary);
+        font-weight: 600;
+      }
+
+      .decision-redirect-close {
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s ease;
+      }
+
+      .decision-redirect-close:hover {
+        background-color: rgba(0, 74, 173, 0.08);
+      }
+
+      .decision-redirect-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+      }
+
       /* Layout geral do widget SUSi */
       .susi-chat-root {
         position: relative;
         z-index: 11000;
         --susi-chat-toggle-height: 176px;
+        isolation: isolate;
       }
 
       .susi-chat-toggle {
@@ -1906,7 +2233,7 @@
         padding: 0;
         border: none;
         border-radius: 0;
-        background: transparent;
+        background: transparent !important;
         box-shadow: none;
         display: inline-flex;
         align-items: flex-end;
@@ -1931,10 +2258,11 @@
         object-fit: contain;
         object-position: bottom center;
         display: block;
-        background: transparent;
+        background: transparent !important;
         border-radius: 0;
-        box-shadow: none;
-        filter: drop-shadow(0 12px 24px rgba(15, 37, 78, 0.35));
+        box-shadow: none !important;
+        filter: none !important;
+        mix-blend-mode: normal !important;
       }
 
       .susi-chat-modal {
