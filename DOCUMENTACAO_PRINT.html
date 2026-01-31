@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Técnico Completo - Portal SESAU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #003399;
+            --secondary: #002266;
+            --text: #222;
+            --code-bg: #f4f6f8;
+            --header-bg: #e6f0ff;
+            --base-font-size: 10pt;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            line-height: 1.4;
+            margin: 0;
+            background: #fff;
+            font-size: var(--base-font-size);
+        }
+
+        .document-container {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20mm;
+        }
+
+        /* Títulos */
+        h1 {
+            font-size: 24pt;
+            color: var(--primary);
+            margin-bottom: 0.5em;
+        }
+
+        h2 {
+            font-size: 16pt;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 5px;
+            margin-top: 0;
+            color: var(--secondary);
+            page-break-before: always;
+        }
+
+        .toc h2 {
+            page-break-before: avoid;
+        }
+
+        h3 {
+            font-size: 13pt;
+            margin-top: 25px;
+            font-weight: 700;
+            color: #333;
+            background: var(--header-bg);
+            padding: 5px 10px;
+            border-left: 4px solid var(--primary);
+            page-break-after: avoid;
+        }
+
+        h4 {
+            font-size: 11pt;
+            margin-top: 15px;
+            font-weight: 700;
+            color: #555;
+            text-transform: uppercase;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 2px;
+        }
+
+        p,
+        li {
+            text-align: justify;
+            margin-bottom: 8px;
+        }
+
+        ul,
+        ol {
+            margin-top: 5px;
+        }
+
+        /* Links */
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Código */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 8pt;
+            white-space: pre-wrap;
+            word-break: break-all;
+            position: relative;
+            border-left: 3px solid var(--primary);
+            page-break-inside: avoid;
+            margin: 10px 0;
+        }
+
+        /* Tabelas */
+        .schema-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-bottom: 20px;
+        }
+
+        .schema-table th {
+            background: var(--primary);
+            color: white;
+            padding: 5px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .schema-table td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            vertical-align: top;
+        }
+
+        .schema-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        /* Capa */
+        .cover-page {
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            page-break-after: always;
+        }
+
+        .cover-logo {
+            max-width: 350px;
+            margin-bottom: 40px;
+        }
+
+        .cover-title {
+            font-size: 28pt;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .cover-subtitle {
+            font-size: 16pt;
+            color: #666;
+            margin-bottom: 60px;
+        }
+
+        .cover-meta {
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+            width: 60%;
+            font-size: 11pt;
+        }
+
+        /* Sumário */
+        .toc {
+            page-break-before: always;
+            page-break-after: always;
+        }
+
+        .toc-item {
+            border-bottom: 1px dotted #ccc;
+            padding: 6px 0;
+            font-size: 11pt;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .toc-item a {
+            color: black;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .toc-item a::after {
+            content: " ";
+            flex-grow: 1;
+            border-bottom: 1px dotted #999;
+            margin: 0 10px;
+            position: relative;
+            top: -5px;
+        }
+
+        /* Termo */
+        .signature-block {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+            page-break-inside: avoid;
+        }
+
+        .signature-line {
+            width: 45%;
+            border-top: 1px solid #000;
+            text-align: center;
+            padding-top: 5px;
+            font-weight: bold;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 1.5cm;
+
+                @bottom-right {
+                    content: "Pág. " counter(page);
+                    font-size: 9pt;
+                }
+            }
+
+            body {
+                background: white;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .document-container {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="document-container">
+
+        <!-- CAPA -->
+        <div class="cover-page">
+            <img src="https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr_horizontal.png?w=700"
+                alt="Logo PCR" class="cover-logo">
+            <div class="cover-title">MANUAL TÉCNICO E<br>FUNCIONAL</div>
+            <div class="cover-subtitle">Portal de Mobilidade Interna - SESAU</div>
+
+            <div class="cover-meta">
+                <p><strong>Projeto:</strong> Solução Web + Integração n8n</p>
+                <p><strong>Cliente:</strong> Secretaria de Saúde do Recife</p>
+                <p><strong>Data de Entrega:</strong> 31/01/2026</p>
+            </div>
+        </div>
+
+        <!-- SUMÁRIO -->
+        <div class="toc">
+            <h2>Sumário</h2>
+            <div class="toc-item"><a href="#apresentacao">1. Apresentação</a></div>
+            <div class="toc-item"><a href="#publico">2. Público Alvo</a></div>
+            <div class="toc-item"><a href="#usabilidade">3. Guia de Usabilidade</a></div>
+            <div class="toc-item"><a href="#tecnico">4. Dados Técnicos (Frontend)</a></div>
+            <div class="toc-item"><a href="#fluxo">5. Fluxo de Processamento (Backend & SQL)</a></div>
+            <div class="toc-item"><a href="#integracao">6. Integração SE Suite (SOAP)</a></div>
+            <div class="toc-item"><a href="#schema">7. Dicionário de Dados Completo</a></div>
+            <div class="toc-item"><a href="#termo">8. Termo de Aceite</a></div>
+        </div>
+        <br>
+
+        <!-- 1. APRESENTAÇÃO -->
+        <h2 id="apresentacao">1. Apresentação</h2>
+        <p>O <strong>Portal de Mobilidade Interna da SESAU</strong> é uma solução digital desenvolvida para modernizar,
+            simplificar e dar transparência ao processo de movimentação interna dos servidores da Secretaria de Saúde do
+            Recife.</p>
+        <p>O sistema substitui fluxos baseados em papel ou e-mails desestruturados por um ambiente web intuitivo, onde o
+            servidor pode:</p>
+        <ul>
+            <li>Consultar seus dados funcionais.</li>
+            <li>Solicitar mobilidade (transferência) para outras unidades.</li>
+            <li>Acompanhar o status das suas solicitações (Classificação via Ranking).</li>
+            <li>Obter comprovantes formais de suas requisições.</li>
+        </ul>
+
+        <!-- 2. PÚBLICO ALVO -->
+        <h2 id="publico">2. Público Alvo</h2>
+        <ul>
+            <li><strong>Servidores Ativos da SESAU:</strong> Profissionais de todos os vínculos (Estatutários, CTD) que
+                desejam solicitar
+                mudança de lotação.</li>
+            <li><strong>Gestão de Pessoas (SEGTES):</strong> Setor responsável por analisar as solicitações
+                padronizadas,
+                eliminando retrabalho de digitação.</li>
+        </ul>
+
+        <!-- 3. USABILIDADE -->
+        <h2 id="usabilidade">3. Guia de Usabilidade</h2>
+        <h3>Acesso ao Portal</h3>
+        <p>O acesso é restrito e autenticado via <strong>Keycloak</strong> (integrado ao AD da Prefeitura).</p>
+        <ul>
+            <li><strong>Portal do Servidor:</strong> <a href="#">.../webhook/portal-sesau-servidores</a></li>
+            <li><strong>Formulário de Solicitação:</strong> <a
+                    href="#">.../webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2</a></li>
+        </ul>
+        <h3>Jornada do Usuário</h3>
+        <ol>
+            <li><strong>Login:</strong> Servidor acessa com login e senha de rede.</li>
+            <li><strong>Dashboard:</strong> Visualiza solicitações anteriores e botão "Nova Solicitação".</li>
+            <li><strong>Formulário:</strong> Confere dados pessoais (bloqueados), atualiza contatos e escolhe unidades.
+            </li>
+            <li><strong>Confirmação:</strong> Recebe e-mail com protocolo (WFID) e comprovante.</li>
+        </ol>
+
+        <!-- 4. DADOS TÉCNICOS -->
+        <h2 id="tecnico">4. Dados Técnicos (Arquitetura)</h2>
+        <h3>Stack Frontend</h3>
+        <ul>
+            <li><strong>Linguagem:</strong> HTML5, CSS3, JavaScript (ES6+).</li>
+            <li><strong>Frameworks:</strong> Bootstrap 5.3 + Choices.js (Selects Avançados).</li>
+            <li><strong>Design:</strong> Identidade visual SESAU (Azul PCR).</li>
+        </ul>
+
+        <!-- 5. FLUXO DE PROCESSAMENTO -->
+        <h2 id="fluxo">5. Fluxo de Processamento (Backend & SQL)</h2>
+        <p>O "cérebro" da aplicação é um workflow no <strong>n8n</strong> que orquestra as seguintes etapas:</p>
+
+        <h3>5.1. Recepção e Limpeza (Sanitização)</h3>
+        <p>O webhook recebe o POST do formulário. A primeira ação é remover rascunhos anteriores para evitar
+            duplicidade.</p>
+        <pre>DELETE FROM mobilidade_dados_recebidos WHERE matricula = $1;</pre>
+
+        <h3>5.2. Atualização Cadastral (Master Data Update)</h3>
+        <p>Dados de contato (email, zap) e endereço são atualizados na tabela mestre (<code>relacao_nominal</code>) para
+            uso futuro do RH.</p>
+        <pre>
+UPDATE mobilidade_segtes_relacao_nominal AS mdr
+SET
+  distrito = $1, unidade_de_lotacao = $2, email = LOWER($3),
+  cep = $5, rua = UPPER($6), numero_rua = $7, complemento_do_endereco = UPPER($8),
+  bairro = UPPER($9), cidade = UPPER($10), uf_estado = UPPER($11)
+WHERE matricula = $4
+    </pre>
+
+        <h3>5.3. Persistência da Solicitação (Insert)</h3>
+        <p>A solicitação oficial é gravada na tabela transacional <code>dados_recebidos</code>. Campos vazios de data
+            são tratados para <code>NULL</code>.</p>
+        <pre>
+INSERT INTO mobilidade_dados_recebidos (
+  matricula, nome, cargo, vinculo, distrito_atual, lotacao_atual, horario_atual, 
+  regime_trabalho_atual, data_admissao, data_nascimento, grupo, wfid, email, whatsapp, 
+  status_solicitacao, cpf, inserido_no_banco, distrito_desejado, lotacao_desejada, 
+  horario_desejado, regime_trabalho_desejado, prioridade, data_solicitacao, 
+  submissao, categoria, ch, especialidade, loginsei
+)
+SELECT
+  '{{ $json.matricula }}', '{{ $json.nome }}', '{{ $json.cargo }}', '{{ $json.vinculo }}',
+  '{{ $json.distrito_atual }}', '{{ $json.lotacao_atual }}', '{{ $json.horario_atual }}',
+  '{{ $json.regime_atual }}',
+  CASE WHEN '{{ $json.admissao }}' = '' THEN NULL ELSE TO_DATE('{{ $json.admissao }}', 'YYYY-MM-DD') END,
+  CASE WHEN '{{ $json.nascimento }}' = '' THEN NULL ELSE TO_DATE('{{ $json.nascimento }}', 'YYYY-MM-DD') END,
+  '{{ $json.grupo }}', '{{ $json.wfid }}', '{{ $json.email }}', '{{ $json.whatsapp }}',
+  'AGUARDANDO MOBILIDADE', '{{ $json.cpf }}', 'SIM', '{{ $json.distrito }}', '{{ $json.lotacao }}',
+  '{{ $json.turno }}', '{{ $json.regime }}',
+  COALESCE(NULLIF('{{ $json.prioridade }}','')::int, 0),
+  CASE WHEN '{{ $json.solicitacao }}' = '' THEN NULL ELSE TO_DATE('{{ $json.solicitacao }}', 'YYYY-MM-DD') END,
+  CASE WHEN '{{ $json.credenciamento }}' = '' THEN NULL ELSE TO_DATE('{{ $json.credenciamento }}', 'YYYY-MM-DD') END,
+  '{{ $json.categoria_do_cargo }}', '{{ $json.ch_de_atuacao_hor_esp }}', '{{ $json.especialidade_do_cargo }}',
+  (SELECT msr.loginsei FROM mobilidade_segtes_relacao_nominal msr WHERE msr.matricula = '{{ $json.matricula }}' LIMIT 1)
+    </pre>
+
+        <h3>5.4. Lógica de Ranking (Regras de Negócio)</h3>
+        <p>O sistema classifica automaticamente os candidatos. A query utiliza <code>DENSE_RANK()</code> com 4 critérios
+            de desempate e aplica regras de exclusão (ex: Enfermeiros recentes).</p>
+        <pre>
+INSERT INTO ranking_mobilidade (
+    matricula, cpf, nome, cargo, categoria, data_admissao, distrito, lotacao, 
+    turno, regime, prioridade, data_nascimento, data_solicitacao, data_submissao, 
+    ranking, especialidade, ch, id, ds_atual, lotacao_atual, telefone, email, 
+    situacao, grupo, renovacao
+)
+SELECT DISTINCT
+    md.matricula, md.cpf, md.nome, md.cargo,
+    COALESCE(NULLIF(md.categoria, ''), ms.categoria_do_cargo) AS categoria,
+    md.data_admissao::date, md.distrito_desejado AS distrito, md.lotacao_desejada AS lotacao,
+    NULLIF(md.horario_desejado, '') AS turno, md.regime_trabalho_desejado AS regime,
+    md.prioridade, md.data_nascimento::date, md.data_solicitacao::date, md.submissao::date,
+    -- CÁLCULO DO RANKING
+    DENSE_RANK() OVER (
+        PARTITION BY 
+            md.lotacao_desejada, 
+            COALESCE(NULLIF(md.categoria, ''), ms.categoria_do_cargo), 
+            md.especialidade 
+        ORDER BY 
+            md.data_solicitacao, -- 1º Quem pediu antes
+            md.submissao,        -- 2º Hora do envio
+            md.data_admissao,    -- 3º Mais antigo na rede
+            md.data_nascimento,  -- 4º Mais idoso
+            md.id
+    ) AS ranking,
+    md.especialidade, md.ch, md.id, md.distrito_atual AS ds_atual, md.lotacao_atual,
+    md.whatsapp AS telefone, md.email, md.status_solicitacao AS situacao, md.grupo, md.renov
+FROM mobilidade_dados_recebidos md
+LEFT JOIN mobilidade_segtes_relacao_nominal ms ON md.matricula = ms.matricula
+WHERE NOT EXISTS (
+    SELECT 1 FROM ranking_mobilidade AS rm
+    WHERE rm.matricula = md.matricula AND rm.lotacao = md.lotacao_desejada AND rm.id = md.id
+)
+  AND md.distrito_desejado IS NOT NULL AND md.distrito_desejado <> 'NÃO ESPECIFICOU UNIDADE'
+  AND md.lotacao_desejada IS NOT NULL AND md.lotacao_desejada <> 'NÃO ESPECIFICOU UNIDADE'
+  AND (md.status_solicitacao = 'AGUARDANDO MOBILIDADE' OR md.status_solicitacao = 'NÃO ATENDEU ÀS TENTATIVAS DE CONTATO')
+  -- REGRA DE BLOQUEIO (Enfermeiros 40h recentes em USF)
+  AND NOT (
+    md.cargo = 'ENFERMEIRO 40H' AND md.data_admissao >= '2020-01-01' 
+    AND (md.lotacao_desejada LIKE '%USF%' OR md.lotacao_desejada LIKE '%PSF%' OR md.lotacao_desejada LIKE '%UPINHA%' 
+         OR md.lotacao_desejada LIKE '%BRUNO MAIA%' OR md.lotacao_desejada LIKE '%COSTA CARVALHO%')
+    AND md.lotacao_desejada NOT LIKE '%MAE CORUJA%' AND md.lotacao_desejada NOT LIKE '%CONSULTORIO NA RUA%'
+  )
+  AND md.data_solicitacao IS NOT NULL AND md.submissao IS NOT NULL
+  AND md.data_admissao IS NOT NULL AND md.data_nascimento IS NOT NULL
+  AND (md.renov = 'SIM' OR md.renov = '' OR md.renov IS NULL);
+    </pre>
+
+        <!-- 6. INTEGRAÇÃO SE SUITE -->
+        <h2 id="integracao">6. Integração SE Suite (SOAP)</h2>
+        <p>Comunicação com o motor BPM para abertura de processos.</p>
+
+        <h4>6.1. Update da Tabela Principal (EditEntityRecord)</h4>
+        <pre>
+&lt;soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+  &lt;soap:Body&gt;
+    &lt;tns:editEntityRecord xmlns:tns="urn:workflow"&gt;
+      &lt;tns:WorkflowID&gt;{{ $json.wfid }}&lt;/tns:WorkflowID&gt;
+      &lt;tns:EntityID&gt;credsesau&lt;/tns:EntityID&gt;
+      &lt;tns:EntityAttributeList&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;cpf&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.cpf }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;matricula&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.matricula }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;admissao&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.admissao }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;nascimento&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.nascimento }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;nome&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.nome }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;cargo&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.cargo }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;categoria&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.categoria }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;especialidade&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.especialidade }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;grupo&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.grupo }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;vinculo&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.vinculo }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;cargahoraria&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.ch_de_atuacao_hor_esp }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;cep&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.cep }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;logradouro&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.logradouro }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;numero&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.numero }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;complemento&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.complemento }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;bairro&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.bairro }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;cidade&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.cidade }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;estado&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.uf }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;whatsapp&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.whatsapp }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;telefone2&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.telefone2 }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;email&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.email }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;distritoatual&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.distrito_atual }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;lotacaoatual&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.lotacao_atual }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;horarioatual&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.horario_atual }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;regimeatual&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ $json.regime_atual }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;origem&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;Portal HTML&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+      &lt;/tns:EntityAttributeList&gt;
+    &lt;/tns:editEntityRecord&gt;
+  &lt;/soap:Body&gt;
+&lt;/soap:Envelope&gt;
+    </pre>
+
+        <h4>6.2. Criação de Filhos no Grid (NewChildEntityRecord)</h4>
+        <pre>
+&lt;soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+  &lt;soap:Body&gt;
+    &lt;tns:newChildEntityRecord xmlns:tns="urn:workflow"&gt;
+      &lt;tns:WorkflowID&gt;{{ wfid }}&lt;/tns:WorkflowID&gt;
+      &lt;tns:MainEntityID&gt;credsesau&lt;/tns:MainEntityID&gt;
+      &lt;tns:ChildRelationshipID&gt;gridlotacoes12&lt;/tns:ChildRelationshipID&gt;
+      &lt;tns:EntityAttributeList&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;prioridade&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ prioridade }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;distrito&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ distrito }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;lotacao&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ lotacao }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;data1&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ solicitacao }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;data3&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ credenciamento }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;turno&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ turno }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+        &lt;tns:EntityAttribute&gt;&lt;tns:EntityAttributeID&gt;regime&lt;/tns:EntityAttributeID&gt;&lt;tns:EntityAttributeValue&gt;{{ regime }}&lt;/tns:EntityAttributeValue&gt;&lt;/tns:EntityAttribute&gt;
+      &lt;/tns:EntityAttributeList&gt;
+    &lt;/tns:newChildEntityRecord&gt;
+  &lt;/soap:Body&gt;
+&lt;/soap:Envelope&gt;
+    </pre>
+
+        <!-- 7. SCHEMA (Full Tables) -->
+        <h2 id="schema">7. Dicionário de Dados Completo</h2>
+
+        <h3 id="tb-dados-recebidos">7.1 Tabela: mobilidade_dados_recebidos (Solicitações)</h3>
+        <table class="schema-table">
+            <thead>
+                <tr>
+                    <th>Coluna</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>matricula</td>
+                    <td>text</td>
+                    <td>Chave</td>
+                </tr>
+                <tr>
+                    <td>nome</td>
+                    <td>text</td>
+                    <td>Nome</td>
+                </tr>
+                <tr>
+                    <td>cargo</td>
+                    <td>text</td>
+                    <td>Cargo</td>
+                </tr>
+                <tr>
+                    <td>distrito_atual</td>
+                    <td>text</td>
+                    <td>Origem</td>
+                </tr>
+                <tr>
+                    <td>lotacao_atual</td>
+                    <td>text</td>
+                    <td>Unidade Origem</td>
+                </tr>
+                <tr>
+                    <td>horario_atual</td>
+                    <td>text</td>
+                    <td>Turno</td>
+                </tr>
+                <tr>
+                    <td>regime_trabalho_atual</td>
+                    <td>text</td>
+                    <td>Regime</td>
+                </tr>
+                <tr>
+                    <td>data_admissao</td>
+                    <td>date</td>
+                    <td>Admissão</td>
+                </tr>
+                <tr>
+                    <td>data_nascimento</td>
+                    <td>date</td>
+                    <td>Nascimento</td>
+                </tr>
+                <tr>
+                    <td>grupo</td>
+                    <td>text</td>
+                    <td>Grupo</td>
+                </tr>
+                <tr>
+                    <td>distrito_desejado</td>
+                    <td>text</td>
+                    <td>Destino</td>
+                </tr>
+                <tr>
+                    <td>lotacao_desejada</td>
+                    <td>text</td>
+                    <td>Unidade Destino</td>
+                </tr>
+                <tr>
+                    <td>horario_desejado</td>
+                    <td>text</td>
+                    <td>Turno Destino</td>
+                </tr>
+                <tr>
+                    <td>regime_trabalho_desejado</td>
+                    <td>text</td>
+                    <td>Regime Destino</td>
+                </tr>
+                <tr>
+                    <td>prioridade</td>
+                    <td>integer</td>
+                    <td>1...10</td>
+                </tr>
+                <tr>
+                    <td>submissao</td>
+                    <td>date</td>
+                    <td>Envio</td>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>serial</td>
+                    <td>PK</td>
+                </tr>
+                <tr>
+                    <td>data_solicitacao</td>
+                    <td>date</td>
+                    <td>Solicitação</td>
+                </tr>
+                <tr>
+                    <td>wfid</td>
+                    <td>text</td>
+                    <td>ID Processo</td>
+                </tr>
+                <tr>
+                    <td>email</td>
+                    <td>text</td>
+                    <td>Email</td>
+                </tr>
+                <tr>
+                    <td>status_solicitacao</td>
+                    <td>text</td>
+                    <td>Status</td>
+                </tr>
+                <tr>
+                    <td>cpf</td>
+                    <td>text</td>
+                    <td>CPF</td>
+                </tr>
+                <tr>
+                    <td>inserido_no_banco</td>
+                    <td>text</td>
+                    <td>Flag</td>
+                </tr>
+                <tr>
+                    <td>pedido_anterior</td>
+                    <td>text</td>
+                    <td>Controle</td>
+                </tr>
+                <tr>
+                    <td>whatsapp</td>
+                    <td>text</td>
+                    <td>Celular</td>
+                </tr>
+                <tr>
+                    <td>responsavel_insercao</td>
+                    <td>text</td>
+                    <td>Audit</td>
+                </tr>
+                <tr>
+                    <td>cpf_responsavel</td>
+                    <td>text</td>
+                    <td>Audit</td>
+                </tr>
+                <tr>
+                    <td>sei</td>
+                    <td>text</td>
+                    <td>SEI</td>
+                </tr>
+                <tr>
+                    <td>vinculo</td>
+                    <td>text</td>
+                    <td>Vínculo</td>
+                </tr>
+                <tr>
+                    <td>especialidade</td>
+                    <td>text</td>
+                    <td>Especialidade</td>
+                </tr>
+                <tr>
+                    <td>categoria</td>
+                    <td>text</td>
+                    <td>Categoria</td>
+                </tr>
+                <tr>
+                    <td>ch</td>
+                    <td>text</td>
+                    <td>Carga Horaria</td>
+                </tr>
+                <tr>
+                    <td>renov</td>
+                    <td>char(3)</td>
+                    <td>Renovação</td>
+                </tr>
+                <tr>
+                    <td>loginsei</td>
+                    <td>text</td>
+                    <td>Login User</td>
+                </tr>
+                <tr>
+                    <td>hora_submissao</td>
+                    <td>time</td>
+                    <td>Hora Envio</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 id="tb-relacao-nominal">7.2 Tabela: mobilidade_segtes_relacao_nominal (Mestre)</h3>
+        <table class="schema-table">
+            <thead>
+                <tr>
+                    <th>Coluna</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>id</td>
+                    <td>integer</td>
+                    <td>PK</td>
+                </tr>
+                <tr>
+                    <td>matricula</td>
+                    <td>text</td>
+                    <td>Chave</td>
+                </tr>
+                <tr>
+                    <td>cpf</td>
+                    <td>text</td>
+                    <td>CPF</td>
+                </tr>
+                <tr>
+                    <td>pis_pasep</td>
+                    <td>text</td>
+                    <td>PIS</td>
+                </tr>
+                <tr>
+                    <td>rg</td>
+                    <td>text</td>
+                    <td>RG</td>
+                </tr>
+                <tr>
+                    <td>nome_do_servidor</td>
+                    <td>text</td>
+                    <td>Nome</td>
+                </tr>
+                <tr>
+                    <td>vinculo_pcr</td>
+                    <td>text</td>
+                    <td>Vinculo</td>
+                </tr>
+                <tr>
+                    <td>data_admissao</td>
+                    <td>text</td>
+                    <td>Admissao</td>
+                </tr>
+                <tr>
+                    <td>cargo</td>
+                    <td>text</td>
+                    <td>Cargo</td>
+                </tr>
+                <tr>
+                    <td>especialidade_do_cargo</td>
+                    <td>text</td>
+                    <td>Esp.</td>
+                </tr>
+                <tr>
+                    <td>regime_de_trabalho</td>
+                    <td>text</td>
+                    <td>Regime</td>
+                </tr>
+                <tr>
+                    <td>turno_de_trabalho</td>
+                    <td>text</td>
+                    <td>Turno</td>
+                </tr>
+                <tr>
+                    <td>ch_de_atuacao_hor_esp</td>
+                    <td>text</td>
+                    <td>CH</td>
+                </tr>
+                <tr>
+                    <td>grupo</td>
+                    <td>text</td>
+                    <td>Grupo</td>
+                </tr>
+                <tr>
+                    <td>unidade_de_lotacao</td>
+                    <td>text</td>
+                    <td>Lotacao</td>
+                </tr>
+                <tr>
+                    <td>distrito</td>
+                    <td>text</td>
+                    <td>DS</td>
+                </tr>
+                <tr>
+                    <td>telefone_1</td>
+                    <td>text</td>
+                    <td>Tel</td>
+                </tr>
+                <tr>
+                    <td>telefone_2</td>
+                    <td>text</td>
+                    <td>Tel</td>
+                </tr>
+                <tr>
+                    <td>email</td>
+                    <td>text</td>
+                    <td>Email</td>
+                </tr>
+                <tr>
+                    <td>rua</td>
+                    <td>text</td>
+                    <td>Logradouro</td>
+                </tr>
+                <tr>
+                    <td>numero_rua</td>
+                    <td>text</td>
+                    <td>Num</td>
+                </tr>
+                <tr>
+                    <td>complemento_do_endereco</td>
+                    <td>text</td>
+                    <td>Compl</td>
+                </tr>
+                <tr>
+                    <td>cep</td>
+                    <td>text</td>
+                    <td>CEP</td>
+                </tr>
+                <tr>
+                    <td>bairro</td>
+                    <td>text</td>
+                    <td>Bairro</td>
+                </tr>
+                <tr>
+                    <td>cidade</td>
+                    <td>text</td>
+                    <td>Cidade</td>
+                </tr>
+                <tr>
+                    <td>uf_estado</td>
+                    <td>text</td>
+                    <td>UF</td>
+                </tr>
+                <tr>
+                    <td>data_nascimento</td>
+                    <td>text</td>
+                    <td>Dt Nasc</td>
+                </tr>
+                <tr>
+                    <td>loginsei</td>
+                    <td>text</td>
+                    <td>Login</td>
+                </tr>
+                <tr>
+                    <td>atualizacao</td>
+                    <td>timestamp</td>
+                    <td>Audit</td>
+                </tr>
+                <!-- Outros campos listados mas omitidos brevidade -->
+            </tbody>
+        </table>
+
+        <h3 id="tb-ranking">7.3 Tabela: ranking_mobilidade</h3>
+        <table class="schema-table">
+            <thead>
+                <tr>
+                    <th>Coluna</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>matricula</td>
+                    <td>text</td>
+                    <td>Matrícula</td>
+                </tr>
+                <tr>
+                    <td>nome</td>
+                    <td>text</td>
+                    <td>Nome</td>
+                </tr>
+                <tr>
+                    <td>cargo</td>
+                    <td>text</td>
+                    <td>Cargo</td>
+                </tr>
+                <tr>
+                    <td>categoria</td>
+                    <td>text</td>
+                    <td>Categoria</td>
+                </tr>
+                <tr>
+                    <td>distrito</td>
+                    <td>text</td>
+                    <td>DS Destino</td>
+                </tr>
+                <tr>
+                    <td>lotacao</td>
+                    <td>text</td>
+                    <td>Und Destino</td>
+                </tr>
+                <tr>
+                    <td>prioridade</td>
+                    <td>integer</td>
+                    <td>1...10</td>
+                </tr>
+                <tr>
+                    <td>data_solicitacao</td>
+                    <td>date</td>
+                    <td>Ordem 1</td>
+                </tr>
+                <tr>
+                    <td>data_submissao</td>
+                    <td>date</td>
+                    <td>Ordem 2</td>
+                </tr>
+                <tr>
+                    <td>data_admissao</td>
+                    <td>date</td>
+                    <td>Ordem 3</td>
+                </tr>
+                <tr>
+                    <td>data_nascimento</td>
+                    <td>date</td>
+                    <td>Ordem 4</td>
+                </tr>
+                <tr>
+                    <td>ranking</td>
+                    <td>integer</td>
+                    <td>Posição</td>
+                </tr>
+                <tr>
+                    <td>situacao</td>
+                    <td>text</td>
+                    <td>Status</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 id="tb-sesuite">7.4 Tabela SE Suite: credsesau</h3>
+        <table class="schema-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>cpf</td>
+                    <td>cpf</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>admissao</td>
+                    <td>Data de admissão</td>
+                    <td>Data</td>
+                </tr>
+                <tr>
+                    <td>nascimento</td>
+                    <td>Data de nascimento</td>
+                    <td>Data</td>
+                </tr>
+                <tr>
+                    <td>matricula</td>
+                    <td>Matrícula</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>nome</td>
+                    <td>Nome</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>cargo</td>
+                    <td>Cargo</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>categoria</td>
+                    <td>Categoria</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>especialidade</td>
+                    <td>Especialidade</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>grupo</td>
+                    <td>Grupo</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>vinculo</td>
+                    <td>Vínculo</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>cargahoraria</td>
+                    <td>Carga Horária</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>cep</td>
+                    <td>CEP</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>logradouro</td>
+                    <td>Logradouro</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>numero</td>
+                    <td>Número</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>complemento</td>
+                    <td>Complemento</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>bairro</td>
+                    <td>Bairro</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>cidade</td>
+                    <td>Cidade</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>estado</td>
+                    <td>Estado</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>whatsapp</td>
+                    <td>Whatsapp</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>telefone2</td>
+                    <td>Telefone alternativo</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>email</td>
+                    <td>E-mail</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>distritoatual</td>
+                    <td>distrito atual</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>lotacaoatual</td>
+                    <td>lotação atual</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>horarioatual</td>
+                    <td>horário atual</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>regimeatual</td>
+                    <td>regime atual</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>wfid</td>
+                    <td>wfid</td>
+                    <td>Texto</td>
+                </tr>
+                <tr>
+                    <td>registrosnagrid</td>
+                    <td>registros na grid</td>
+                    <td>Número longo</td>
+                </tr>
+                <tr>
+                    <td>desejaunidades</td>
+                    <td>Deseja listar...</td>
+                    <td>Opções</td>
+                </tr>
+                <tr>
+                    <td>raio</td>
+                    <td>Informe o raio</td>
+                    <td>Opções</td>
+                </tr>
+                <tr>
+                    <td>origem</td>
+                    <td>origem</td>
+                    <td>Texto</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 8. TERMO -->
+        <h2 id="termo">8. Termo de Aceite</h2>
+        <div style="border: 2px solid #000; padding: 25px;">
+            <p style="text-align: center; font-weight: bold;">TERMO DE ENTREGA DE SOFTWARE</p>
+            <p><strong>PROJETO:</strong> Portal de Mobilidade Interna SESAU</p>
+            <p><strong>DATA:</strong> 31/01/2026</p>
+            <p>Confirmamos o recebimento da documentação técnica completa e do código fonte.</p>
+            <div class="signature-block">
+                <div class="signature-line">Responsável Técnico</div>
+                <div class="signature-line">Cliente (SESAU)</div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

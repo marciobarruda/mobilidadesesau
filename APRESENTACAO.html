@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação Completa - Portal SESAU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #003399;
+            /* Azul PCR/SESAU */
+            --text: #333;
+            --bg: #ccc;
+            --slide-width: 297mm;
+            /* A4 Landscape */
+            --slide-height: 210mm;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        .slide {
+            width: var(--slide-width);
+            height: var(--slide-height);
+            background: white;
+            margin: 20px auto;
+            padding: 15mm 20mm;
+            box-sizing: border-box;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            page-break-after: always;
+            overflow: hidden;
+            /* Garante que nada saia do slide na impressão */
+        }
+
+        /* Tipografia */
+        h1 {
+            font-size: 36pt;
+            color: var(--primary);
+            margin: 0 0 0.5em 0;
+        }
+
+        h2 {
+            font-size: 24pt;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 18pt;
+            color: #444;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        p,
+        li {
+            font-size: 14pt;
+            line-height: 1.5;
+            text-align: justify;
+        }
+
+        ul,
+        ol {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        code {
+            font-family: 'Roboto Mono', monospace;
+            background: #f0f0f0;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #d63384;
+        }
+
+        /* Capa */
+        .cover {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .cover h1 {
+            font-size: 42pt;
+            margin-bottom: 20px;
+        }
+
+        .cover p {
+            font-size: 18pt;
+            color: #555;
+            text-align: center;
+        }
+
+        .logo {
+            max-width: 400px;
+            margin-bottom: 50px;
+        }
+
+        /* Rodapé */
+        .footer {
+            position: absolute;
+            bottom: 10mm;
+            left: 20mm;
+            right: 20mm;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10pt;
+            color: #888;
+        }
+
+        /* Tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 12pt;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 8px;
+            text-align: left;
+        }
+
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        /* Colunas */
+        .cols-2 {
+            display: flex;
+            gap: 40px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        /* Termo de Aceite Box */
+        .aceite-box {
+            border: 2px solid #333;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 8px;
+            font-size: 12pt;
+        }
+
+        .signature-block {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .signature-line {
+            border-top: 1px solid #000;
+            width: 45%;
+            text-align: center;
+            padding-top: 10px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .slide {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+            }
+
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SLIDE 1: CAPA -->
+    <div class="slide cover">
+        <img src="https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr_horizontal.png?w=700" alt="Logo"
+            class="logo">
+        <h1>Portal de Mobilidade Interna</h1>
+        <p>Secretaria de Saúde do Recife (SESAU)</p>
+        <p><strong>Documentação Completa de Projeto</strong></p>
+        <p style="font-size: 14pt; margin-top: 40px;">Recife, 31 de Janeiro de 2026</p>
+    </div>
+
+    <!-- SLIDE 2: SUMÁRIO -->
+    <div class="slide">
+        <h2>Sumário</h2>
+        <div class="cols-2">
+            <div class="col">
+                <ul style="font-size: 18pt; line-height: 2;">
+                    <li><strong>1. Apresentação</strong></li>
+                    <li><strong>2. Público Alvo</strong></li>
+                    <li><strong>3. Guia de Usabilidade</strong>
+                        <ul>
+                            <li>Acesso e URLs</li>
+                            <li>Fluxo de Solicitação</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="col">
+                <ul style="font-size: 18pt; line-height: 2;">
+                    <li><strong>4. Dados Técnicos</strong>
+                        <ul>
+                            <li>Arquitetura Frontend</li>
+                            <li>Fluxo n8n</li>
+                            <li>Banco de Dados</li>
+                        </ul>
+                    </li>
+                    <li><strong>5. Biblioteca de Dados</strong></li>
+                    <li><strong>6. Termo de Aceite</strong></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer"><span>Sumário</span><span>2 / 9</span></div>
+    </div>
+
+    <!-- SLIDE 3: APRESENTAÇÃO & PÚBLICO ALVO -->
+    <div class="slide">
+        <h2>1. Apresentação</h2>
+        <p>O <strong>Portal de Mobilidade Interna da SESAU</strong> é uma solução digital desenvolvida para modernizar,
+            simplificar e dar transparência ao processo de movimentação interna dos servidores da Secretaria de Saúde do
+            Recife.</p>
+        <p>O sistema substitui fluxos manuais por um ambiente web intuitivo onde o servidor pode:</p>
+        <ul>
+            <li>Consultar seus dados funcionais.</li>
+            <li>Solicitar mobilidade (transferência) para outras unidades.</li>
+            <li>Acompanhar status e obter comprovantes.</li>
+        </ul>
+
+        <h2>2. Público Alvo</h2>
+        <ul>
+            <li><strong>Servidores Ativos da SESAU:</strong> Todos os vínculos (Estatutários, CTD, Comissionados).</li>
+            <li><strong>Equipe de RH / Gestão de Pessoas:</strong> Recebimento de dados padronizados.</li>
+        </ul>
+        <div class="footer"><span>Apresentação</span><span>3 / 9</span></div>
+    </div>
+
+    <!-- SLIDE 4: GUIA DE USABILIDADE (ACESSO) -->
+    <div class="slide">
+        <h2>3. Guia de Usabilidade</h2>
+
+        <h3>Acesso e Autenticação</h3>
+        <p>O acesso é seguro via <strong>Keycloak</strong> (integrado ao AD da Prefeitura).</p>
+
+        <div style="background: #f0f7ff; padding: 20px; border-left: 5px solid var(--primary); margin: 20px 0;">
+            <h3 style="margin-top:0; color: var(--primary);">URLs Oficiais</h3>
+            <p><strong>Portal do Servidor:</strong><br>
+                <a href="#">https://n8n.homolog.app.emprel.gov.br/webhook/portal-sesau-servidores</a>
+            </p>
+
+            <p><strong>Formulário de Solicitação:</strong><br>
+                <a href="#">https://n8n.homolog.app.emprel.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2</a>
+            </p>
+        </div>
+
+        <p><strong>Dicas:</strong> Compatível com Chrome, Firefox, Edge e Safari. Totalmente responsivo
+            (Mobile/Desktop).</p>
+        <div class="footer"><span>Usabilidade</span><span>4 / 9</span></div>
+    </div>
+
+    <!-- SLIDE 5: FLUXO DE SOLICITAÇÃO -->
+    <div class="slide">
+        <h2>3. Guia de Usabilidade (Continuação)</h2>
+        <h3>Fluxo Passo a Passo</h3>
+        <ol>
+            <li><strong>Início:</strong> Clique em "Nova Solicitação" no dashboard.</li>
+            <li><strong>Identificação:</strong> Conferência automática de dados funcionais (Matrícula, Nome, Cargo).
+            </li>
+            <li><strong>Contatos:</strong> Atualização obrigatória de WhatsApp e E-mail para notificações.</li>
+            <li><strong>Preferências:</strong> Seleção de Unidades de Destino (múltipla escolha) e opção de Permuta.
+            </li>
+            <li><strong>Justificativa:</strong> Informar motivo e anexar documentos (se necessário).</li>
+            <li><strong>Conclusão:</strong> Envio da solicitação e recebimento do comprovante PDF.</li>
+        </ol>
+
+        <h3>Acompanhamento</h3>
+        <p>O status ("Em análise", "Aprovado", "Aguardando Vaga") pode ser consultado a qualquer momento no painel
+            "Minhas Solicitações".</p>
+        <div class="footer"><span>Usabilidade</span><span>5 / 9</span></div>
+    </div>
+
+    <!-- SLIDE 6: DADOS TÉCNICOS (1/2) -->
+    <div class="slide">
+        <h2>4. Dados Técnicos</h2>
+
+        <div class="cols-2">
+            <div class="col">
+                <h3>Arquitetura Frontend</h3>
+                <ul>
+                    <li><strong>HTML5 / CSS3 / ES6+</strong></li>
+                    <li><strong>Bootstrap 5.3:</strong> Layout responsivo.</li>
+                    <li><strong>Choices.js:</strong> Componente de seleção avançada.</li>
+                    <li><strong>Google Fonts:</strong> Inter e Public Sans.</li>
+                    <li><strong>Estilização:</strong> CSS Variables (Azul SESAU).</li>
+                </ul>
+
+                <h3>Banco de Dados (PostgreSQL)</h3>
+                <ul>
+                    <li><code>mobilidade_segtes_relacao_nominal</code>: Dados mestres de pessoal.</li>
+                    <li><code>unidades_sesau</code>: Catálogo de unidades/turnos.</li>
+                    <li><code>ranking_mobilidade</code>: Tabela de processamento de filas.</li>
+                </ul>
+            </div>
+
+            <div class="col">
+                <h3>Integração Backend (n8n)</h3>
+                <p>Orquestração completa via Webhooks e Nodes:</p>
+                <ul>
+                    <li><strong>Webhooks:</strong> Recebimento de formulários e renderização HTML.</li>
+                    <li><strong>Nodes Code (JS):</strong> Validação e sanitização de dados.</li>
+                    <li><strong>PostgreSQL Nodes:</strong> Persistência e consultas.</li>
+                    <li><strong>SOAP Request:</strong> Integração com SE Suite.</li>
+                    <li><strong>Mailgun/Gmail:</strong> Disparo de notificações.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer"><span>Dados Técnicos</span><span>6 / 9</span></div>
+    </div>
+
+    <!-- SLIDE 7: DADOS TÉCNICOS (2/2) - FLUXO DETALHADO -->
+    <div class="slide">
+        <h2>4. Dados Técnicos (Fluxo de Processamento)</h2>
+        <p>Detalhes da lógica implementada no workflow n8n:</p>
+
+        <ol>
+            <li><strong>Recepção e Validação:</strong> Webhook recebe POST. Scripts JS formatam datas
+                (<code>DD/MM/YYYY</code> &rarr; <code>YYYY-MM-DD</code>) e padronizam textos (Upper/Lowercase).</li>
+            <li><strong>Persistência:</strong>
+                <ul>
+                    <li>Atualiza contatos na tabela mestre dos servidores.</li>
+                    <li>Remove solicitações antigas pendentes (limpeza de histórico).</li>
+                    <li>Insere novo registro em <code>mobilidade_dados_recebidos</code>.</li>
+                </ul>
+            </li>
+            <li><strong>Ranking Automático:</strong> Execução de <em>Stored Procedure</em> que classifica candidatos
+                baseado em Prioridade, Data Solicitação, Admissão e Nascimento.</li>
+            <li><strong>Integração SE Suite (BPM):</strong> Chamada SOAP (<code>newChildEntityRecord</code>) para criar
+                processo administrativo oficial automaticamente.</li>
+            <li><strong>Notificação:</strong> Envio de e-mails transacionais com protocolo gerado.</li>
+        </ol>
+        <div class="footer"><span>Dados Técnicos</span><span>7 / 9</span></div>
+    </div>
+
+    <!-- SLIDE 8: BIBLIOTECA DE DADOS -->
+    <div class="slide">
+        <h2>5. Biblioteca de Dados</h2>
+        <p>Dicionário das principais variáveis manipuladas:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 20%;">Campo</th>
+                    <th style="width: 40%;">Descrição</th>
+                    <th style="width: 20%;">Tipo</th>
+                    <th style="width: 20%;">Origem</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>matricula</code></td>
+                    <td>Identificação única do servidor</td>
+                    <td>Numérico</td>
+                    <td>RH / n8n</td>
+                </tr>
+                <tr>
+                    <td><code>nome</code></td>
+                    <td>Nome civil completo</td>
+                    <td>Texto</td>
+                    <td>RH / n8n</td>
+                </tr>
+                <tr>
+                    <td><code>cpf</code></td>
+                    <td>CPF (formatado ou puro)</td>
+                    <td>Texto</td>
+                    <td>RH / n8n</td>
+                </tr>
+                <tr>
+                    <td><code>cargo</code> / <code>vinculo</code></td>
+                    <td>Dados de ocupação e regime</td>
+                    <td>Texto</td>
+                    <td>RH / n8n</td>
+                </tr>
+                <tr>
+                    <td><code>email</code></td>
+                    <td>E-mail para notificações</td>
+                    <td>E-mail</td>
+                    <td><strong>Editável</strong></td>
+                </tr>
+                <tr>
+                    <td><code>whatsapp</code></td>
+                    <td>Celular de contato</td>
+                    <td>Numérico</td>
+                    <td><strong>Editável</strong></td>
+                </tr>
+                <tr>
+                    <td><code>unidades_destino</code></td>
+                    <td>Lista de unidades pleiteadas</td>
+                    <td>Array</td>
+                    <td>Formulário</td>
+                </tr>
+                <tr>
+                    <td><code>wfid</code></td>
+                    <td>ID do Processo (SE Suite)</td>
+                    <td>Numérico</td>
+                    <td>Gerado</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="footer"><span>Biblioteca de Dados</span><span>8 / 9</span></div>
+    </div>
+
+    <!-- SLIDE 9: TERMO DE ACEITE -->
+    <div class="slide">
+        <h2>6. Termo de Aceite</h2>
+
+        <div class="aceite-box">
+            <p><strong>PROJETO:</strong> Portal de Mobilidade Interna SESAU &nbsp;|&nbsp; <strong>ENTREGA:</strong>
+                31/01/2026</p>
+            <p>Declaro que a solução descrita foi entregue, testada e homologada nas seguintes condições:</p>
+
+            <div style="display: flex; gap: 20px; margin: 20px 0;">
+                <div>[ X ] Código Fonte Completo</div>
+                <div>[ X ] Integrações n8n Configuradas</div>
+                <div>[ X ] Documentação Técnica</div>
+            </div>
+
+            <p><em>O sistema encontra-se em condições de operação (produção).</em></p>
+
+            <div class="signature-block">
+                <div class="signature-line">
+                    Responsável Técnico<br>(Desenvolvimento)
+                </div>
+                <div class="signature-line">
+                    Secretaria de Saúde do Recife<br>(Cliente)
+                </div>
+            </div>
+
+            <p style="text-align: center; margin-top: 20px; color: #666;">Recife/PE, ______ de
+                __________________________ de 2026.</p>
+        </div>
+        <div class="footer"><span>Encerramento</span><span>9 / 9</span></div>
+    </div>
+
+</body>
+
+</html>
