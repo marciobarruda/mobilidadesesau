@@ -1,598 +1,778 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Portal do Servidor • SESAU</title>
-    <link
-      rel="icon"
-      href="https://statics.recife.pe.gov.br/images/dynamics/conecta/icons/favicon.png?w=32&h=32&fit=fill&border=2,transparent,shrink"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <style>
-      :root {
-        --brand-primary: #004aad;
-        --brand-secondary: #003579;
-        --brand-highlight: #00a3ff;
-        --surface: #ffffff;
-        --surface-strong: #ffffff;
-        --border-color: #d6deea;
-        --text-strong: #1f2937;
-        --text-muted: #4b5563;
-      }
 
-      *, *::before, *::after {
-        box-sizing: border-box;
-      }
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portal do Servidor • SESAU</title>
+  <link rel="icon"
+    href="https://statics.recife.pe.gov.br/images/dynamics/conecta/icons/favicon.png?w=32&h=32&fit=fill&border=2,transparent,shrink" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --brand-primary: #004aad;
+      --brand-secondary: #003579;
+      --brand-highlight: #00a3ff;
+      --surface: #ffffff;
+      --surface-strong: #ffffff;
+      --border-color: #d6deea;
+      --text-strong: #1f2937;
+      --text-muted: #4b5563;
+    }
 
-      body {
-        font-family: "Inter", "Roboto", "Open Sans", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-        background: var(--surface);
-        color: var(--text-strong);
-        min-height: 100vh;
-      }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
 
+    body {
+      font-family: "Inter", "Roboto", "Open Sans", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--surface);
+      color: var(--text-strong);
+      min-height: 100vh;
+    }
+
+    /* Classe para embaçar o portal */
+    .portal-blur {
+      filter: blur(8px);
+      pointer-events: none;
+      user-select: none;
+      transition: filter 0.3s ease;
+    }
+
+    header.site-header {
+      background: url("https://statics.recife.pe.gov.br/images/dynamics/automacao/header.png?w=3000") center/cover no-repeat;
+      color: #ffffff;
+      padding: 3.5rem 0 2.75rem;
+      transition: filter 0.3s ease;
+    }
+
+    header .lead {
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 100%;
+      font-size: 1rem;
+      line-height: 1.65;
+      text-align: justify;
+    }
+
+    .badge-open {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .user-greeting {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin-bottom: 2.5rem;
+      padding: 1.2rem 1.6rem;
+      border-radius: 18px;
+      background: var(--surface-strong);
+      color: var(--text-strong);
+      border: 1px solid rgba(0, 83, 164, 0.12);
+      box-shadow: 0 16px 34px rgba(0, 45, 98, 0.08);
+    }
+
+    .user-greeting::before {
+      content: "👋";
+      font-size: 1.4rem;
+    }
+
+    .user-greeting strong {
+      color: var(--brand-secondary);
+    }
+
+    .card {
+      border-radius: 16px;
+      overflow: hidden;
+      border: none;
+    }
+
+    .rounded-4 {
+      border-radius: 16px !important;
+    }
+
+    .card-programa {
+      border: 1px solid rgba(0, 74, 173, 0.08);
+      border-radius: 16px;
+      background: var(--surface-strong);
+      box-shadow: 0 12px 32px rgba(15, 37, 78, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      height: 100%;
+    }
+
+    .card-programa:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(15, 37, 78, 0.12);
+    }
+
+    .card-programa .card-header {
+      border-bottom: 1px solid rgba(0, 74, 173, 0.1);
+      background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
+      padding: 1.5rem 1.5rem 1.2rem;
+    }
+
+    .card-programa .card-body {
+      padding: 1.5rem;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.02em;
+      color: var(--brand-primary);
+    }
+
+    .section-title::before {
+      content: "";
+      display: inline-block;
+      width: 28px;
+      height: 3px;
+      border-radius: 999px;
+      background: var(--brand-highlight);
+    }
+
+    .card-hero .card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .card-hero .card-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: #004aad;
+      text-transform: uppercase;
+    }
+
+    .card-hero .card-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #004aad;
+      margin: 0;
+    }
+
+    .card-hero .card-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .card-hero .card-list {
+      padding-left: 1.1rem;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      color: var(--text-strong);
+    }
+
+    .card-hero .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .downloads-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .download-card {
+      border: 1px solid var(--border-color);
+      background: var(--surface-strong);
+      border-radius: 4px;
+      padding: 1.35rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      min-height: 170px;
+    }
+
+    .mapa-unidades-wrapper {
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f6f9ff;
+    }
+
+    .mapa-unidades-frame {
+      border: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .collapsible-form {
+      border: 1px solid rgba(0, 83, 164, 0.18);
+      border-radius: 16px;
+      background: rgba(0, 83, 164, 0.06);
+      padding: 1.25rem 1.5rem 0;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .collapsible-form summary {
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      list-style: none;
+      font-size: 1.05rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(0, 83, 164, 0.18);
+      color: var(--brand-secondary);
+    }
+
+    .collapsible-form summary::marker,
+    .collapsible-form summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .collapsible-form summary::after {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+      margin-left: 1rem;
+    }
+
+    .collapsible-form[open] summary::after {
+      transform: rotate(225deg);
+    }
+
+    .collapsible-form[open] {
+      background: rgba(0, 83, 164, 0.08);
+      padding-bottom: 1.5rem;
+    }
+
+    .collapsible-form[open] summary {
+      margin-bottom: 1rem;
+      border-bottom-color: rgba(0, 83, 164, 0.25);
+    }
+
+    .minhas-grid {
+      margin-top: 1rem;
+    }
+
+    .minha-card {
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid rgba(0, 83, 164, 0.18);
+      border-radius: 14px;
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(0, 45, 98, 0.12);
+      position: relative;
+      padding: 1.1rem 1.25rem;
+    }
+
+    .minha-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      border: 2px solid transparent;
+      transition: border-color 0.2s ease;
+    }
+
+    .minha-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 34px rgba(0, 45, 98, 0.16);
+    }
+
+    .minha-card:hover::after {
+      border-color: rgba(0, 163, 255, 0.5);
+    }
+
+    .minhas-placeholder {
+      padding: 1.25rem;
+      border-radius: 4px;
+      background: rgba(0, 83, 164, 0.05);
+      border: 1px dashed rgba(0, 83, 164, 0.2);
+      color: var(--text-muted);
+    }
+
+    .feedback-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(27, 38, 59, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 1050;
+    }
+
+    .feedback-modal-backdrop.active {
+      display: flex;
+    }
+
+    .feedback-modal {
+      background: #ffffff;
+      border-radius: 1.25rem;
+      max-width: 980px;
+      width: 100%;
+      max-height: 88vh;
+      box-shadow: 0 32px 68px rgba(0, 0, 0, 0.2);
+      padding: 2rem;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feedback-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .modal-logo {
+      max-height: 52px;
+      width: auto;
+      flex-shrink: 0;
+    }
+
+    .feedback-modal-title {
+      font-weight: 700;
+      font-size: 1.35rem;
+      margin-bottom: 0.35rem;
+      color: var(--text-strong);
+    }
+
+    .feedback-modal-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .modal-meta {
+      background: rgba(0, 83, 164, 0.08);
+      border-radius: 14px;
+      padding: 0.75rem 1.2rem;
+      min-width: 220px;
+      text-align: right;
+    }
+
+    .modal-meta-label {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brand-secondary);
+      font-weight: 700;
+    }
+
+    .modal-meta-value {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--brand-primary);
+      margin-top: 0.25rem;
+    }
+
+    .feedback-modal-message {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-strong);
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-table-wrapper {
+      border-radius: 14px;
+      border: 1px solid rgba(0, 83, 164, 0.12);
+      background: #f8fbff;
+      padding: 1rem;
+    }
+
+    .modal-table-wrapper table td:first-child {
+      font-weight: 700;
+      color: var(--brand-secondary);
+    }
+
+    .modal-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    .modal-actions-default,
+    .modal-actions-renovacoes {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    .form-feedback {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      padding: 1.5rem;
+      z-index: 1200;
+    }
+
+    .form-feedback.active {
+      display: flex;
+    }
+
+    .form-feedback-dialog {
+      position: relative;
+      max-width: 420px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 22px 50px rgba(15, 37, 78, 0.2);
+      border: 1px solid rgba(0, 74, 173, 0.08);
+    }
+
+    .form-feedback-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .form-feedback-title.alert {
+      color: #d92d20;
+    }
+
+    .form-feedback-title.success {
+      color: #047857;
+    }
+
+    .form-feedback-body {
+      color: var(--text-strong);
+      font-size: 0.98rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .form-feedback-body ul {
+      padding-left: 1.2rem;
+      margin: 0;
+    }
+
+    .form-feedback-body li {
+      margin-bottom: 0.35rem;
+    }
+
+    .form-feedback-close {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.6rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .form-feedback-close:focus {
+      outline: 2px solid var(--brand-primary);
+      outline-offset: 2px;
+    }
+
+    /* Modal de Aviso */
+    .aviso-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      visibility: hidden;
+      opacity: 0;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 13000;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .aviso-modal-backdrop.active {
+      display: flex;
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .aviso-modal {
+      position: relative;
+      max-width: 520px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 0;
+      box-shadow: 0 24px 60px rgba(15, 37, 78, 0.22);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-20px) scale(0.96);
+    }
+
+    .aviso-modal-backdrop.active .aviso-modal {
+      animation: avisoSlideIn 0.3s ease-out forwards;
+    }
+
+    @keyframes avisoSlideIn {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .aviso-modal-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+      color: #ffffff;
+    }
+
+    .aviso-modal-header.dica {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .aviso-modal-icon {
+      font-size: 1.75rem;
+      flex-shrink: 0;
+    }
+
+    .aviso-modal-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .aviso-modal-body {
+      padding: 1.5rem;
+      font-size: 0.98rem;
+      line-height: 1.7;
+      color: var(--text-strong);
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+
+    .aviso-modal-body strong {
+      color: var(--brand-primary);
+      font-weight: 600;
+    }
+
+    .aviso-modal-footer {
+      display: flex;
+      justify-content: center;
+      padding: 0 1.5rem 1.5rem;
+    }
+
+    .aviso-modal-btn {
+      min-width: 140px;
+      padding: 0.7rem 2rem;
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.15s ease;
+      background: var(--brand-primary);
+      color: #ffffff;
+    }
+
+    .aviso-modal-btn:hover {
+      background: var(--brand-secondary);
+      transform: translateY(-1px);
+    }
+
+    .aviso-modal-btn:focus-visible {
+      outline: 3px solid rgba(0, 163, 255, 0.6);
+      outline-offset: 2px;
+    }
+
+    .aviso-modal-header.dica+.aviso-modal-body strong {
+      color: #d97706;
+    }
+
+    footer {
+      color: var(--text-muted);
+      padding: 2.5rem 0 2rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background-color: #0062ff;
+      border-color: #0062ff;
+      font-weight: 600;
+      padding: 0.65rem 1.5rem;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+      background-color: #004bd6;
+      border-color: #004bd6;
+    }
+
+    .btn-outline-primary {
+      color: #0062ff;
+      border-color: #0062ff;
+      font-weight: 600;
+      padding: 0.65rem 1.5rem;
+    }
+
+    .btn-outline-primary:hover,
+    .btn-outline-primary:focus {
+      background-color: rgba(0, 98, 255, 0.08);
+      color: #004bd6;
+      border-color: #004bd6;
+    }
+
+    .btn-soft {
+      background-color: #f5f5f5;
+      color: var(--text-strong);
+      border: 1px solid #e5e7eb;
+      font-weight: 600;
+      padding: 0.65rem 1.5rem;
+    }
+
+    .btn-soft:hover,
+    .btn-soft:focus {
+      background-color: #e7e7e7;
+      border-color: #d1d5db;
+      color: var(--text-strong);
+    }
+
+    @media (max-width: 768px) {
       header.site-header {
-        background: url("https://statics.recife.pe.gov.br/images/dynamics/automacao/header.png?w=3000")
-          center/cover no-repeat;
-        color: #ffffff;
-        padding: 3.5rem 0 2.75rem;
-      }
-
-      header .lead {
-        color: rgba(255, 255, 255, 0.9);
-        max-width: 100%;
-        font-size: 1rem;
-        line-height: 1.65;
-        text-align: justify;
+        padding: 2.5rem 0 2rem;
       }
 
       .badge-open {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.95rem;
-        font-weight: 600;
-        padding: 0.45rem 0.9rem;
-        border-radius: 999px;
-        background-color: rgba(255, 255, 255, 0.14);
-      }
-
-      .user-greeting {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-size: 1.05rem;
-        font-weight: 500;
-        margin-bottom: 2.5rem;
-        padding: 1.2rem 1.6rem;
-        border-radius: 18px;
-        background: var(--surface-strong);
-        color: var(--text-strong);
-        border: 1px solid rgba(0, 83, 164, 0.12);
-        box-shadow: 0 16px 34px rgba(0, 45, 98, 0.08);
-      }
-
-      .user-greeting::before {
-        content: "👋";
-        font-size: 1.4rem;
-      }
-
-      .user-greeting strong {
-        color: var(--brand-secondary);
-      }
-
-      .card {
-        border-radius: 16px;
-        overflow: hidden;
-        border: none;
-      }
-
-      .rounded-4 {
-        border-radius: 16px !important;
-      }
-
-      .card-programa {
-        border: 1px solid rgba(0, 74, 173, 0.08);
-        border-radius: 16px;
-        background: var(--surface-strong);
-        box-shadow: 0 12px 32px rgba(15, 37, 78, 0.08);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        height: 100%;
-      }
-
-      .card-programa:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 18px 40px rgba(15, 37, 78, 0.12);
-      }
-
-      .card-programa .card-header {
-        border-bottom: 1px solid rgba(0, 74, 173, 0.1);
-        background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
-        padding: 1.5rem 1.5rem 1.2rem;
-      }
-
-      .card-programa .card-body {
-        padding: 1.5rem;
-      }
-
-      .section-title {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 700;
-        font-size: 1.1rem;
-        letter-spacing: 0.02em;
-        color: var(--brand-primary);
-      }
-
-      .section-title::before {
-        content: "";
-        display: inline-block;
-        width: 28px;
-        height: 3px;
-        border-radius: 999px;
-        background: var(--brand-highlight);
-      }
-
-      .card-hero .card-body {
-        display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
-      }
-
-      .card-hero .card-tag {
-        font-size: 0.75rem;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        color: #004aad;
-        text-transform: uppercase;
-      }
-
-      .card-hero .card-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #004aad;
-        margin: 0;
-      }
-
-      .card-hero .card-subtitle {
-        font-size: 1rem;
-        color: var(--text-muted);
-        margin: 0;
-      }
-
-      .card-hero .card-list {
-        padding-left: 1.1rem;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.6rem;
-        color: var(--text-strong);
-      }
-
-      .card-hero .card-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-      }
-
-      .downloads-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.25rem;
-      }
-
-      .download-card {
-        border: 1px solid var(--border-color);
-        background: var(--surface-strong);
-        border-radius: 4px;
-        padding: 1.35rem 1.4rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        min-height: 170px;
-      }
-
-      .mapa-unidades-wrapper {
-        border-radius: 12px;
-        overflow: hidden;
-        background: #f6f9ff;
-      }
-
-      .mapa-unidades-frame {
-        border: 0;
         width: 100%;
-        height: 100%;
-      }
-
-      .collapsible-form {
-        border: 1px solid rgba(0, 83, 164, 0.18);
-        border-radius: 16px;
-        background: rgba(0, 83, 164, 0.06);
-        padding: 1.25rem 1.5rem 0;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-      }
-
-      .collapsible-form summary {
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        list-style: none;
-        font-size: 1.05rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid rgba(0, 83, 164, 0.18);
-        color: var(--brand-secondary);
-      }
-
-      .collapsible-form summary::marker,
-      .collapsible-form summary::-webkit-details-marker {
-        display: none;
-      }
-
-      .collapsible-form summary::after {
-        content: "";
-        width: 12px;
-        height: 12px;
-        border-right: 2px solid currentColor;
-        border-bottom: 2px solid currentColor;
-        transform: rotate(45deg);
-        transition: transform 0.2s ease;
-        margin-left: 1rem;
-      }
-
-      .collapsible-form[open] summary::after {
-        transform: rotate(225deg);
-      }
-
-      .collapsible-form[open] {
-        background: rgba(0, 83, 164, 0.08);
-        padding-bottom: 1.5rem;
-      }
-
-      .collapsible-form[open] summary {
-        margin-bottom: 1rem;
-        border-bottom-color: rgba(0, 83, 164, 0.25);
-      }
-
-      .minhas-grid {
-        margin-top: 1rem;
-      }
-
-      .minha-card {
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        border: 1px solid rgba(0, 83, 164, 0.18);
-        border-radius: 14px;
-        background: #ffffff;
-        box-shadow: 0 10px 24px rgba(0, 45, 98, 0.12);
-        position: relative;
-        padding: 1.1rem 1.25rem;
-      }
-
-      .minha-card::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 14px;
-        border: 2px solid transparent;
-        transition: border-color 0.2s ease;
-      }
-
-      .minha-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 18px 34px rgba(0, 45, 98, 0.16);
-      }
-
-      .minha-card:hover::after {
-        border-color: rgba(0, 163, 255, 0.5);
-      }
-
-      .minhas-placeholder {
-        padding: 1.25rem;
-        border-radius: 4px;
-        background: rgba(0, 83, 164, 0.05);
-        border: 1px dashed rgba(0, 83, 164, 0.2);
-        color: var(--text-muted);
-      }
-
-      .feedback-modal-backdrop {
-        position: fixed;
-        inset: 0;
-        background: rgba(27, 38, 59, 0.45);
-        display: none;
-        align-items: center;
         justify-content: center;
-        padding: 1.5rem;
-        z-index: 1050;
       }
-      .feedback-modal-backdrop.active { display: flex; }
+
       .feedback-modal {
-        background: #ffffff;
-        border-radius: 1.25rem;
-        max-width: 980px;
-        width: 100%;
-        max-height: 88vh;
-        box-shadow: 0 32px 68px rgba(0, 0, 0, 0.2);
-        padding: 2rem;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
+        padding: 1.5rem;
+        max-height: 90vh;
       }
 
       .feedback-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
+        flex-direction: column;
+        align-items: stretch;
       }
 
       .modal-header-left {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
       }
 
       .modal-logo {
-        max-height: 52px;
-        width: auto;
-        flex-shrink: 0;
-      }
-
-      .feedback-modal-title {
-        font-weight: 700;
-        font-size: 1.35rem;
-        margin-bottom: 0.35rem;
-        color: var(--text-strong);
-      }
-
-      .feedback-modal-subtitle {
-        color: var(--text-muted);
-        font-size: 0.95rem;
+        max-height: 42px;
       }
 
       .modal-meta {
-        background: rgba(0, 83, 164, 0.08);
-        border-radius: 14px;
-        padding: 0.75rem 1.2rem;
-        min-width: 220px;
-        text-align: right;
+        text-align: left;
+      }
+    }
+
+    /* Impressão apenas do conteúdo do modal */
+    @media print {
+      body * {
+        visibility: hidden !important;
       }
 
-      .modal-meta-label {
-        display: block;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--brand-secondary);
-        font-weight: 700;
+      .feedback-modal,
+      .feedback-modal * {
+        visibility: visible !important;
       }
 
-      .modal-meta-value {
-        display: block;
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: var(--brand-primary);
-        margin-top: 0.25rem;
-      }
-
-      .feedback-modal-message {
-        font-size: 0.95rem;
-        line-height: 1.6;
-        color: var(--text-strong);
-        overflow-y: auto;
-        flex: 1;
-      }
-
-      .modal-table-wrapper {
-        border-radius: 14px;
-        border: 1px solid rgba(0, 83, 164, 0.12);
-        background: #f8fbff;
-        padding: 1rem;
-      }
-
-      .modal-table-wrapper table td:first-child {
-        font-weight: 700;
-        color: var(--brand-secondary);
-      }
-
-      .modal-actions {
-        margin-top: 1.5rem;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 0.75rem;
-      }
-
-      .modal-actions-default,
-      .modal-actions-renovacoes {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        width: 100%;
-      }
-
-      .form-feedback {
-        position: fixed;
-        inset: 0;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        background: rgba(15, 23, 42, 0.45);
-        padding: 1.5rem;
-        z-index: 1200;
-      }
-
-      .form-feedback.active {
-        display: flex;
-      }
-
-      .form-feedback-dialog {
-        position: relative;
-        max-width: 420px;
-        width: 100%;
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 1.75rem;
-        box-shadow: 0 22px 50px rgba(15, 37, 78, 0.2);
-        border: 1px solid rgba(0, 74, 173, 0.08);
-      }
-
-      .form-feedback-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin-bottom: 0.75rem;
-      }
-
-      .form-feedback-title.alert {
-        color: #d92d20;
-      }
-
-      .form-feedback-title.success {
-        color: #047857;
-      }
-
-      .form-feedback-body {
-        color: var(--text-strong);
-        font-size: 0.98rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-      }
-
-      .form-feedback-body ul {
-        padding-left: 1.2rem;
-        margin: 0;
-      }
-
-      .form-feedback-body li {
-        margin-bottom: 0.35rem;
-      }
-
-      .form-feedback-close {
+      .feedback-modal {
         position: absolute;
-        top: 0.6rem;
-        right: 0.6rem;
-        border: none;
-        background: transparent;
-        color: var(--text-muted);
-        font-size: 1.2rem;
-        cursor: pointer;
+        inset: 0;
+        box-shadow: none;
       }
+    }
+  </style>
+</head>
 
-      .form-feedback-close:focus {
-        outline: 2px solid var(--brand-primary);
-        outline-offset: 2px;
-      }
+<body>
+  <div id="portal-content">
+    <input type="hidden" id="n8n_nome_exibicao" value="{{$json[" data"]["dadosComuns"]["nome"]}}">
+    <input type="hidden" id="n8n_nome_servidor" value="{{$json[" data"]["dadosComuns"]["servidor"]}}">
+    <input type="hidden" id="n8n_cpf" value="{{$json[" data"]["dadosComuns"]["cpf"]}}">
+    <input type="hidden" id="n8n_email" value="{{$json[" data"]["dadosComuns"]["email"]}}">
+    <input type="hidden" id="n8n_whatsapp" value="{{$json[" data"]["dadosComuns"]["whatsapp"]}}">
+    <input type="hidden" id="n8n_telalternativo" value="{{$json[" data"]["dadosComuns"]["telalternativo"]}}">
 
-      footer {
-        color: var(--text-muted);
-        padding: 2.5rem 0 2rem;
-        font-size: 0.9rem;
-      }
+    <input type="hidden" id="n8n_cep" value="{{$json[" data"]["dadosComuns"]["endereco"]["cep"]}}">
+    <input type="hidden" id="n8n_logradouro" value="{{$json[" data"]["dadosComuns"]["endereco"]["logradouro"]}}">
+    <input type="hidden" id="n8n_numero" value="{{$json[" data"]["dadosComuns"]["endereco"]["numero"]}}">
+    <input type="hidden" id="n8n_complemento" value="{{$json[" data"]["dadosComuns"]["endereco"]["complemento"]}}">
+    <input type="hidden" id="n8n_bairro" value="{{$json[" data"]["dadosComuns"]["endereco"]["bairro"]}}">
+    <input type="hidden" id="n8n_cidade" value="{{$json[" data"]["dadosComuns"]["endereco"]["cidade"]}}">
+    <input type="hidden" id="n8n_uf" value="{{$json[" data"]["dadosComuns"]["endereco"]["uf"]}}">
 
-      .btn-primary {
-        background-color: #0062ff;
-        border-color: #0062ff;
-        font-weight: 600;
-        padding: 0.65rem 1.5rem;
-      }
+    <input type="hidden" id="n8n_v0_mat" value="{{$json[" data"]["vinculos"][0]["matricula"]}}">
+    <input type="hidden" id="n8n_v0_cargo" value="{{$json[" data"]["vinculos"][0]["cargo"]}}">
+    <input type="hidden" id="n8n_v0_grupo" value="{{$json[" data"]["vinculos"][0]["grupo"]}}">
+    <input type="hidden" id="n8n_v0_ds" value="{{$json[" data"]["vinculos"][0]["ds"]}}">
 
-      .btn-primary:hover,
-      .btn-primary:focus {
-        background-color: #004bd6;
-        border-color: #004bd6;
-      }
+    <input type="hidden" id="n8n_v1_mat" value="{{$json[" data"]["vinculos"][1] ?
+      $json["data"]["vinculos"][1]["matricula"] : '' }}">
+    <input type="hidden" id="n8n_v1_cargo" value="{{$json[" data"]["vinculos"][1] ?
+      $json["data"]["vinculos"][1]["cargo"] : '' }}">
+    <input type="hidden" id="n8n_v1_grupo" value="{{$json[" data"]["vinculos"][1] ?
+      $json["data"]["vinculos"][1]["grupo"] : '' }}">
+    <input type="hidden" id="n8n_v1_ds" value="{{$json[" data"]["vinculos"][1] ? $json["data"]["vinculos"][1]["ds"] : ''
+      }}">
 
-      .btn-outline-primary {
-        color: #0062ff;
-        border-color: #0062ff;
-        font-weight: 600;
-        padding: 0.65rem 1.5rem;
-      }
-
-      .btn-outline-primary:hover,
-      .btn-outline-primary:focus {
-        background-color: rgba(0, 98, 255, 0.08);
-        color: #004bd6;
-        border-color: #004bd6;
-      }
-
-      .btn-soft {
-        background-color: #f5f5f5;
-        color: var(--text-strong);
-        border: 1px solid #e5e7eb;
-        font-weight: 600;
-        padding: 0.65rem 1.5rem;
-      }
-
-      .btn-soft:hover,
-      .btn-soft:focus {
-        background-color: #e7e7e7;
-        border-color: #d1d5db;
-        color: var(--text-strong);
-      }
-
-      @media (max-width: 768px) {
-        header.site-header { padding: 2.5rem 0 2rem; }
-        .badge-open { width: 100%; justify-content: center; }
-        .feedback-modal {
-          padding: 1.5rem;
-          max-height: 90vh;
-        }
-        .feedback-modal-header {
-          flex-direction: column;
-          align-items: stretch;
-        }
-        .modal-header-left {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 0.75rem;
-        }
-        .modal-logo {
-          max-height: 42px;
-        }
-        .modal-meta {
-          text-align: left;
-        }
-      }
-
-      /* Impressão apenas do conteúdo do modal */
-      @media print {
-        body * { visibility: hidden !important; }
-        .feedback-modal, .feedback-modal * { visibility: visible !important; }
-        .feedback-modal { position: absolute; inset: 0; box-shadow: none; }
-      }
-    </style>
-  </head>
-  <body>
     <header class="site-header">
       <div class="container">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
           <div>
             <span class="badge-open">Portal do Servidor • SESAU</span>
             <h1 class="h3 mt-3 mb-2">Mobilidade Interna & Serviços</h1>
-            <p class="lead mb-0">Acompanhe solicitações, atualize seus dados e acesse orientações. Tudo em um só lugar, com a cara de Recife.</p>
+            <p class="lead mb-0">Acompanhe solicitações, atualize seus dados e acesse orientações. Tudo em um só lugar,
+              com a cara de Recife.</p>
           </div>
         </div>
       </div>
     </header>
 
     <main class="container py-4">
-      <div class="user-greeting" id="saudacao">Olá, <strong>{{$json["data"]["dadosComuns"]["nome"]}}!</strong> Este é o seu portal do servidor.</div>
+      <div class="user-greeting" id="saudacao">Olá, <strong id="header_nome">...</strong>! Este é o
+        seu portal do servidor.</div>
 
       <div class="row g-4" id="heroCardsRow">
-        <!-- Card 1: Mobilidade Interna -->
         <section class="col-12 col-lg-5 col-xl-4">
           <div class="card card-programa card-hero h-100">
             <div class="card-body">
@@ -605,17 +785,13 @@
                 <li>Validade de 12 meses, com necessidade de renovação antes do vencimento.</li>
               </ul>
               <div class="card-actions">
-                <form
-                  id="novaSolicitacaoForm"
+                <form id="novaSolicitacaoForm"
                   action="https://n8n.homolog.app.emprel.gov.br/webhook/f188b0f4-f4c9-455b-8dd9-e800c44b46e2"
-                  method="post"
-                  target="_blank"
-                  class="d-inline"
-                >
+                  method="post" target="_blank" class="d-inline">
                   <input type="hidden" name="ds" id="novaSolicitacaoDs" />
                   <input type="hidden" name="grupo" id="novaSolicitacaoGrupo" />
                   <input type="hidden" name="cpf" id="novaSolicitacaoCpf" />
-                  <input type="hidden" name="matricula" id="novaSolicitacaoMatricula" value="{{$json["data"]["vinculos"][0]["matricula"]}}" />
+                  <input type="hidden" name="matricula" id="novaSolicitacaoMatricula" />
                   <button type="button" class="btn btn-primary" id="btnNovaSolicitacao">Nova solicitação</button>
                 </form>
               </div>
@@ -623,7 +799,6 @@
           </div>
         </section>
 
-        <!-- Card 2: Atualização Cadastral -->
         <section class="col-12 col-lg-7 col-xl-8">
           <div class="card card-programa card-hero h-100">
             <div class="card-body">
@@ -634,39 +809,26 @@
                 <summary>Atualizar cadastro</summary>
                 <form id="form-cadastro" class="pt-3" novalidate>
                   <div class="row g-3">
-                    <!-- Matrícula -->
                     <div class="col-12">
                       <label for="matriculaSelect" class="form-label">Matrícula</label>
                       <select id="matriculaSelect" class="form-select" required></select>
-                      <input type="hidden" id="grupoHidden" value="{{$json["data"]["vinculos"][0]["grupo"]}}" />
-                      <input type="hidden" id="cpfHidden" value="{{$json["data"]["dadosComuns"]["cpf"]}}" />
-                      <input type="hidden" id="dsHidden" value="{{$json["data"]["vinculos"][0]["ds"]}}" />
-                      <input type="hidden" id="servidorHidden" value="{{$json["data"]["dadosComuns"]["servidor"]}}" />
+                      <input type="hidden" id="grupoHidden" />
+                      <input type="hidden" id="cpfHidden" />
+                      <input type="hidden" id="dsHidden" />
+                      <input type="hidden" id="servidorHidden" />
                       <div class="invalid-feedback">Selecione uma matrícula válida.</div>
                     </div>
 
-                    <!-- Contatos -->
                     <div class="col-12 col-md-6">
                       <label for="email" class="form-label">E-mail</label>
-                      <input
-                        id="email"
-                        type="email"
-                        class="form-control"
-                        placeholder="seu.email@recife.pe.gov.br"
-                        autocomplete="email"
-                      />
+                      <input id="email" type="email" class="form-control" placeholder="seu.email@recife.pe.gov.br"
+                        autocomplete="email" />
                       <div class="invalid-feedback">Informe um e-mail válido.</div>
                     </div>
                     <div class="col-12 col-md-6">
                       <label for="whatsapp" class="form-label">WhatsApp</label>
-                      <input
-                        id="whatsapp"
-                        class="form-control"
-                        placeholder="81999999999"
-                        inputmode="numeric"
-                        pattern="\d{11}"
-                        maxlength="11"
-                      />
+                      <input id="whatsapp" class="form-control" placeholder="81999999999" inputmode="numeric"
+                        pattern="\d{11}" maxlength="11" />
                       <div class="invalid-feedback">Informe um WhatsApp com 11 dígitos numéricos.</div>
                     </div>
                     <div class="col-12 col-md-6">
@@ -674,7 +836,6 @@
                       <input id="telefonealternativo" class="form-control" placeholder="(81) 3333-3333" />
                     </div>
 
-                    <!-- Endereço -->
                     <div class="col-12 col-sm-4">
                       <label for="cep" class="form-label">CEP</label>
                       <input id="cep" class="form-control" placeholder="00000-000" />
@@ -706,7 +867,6 @@
                       <div class="invalid-feedback">UF deve ter 2 letras.</div>
                     </div>
 
-                    <!-- DS/Executiva -->
                     <div class="col-12 col-md-4 col-lg-3">
                       <label for="dsSelect" class="form-label">DS/Executiva atual</label>
                       <select id="dsSelect" class="form-select" required>
@@ -732,7 +892,6 @@
                       <div class="invalid-feedback">Selecione a DS/Executiva.</div>
                     </div>
 
-                    <!-- Unidade/Turno/Regime (dinâmicos) -->
                     <div class="col-12 col-md-8 col-lg-9">
                       <label for="unidadeSelect" class="form-label">Unidade atual</label>
                       <select id="unidadeSelect" class="form-select" disabled>
@@ -766,7 +925,6 @@
           </div>
         </section>
 
-        <!-- Card 3: Minhas Solicitações -->
         <section class="col-12 col-xl-6">
           <div class="card card-programa">
             <div class="card-header">
@@ -774,14 +932,12 @@
             </div>
             <div class="card-body">
               <div id="minhasSolicitacoes" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 minhas-grid">
-                <!-- Mini cards renderizados via JS -->
               </div>
               <div id="minhasPlaceholder" class="minhas-placeholder mt-3 d-none">Nenhum vínculo encontrado.</div>
             </div>
           </div>
         </section>
 
-        <!-- Card 4: Minhas Renovações -->
         <section class="col-12 col-xl-6">
           <div class="card card-programa">
             <div class="card-header">
@@ -789,14 +945,13 @@
             </div>
             <div class="card-body">
               <div id="minhasRenovacoes" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 minhas-grid">
-                <!-- Mini cards renderizados via JS -->
               </div>
-              <div id="minhasRenovacoesPlaceholder" class="minhas-placeholder mt-3 d-none">Nenhum vínculo encontrado.</div>
+              <div id="minhasRenovacoesPlaceholder" class="minhas-placeholder mt-3 d-none">Nenhum vínculo encontrado.
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- Card 5: Orientações -->
         <section class="col-12 col-lg-6">
           <div class="card card-programa h-100">
             <div class="card-header">
@@ -808,7 +963,6 @@
           </div>
         </section>
 
-        <!-- Card 6: Publicações -->
         <section class="col-12 col-lg-6">
           <div class="card card-programa h-100">
             <div class="card-header">
@@ -820,7 +974,6 @@
           </div>
         </section>
 
-        <!-- Card 7: Mapa das Unidades -->
         <section class="col-12">
           <div class="card card-programa h-100">
             <div class="card-header">
@@ -828,14 +981,9 @@
             </div>
             <div class="card-body">
               <div class="mapa-unidades-wrapper ratio ratio-4x3">
-                <iframe
-                  src="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/mapa-unidades-sesau"
-                  title="Mapa das unidades de saúde"
-                  class="mapa-unidades-frame"
-                  loading="lazy"
-                  allow="geolocation *; fullscreen"
-                  allowfullscreen
-                ></iframe>
+                <iframe src="https://n8n.homolog.app.emprel.gov.br/webhook/mapa-unidades-sesau"
+                  title="Mapa das unidades de saúde" class="mapa-unidades-frame" loading="lazy"
+                  allow="geolocation *; fullscreen" allowfullscreen></iframe>
               </div>
             </div>
           </div>
@@ -849,535 +997,507 @@
         <div class="text-end">Portal do Servidor • Automação e Serviços</div>
       </div>
     </footer>
+  </div>
 
-    <!-- Modal custom (feedback) -->
-    <div id="modalBackdrop" class="feedback-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-      <div class="feedback-modal">
-        <div class="feedback-modal-header">
-          <div class="modal-header-left">
-            <img
-              src="https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200"
-              alt="Logo Gestão PCR"
-              class="modal-logo"
-            />
-            <div>
-              <div class="feedback-modal-title" id="modalTitle">Comprovante de solicitação</div>
-              <div class="feedback-modal-subtitle" id="modalSubtitle">Unidades selecionadas para a matrícula —</div>
-            </div>
-          </div>
-          <div class="modal-meta">
-            <span class="modal-meta-label">Protocolo da solicitação</span>
-            <span class="modal-meta-value" id="modalNumeroSolicitacao">—</span>
+  <div id="modalBackdrop" class="feedback-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="feedback-modal">
+      <div class="feedback-modal-header">
+        <div class="modal-header-left">
+          <img src="https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200" alt="Logo Gestão PCR"
+            class="modal-logo" />
+          <div>
+            <div class="feedback-modal-title" id="modalTitle">Comprovante de solicitação</div>
+            <div class="feedback-modal-subtitle" id="modalSubtitle">Unidades selecionadas para a matrícula —</div>
           </div>
         </div>
-        <div id="modalBody" class="feedback-modal-message"></div>
-        <div class="modal-actions">
-          <div class="modal-actions-default" aria-hidden="false">
-            <button type="button" class="btn btn-success" id="btnSalvarPDF">Salvar em PDF</button>
-            <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
-            <button type="button" class="btn btn-danger" id="btnFecharModal">Fechar</button>
-          </div>
-          <div class="modal-actions-renovacoes d-none" aria-hidden="true">
-            <button type="button" class="btn btn-success" id="btnRenovarPedido">Renovar pedido</button>
-            <button type="button" class="btn btn-danger" id="btnNaoRenovarPedido">Não renovar pedido</button>
-            <button type="button" class="btn btn-secondary" id="btnFecharRenovacao">Fechar</button>
-          </div>
+        <div class="modal-meta">
+          <span class="modal-meta-label">Protocolo da solicitação</span>
+          <span class="modal-meta-value" id="modalNumeroSolicitacao">—</span>
+        </div>
+      </div>
+      <div id="modalBody" class="feedback-modal-message"></div>
+      <div class="modal-actions">
+        <div class="modal-actions-default" aria-hidden="false">
+          <button type="button" class="btn btn-success" id="btnSalvarPDF">Salvar em PDF</button>
+          <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
+          <button type="button" class="btn btn-danger" id="btnFecharModal">Fechar</button>
+        </div>
+        <div class="modal-actions-renovacoes d-none" aria-hidden="true">
+          <button type="button" class="btn btn-success" id="btnRenovarPedido">Renovar pedido</button>
+          <button type="button" class="btn btn-danger" id="btnNaoRenovarPedido">Não renovar pedido</button>
+          <button type="button" class="btn btn-secondary" id="btnFecharRenovacao">Fechar</button>
         </div>
       </div>
     </div>
+  </div>
 
-    <div id="formFeedback" class="form-feedback" aria-hidden="true">
-      <div class="form-feedback-dialog" role="alertdialog" aria-modal="true" aria-labelledby="formFeedbackTitle" aria-describedby="formFeedbackBody">
-        <button type="button" class="form-feedback-close" id="formFeedbackClose" aria-label="Fechar aviso">×</button>
-        <div id="formFeedbackTitle" class="form-feedback-title"></div>
-        <div id="formFeedbackBody" class="form-feedback-body"></div>
-      </div>
+  <div id="formFeedback" class="form-feedback" aria-hidden="true">
+    <div class="form-feedback-dialog" role="alertdialog" aria-modal="true" aria-labelledby="formFeedbackTitle"
+      aria-describedby="formFeedbackBody">
+      <button type="button" class="form-feedback-close" id="formFeedbackClose" aria-label="Fechar aviso">×</button>
+      <div id="formFeedbackTitle" class="form-feedback-title"></div>
+      <div id="formFeedbackBody" class="form-feedback-body"></div>
     </div>
+  </div>
 
-    <div id="decisionRedirectModal" class="decision-redirect-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
-      <div class="decision-redirect-dialog" role="document">
-        <div class="decision-redirect-header">
-          <h2 id="decisionRedirectTitle" class="decision-redirect-title"></h2>
-          <button type="button" class="decision-redirect-close" aria-label="Fechar" id="decisionRedirectClose">&times;</button>
-        </div>
-        <p id="decisionRedirectMessage" class="decision-redirect-message"></p>
-        <p id="decisionRedirectCountdown" class="decision-redirect-countdown"></p>
-        <div class="decision-redirect-actions">
-          <button type="button" class="btn btn-primary" id="decisionRedirectNow">Fechar agora</button>
-        </div>
-      </div>
-    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script>
-      // ===== Helpers =====
-      const postJSON = async (url, body) => {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body || {})
-        });
-        if (!res.ok) throw new Error('Erro de rede');
-        return res.json();
-      };
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    // ===== SEGURANÇA N8N: Extração de Dados dos Inputs =====
+    const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value : '';
 
-      const toBRDate = (iso) => {
-        if (!iso) return '';
-        const d = new Date(iso);
-        if (isNaN(d)) return '';
-        return d.toLocaleDateString('pt-BR');
-      };
+    const nomeServidorTemplate = sanitizeValue(getVal('n8n_nome_servidor'));
+    const nomeExibicaoTemplate = sanitizeValue(getVal('n8n_nome_exibicao'));
 
-      const setStatus = (msg, ok = true) => {
-        const el = document.getElementById('formStatus');
-        el.textContent = msg || '';
-        el.className = ok ? 'text-success ms-2' : 'text-danger ms-2';
-      };
+    // Atualiza cabeçalho
+    document.getElementById('header_nome').textContent = nomeExibicaoTemplate || nomeServidorTemplate;
 
-      const sanitizeValue = (val) => {
-        if (val === null || val === undefined) return '';
-        const str = String(val).trim();
-        return str === 'undefined' || str === 'null' ? '' : str;
-      };
-
-      const sanitizeUF = (val) => (val || '').toUpperCase().slice(0,2);
-      const isUF = (val) => /^[A-Za-z]{2}$/.test(val || '');
-      const isCEP = (val) => /^(\d{5}-?\d{3})$/.test(val || '');
-      const onlyDigits = (val) => (val || '').replace(/\D+/g, '');
-      const normalizeWhats = (val) => onlyDigits(val).slice(0, 11);
-      const isWhats = (val) => /^\d{11}$/.test(String(val || '').trim());
-      const isEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(val || '').trim());
-
-      const formatCPF = (value) => {
-        const digits = (value || '').replace(/\D+/g, '');
-        if (digits.length !== 11) return sanitizeValue(value);
-        return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-      };
-
-      const markInvalid = (el) => {
-        if (!el) return;
-        el.classList.add('is-invalid');
-        el.classList.remove('is-valid');
-      };
-
-      const markValid = (el) => {
-        if (!el) return;
-        el.classList.remove('is-invalid');
-        el.classList.add('is-valid');
-      };
-
-      const SUCCESS_COUNTDOWN_SECONDS = 10;
-      let formFeedbackIntervalId = null;
-      let lastFeedbackType = null;
-
-      const stopFormFeedbackCountdown = () => {
-        if (formFeedbackIntervalId) {
-          clearInterval(formFeedbackIntervalId);
-          formFeedbackIntervalId = null;
+    const DATA = {
+      nome: nomeServidorTemplate || nomeExibicaoTemplate,
+      servidor: nomeServidorTemplate,
+      nomeExibicao: nomeExibicaoTemplate,
+      cpf: sanitizeValue(getVal('n8n_cpf')),
+      vinculos: [
+        {
+          matricula: sanitizeValue(getVal('n8n_v0_mat')),
+          cargo: sanitizeValue(getVal('n8n_v0_cargo')),
+          grupo: sanitizeValue(getVal('n8n_v0_grupo')),
+          ds: sanitizeValue(getVal('n8n_v0_ds'))
+        },
+        {
+          matricula: sanitizeValue(getVal('n8n_v1_mat')),
+          cargo: sanitizeValue(getVal('n8n_v1_cargo')),
+          grupo: sanitizeValue(getVal('n8n_v1_grupo')),
+          ds: sanitizeValue(getVal('n8n_v1_ds'))
         }
-      };
+      ].filter(v => v.matricula !== ''),
+      contatos: {
+        email: sanitizeValue(getVal('n8n_email')).toLowerCase(),
+        whatsapp: sanitizeValue(getVal('n8n_whatsapp')),
+        telalternativo: sanitizeValue(getVal('n8n_telalternativo'))
+      },
+      endereco: {
+        cep: sanitizeValue(getVal('n8n_cep')),
+        logradouro: sanitizeValue(getVal('n8n_logradouro')),
+        numero: sanitizeValue(getVal('n8n_numero')),
+        complemento: sanitizeValue(getVal('n8n_complemento')),
+        bairro: sanitizeValue(getVal('n8n_bairro')),
+        cidade: sanitizeValue(getVal('n8n_cidade')),
+        uf: sanitizeValue(getVal('n8n_uf'))
+      }
+    };
 
-      const collapseCadastroForm = () => {
-        const details = document.querySelector('details.collapsible-form');
-        if (details) details.open = false;
-      };
+    // Preenche campos ocultos iniciais do form para compatibilidade
+    const nsMat = document.getElementById('novaSolicitacaoMatricula');
+    if (nsMat) nsMat.value = DATA.vinculos[0] ? DATA.vinculos[0].matricula : '';
+    const hCpf = document.getElementById('cpfHidden');
+    if (hCpf) hCpf.value = DATA.cpf;
+    const hServ = document.getElementById('servidorHidden');
+    if (hServ) hServ.value = DATA.servidor;
 
-      const closeFormFeedback = () => {
-        stopFormFeedbackCountdown();
-        const overlay = document.getElementById('formFeedback');
-        if (!overlay) return;
-        overlay.classList.remove('active');
-        overlay.setAttribute('aria-hidden', 'true');
-        if (lastFeedbackType === 'success') collapseCadastroForm();
-        lastFeedbackType = null;
-      };
+    // ===== Helpers =====
+    const postJSON = async (url, body) => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body || {})
+      });
+      if (!res.ok) throw new Error('Erro de rede');
+      return res.json();
+    };
 
-      const showFormFeedbackPopup = (type, details = {}) => {
-        const overlay = document.getElementById('formFeedback');
-        const titleEl = document.getElementById('formFeedbackTitle');
-        const bodyEl = document.getElementById('formFeedbackBody');
-        const missing = Array.isArray(details.missing) ? details.missing : [];
-        const invalid = Array.isArray(details.invalid) ? details.invalid : [];
-        if (!overlay || !titleEl || !bodyEl) return;
-        overlay.classList.add('active');
-        overlay.setAttribute('aria-hidden', 'false');
-        stopFormFeedbackCountdown();
-        lastFeedbackType = type;
+    const toBRDate = (iso) => {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (isNaN(d)) return '';
+      return d.toLocaleDateString('pt-BR');
+    };
 
-        titleEl.classList.remove('alert', 'success');
-        if (type === 'error') {
-          titleEl.classList.add('alert');
-          titleEl.textContent = '❗ Alerta';
-          let html = '';
-          if (missing.length) {
-            html += '<div>Preencha os campos a seguir:</div><ul>';
-            missing.forEach((field) => {
-              html += `<li>${field}</li>`;
-            });
-            html += '</ul>';
-          }
-          if (invalid.length) {
-            html += '<div>Corrija os campos com formato inválido:</div><ul>';
-            invalid.forEach((field) => {
-              html += `<li>${field}</li>`;
-            });
-            html += '</ul>';
-          }
-          if (!html) {
-            html = '<div>Revise os dados informados antes de enviar novamente.</div>';
-          }
-          bodyEl.innerHTML = html;
-        } else {
-          titleEl.classList.add('success');
-          titleEl.textContent = '✅ Sucesso';
-          const countdownId = 'formSuccessCountdown';
-          bodyEl.innerHTML = `
+    const setStatus = (msg, ok = true) => {
+      const el = document.getElementById('formStatus');
+      el.textContent = msg || '';
+      el.className = ok ? 'text-success ms-2' : 'text-danger ms-2';
+    };
+
+    function sanitizeValue(val) {
+      if (val === null || val === undefined) return '';
+      const str = String(val).trim();
+      return str === 'undefined' || str === 'null' ? '' : str;
+    }
+
+    const sanitizeUF = (val) => (val || '').toUpperCase().slice(0, 2);
+    const isUF = (val) => /^[A-Za-z]{2}$/.test(val || '');
+    const isCEP = (val) => /^(\d{5}-?\d{3})$/.test(val || '');
+    const onlyDigits = (val) => (val || '').replace(/\D+/g, '');
+    const normalizeWhats = (val) => onlyDigits(val).slice(0, 11);
+    const isWhats = (val) => /^\d{11}$/.test(String(val || '').trim());
+    const isEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(val || '').trim());
+
+    const formatCPF = (value) => {
+      const digits = (value || '').replace(/\D+/g, '');
+      if (digits.length !== 11) return sanitizeValue(value);
+      return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    };
+
+    const markInvalid = (el) => {
+      if (!el) return;
+      el.classList.add('is-invalid');
+      el.classList.remove('is-valid');
+    };
+
+    const markValid = (el) => {
+      if (!el) return;
+      el.classList.remove('is-invalid');
+      el.classList.add('is-valid');
+    };
+
+    const SUCCESS_COUNTDOWN_SECONDS = 10;
+    let formFeedbackIntervalId = null;
+    let lastFeedbackType = null;
+
+    const stopFormFeedbackCountdown = () => {
+      if (formFeedbackIntervalId) {
+        clearInterval(formFeedbackIntervalId);
+        formFeedbackIntervalId = null;
+      }
+    };
+
+    const collapseCadastroForm = () => {
+      const details = document.querySelector('details.collapsible-form');
+      if (details) details.open = false;
+    };
+
+    const closeFormFeedback = () => {
+      stopFormFeedbackCountdown();
+      const overlay = document.getElementById('formFeedback');
+      if (!overlay) return;
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+      if (lastFeedbackType === 'success') collapseCadastroForm();
+      lastFeedbackType = null;
+    };
+
+    const showFormFeedbackPopup = (type, details = {}) => {
+      const overlay = document.getElementById('formFeedback');
+      const titleEl = document.getElementById('formFeedbackTitle');
+      const bodyEl = document.getElementById('formFeedbackBody');
+      const missing = Array.isArray(details.missing) ? details.missing : [];
+      const invalid = Array.isArray(details.invalid) ? details.invalid : [];
+      if (!overlay || !titleEl || !bodyEl) return;
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+      stopFormFeedbackCountdown();
+      lastFeedbackType = type;
+
+      titleEl.classList.remove('alert', 'success');
+      if (type === 'error') {
+        titleEl.classList.add('alert');
+        titleEl.textContent = '❗ Alerta';
+        let html = '';
+        if (missing.length) {
+          html += '<div>Preencha os campos a seguir:</div><ul>';
+          missing.forEach((field) => {
+            html += `<li>${field}</li>`;
+          });
+          html += '</ul>';
+        }
+        if (invalid.length) {
+          html += '<div>Corrija os campos com formato inválido:</div><ul>';
+          invalid.forEach((field) => {
+            html += `<li>${field}</li>`;
+          });
+          html += '</ul>';
+        }
+        if (!html) {
+          html = '<div>Revise os dados informados antes de enviar novamente.</div>';
+        }
+        bodyEl.innerHTML = html;
+      } else {
+        titleEl.classList.add('success');
+        titleEl.textContent = '✅ Sucesso';
+        const countdownId = 'formSuccessCountdown';
+        bodyEl.innerHTML = `
             <div>Os dados de atualização foram enviados com sucesso.</div>
             <div>Este registro não configura um pedido de mobilidade: trata-se exclusivamente de uma atualização cadastral.</div>
             <div class="mt-2">Fechando em <strong><span id="${countdownId}">${SUCCESS_COUNTDOWN_SECONDS}</span>s</strong>...</div>
           `;
-          let remaining = SUCCESS_COUNTDOWN_SECONDS;
-          formFeedbackIntervalId = setInterval(() => {
-            remaining -= 1;
-            const countdownEl = document.getElementById(countdownId);
-            if (countdownEl) countdownEl.textContent = remaining;
-            if (remaining <= 0) {
-              closeFormFeedback();
-            }
-          }, 1000);
-        }
-
-        const closeBtn = document.getElementById('formFeedbackClose');
-        if (closeBtn) closeBtn.focus();
-      };
-
-      const COMPROVANTE_LOGO_URL = 'https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200';
-      let comprovanteLogoDataUrlPromise = null;
-
-      const getComprovanteLogoDataUrl = async () => {
-        if (!comprovanteLogoDataUrlPromise) {
-          comprovanteLogoDataUrlPromise = fetch(COMPROVANTE_LOGO_URL)
-            .then((response) => {
-              if (!response.ok) throw new Error('Erro ao carregar logotipo');
-              return response.blob();
-            })
-            .then((blob) => new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result);
-              reader.onerror = () => reject(new Error('Falha ao converter logotipo'));
-              reader.readAsDataURL(blob);
-            }))
-            .catch(() => null);
-        }
-        return comprovanteLogoDataUrlPromise;
-      };
-
-      // Dados vindos do template (quando presentes)
-      const nomeServidorTemplate = sanitizeValue(`{{$json["data"]["dadosComuns"]["servidor"]}}`);
-      const nomeExibicaoTemplate = sanitizeValue(`{{$json["data"]["dadosComuns"]["nome"]}}`);
-      const DATA = {
-        nome: nomeServidorTemplate || nomeExibicaoTemplate,
-        servidor: nomeServidorTemplate,
-        nomeExibicao: nomeExibicaoTemplate,
-        cpf: sanitizeValue(`{{$json["data"]["dadosComuns"]["cpf"]}}`),
-        vinculos: [
-          {
-            matricula: sanitizeValue(`{{$json["data"]["vinculos"][0]["matricula"]}}`),
-            cargo: sanitizeValue(`{{$json["data"]["vinculos"][0]["cargo"]}}`),
-            grupo: sanitizeValue(`{{$json["data"]["vinculos"][0]["grupo"]}}`),
-            ds: sanitizeValue(`{{$json["data"]["vinculos"][0]["ds"]}}`)
-          },
-          {
-            matricula: sanitizeValue(`{{$json["data"]["vinculos"][1]["matricula"]}}`),
-            cargo: sanitizeValue(`{{$json["data"]["vinculos"][1]["cargo"]}}`),
-            grupo: sanitizeValue(`{{$json["data"]["vinculos"][1]["grupo"]}}`),
-            ds: sanitizeValue(`{{$json["data"]["vinculos"][1]["ds"]}}`)
+        let remaining = SUCCESS_COUNTDOWN_SECONDS;
+        formFeedbackIntervalId = setInterval(() => {
+          remaining -= 1;
+          const countdownEl = document.getElementById(countdownId);
+          if (countdownEl) countdownEl.textContent = remaining;
+          if (remaining <= 0) {
+            closeFormFeedback();
           }
-        ],
-        contatos: {
-          email: sanitizeValue(`{{$json["data"]["dadosComuns"]["email"]}}`).toLowerCase(),
-          whatsapp: sanitizeValue(`{{$json["data"]["dadosComuns"]["whatsapp"]}}`),
-          telalternativo: sanitizeValue(`{{$json["data"]["dadosComuns"]["telalternativo"]}}`)
-        },
-        endereco: {
-          cep: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["cep"]}}`),
-          logradouro: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["logradouro"]}}`),
-          numero: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["numero"]}}`),
-          complemento: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["complemento"]}}`),
-          bairro: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["bairro"]}}`),
-          cidade: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["cidade"]}}`),
-          uf: sanitizeValue(`{{$json["data"]["dadosComuns"]["endereco"]["uf"]}}`)
-        }
+        }, 1000);
+      }
+
+      const closeBtn = document.getElementById('formFeedbackClose');
+      if (closeBtn) closeBtn.focus();
+    };
+
+    const COMPROVANTE_LOGO_URL = 'https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200';
+    let comprovanteLogoDataUrlPromise = null;
+
+    const getComprovanteLogoDataUrl = async () => {
+      if (!comprovanteLogoDataUrlPromise) {
+        comprovanteLogoDataUrlPromise = fetch(COMPROVANTE_LOGO_URL)
+          .then((response) => {
+            if (!response.ok) throw new Error('Erro ao carregar logotipo');
+            return response.blob();
+          })
+          .then((blob) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error('Falha ao converter logotipo'));
+            reader.readAsDataURL(blob);
+          }))
+          .catch(() => null);
+      }
+      return comprovanteLogoDataUrlPromise;
+    };
+
+    // ===== Inicialização dos campos =====
+    function populateMatriculas() {
+      const sel = document.getElementById('matriculaSelect');
+      sel.innerHTML = '';
+      const opts = [];
+      const pushVinculoOption = (vinculo) => {
+        if (!vinculo) return;
+        const value = sanitizeValue(vinculo.matricula);
+        if (!value) return;
+        opts.push({
+          value,
+          text: value,
+          grupo: sanitizeValue(vinculo.grupo),
+          ds: sanitizeValue(vinculo.ds)
+        });
       };
-
-      // ===== Inicialização dos campos =====
-      function populateMatriculas() {
-        const sel = document.getElementById('matriculaSelect');
-        sel.innerHTML = '';
-        const opts = [];
-        const pushVinculoOption = (vinculo) => {
-          if (!vinculo) return;
-          const value = sanitizeValue(vinculo.matricula);
-          if (!value) return;
-          opts.push({
-            value,
-            text: value,
-            grupo: sanitizeValue(vinculo.grupo),
-            ds: sanitizeValue(vinculo.ds)
-          });
-        };
-        (DATA.vinculos || []).forEach(pushVinculoOption);
-        if (opts.length === 0) {
-          sel.innerHTML = '<option value="" disabled selected>Sem matrículas disponíveis</option>';
-          sel.setAttribute('disabled', 'disabled');
-        } else {
-          sel.removeAttribute('disabled');
-          const placeholder = document.createElement('option');
-          placeholder.value = '';
-          placeholder.textContent = 'Selecione...';
-          placeholder.disabled = true;
-          placeholder.selected = true;
-          sel.appendChild(placeholder);
-          opts.forEach((optionData) => {
-            const option = document.createElement('option');
-            option.value = optionData.value;
-            option.textContent = optionData.text;
-            if (optionData.grupo) option.dataset.grupo = optionData.grupo;
-            if (optionData.ds) option.dataset.ds = optionData.ds;
-            sel.appendChild(option);
-          });
-        }
-        const hiddenGrupo = document.getElementById('grupoHidden');
-        if (hiddenGrupo) {
-          const normalizedGrupo = sanitizeValue(hiddenGrupo.value) || (opts[0]?.grupo || '');
-          hiddenGrupo.value = normalizedGrupo;
-        }
-        const hiddenCpf = document.getElementById('cpfHidden');
-        if (hiddenCpf) hiddenCpf.value = DATA.cpf;
-        const hiddenDs = document.getElementById('dsHidden');
-        if (hiddenDs) {
-          const normalizedDs = sanitizeValue(hiddenDs.value) || (opts[0]?.ds || '');
-          hiddenDs.value = normalizedDs;
-        }
-        const hiddenMatricula = document.getElementById('novaSolicitacaoMatricula');
-        if (hiddenMatricula) {
-          const normalizedMatricula = sanitizeValue(hiddenMatricula.value) || (opts[0]?.value || '');
-          hiddenMatricula.value = normalizedMatricula;
-        }
+      (DATA.vinculos || []).forEach(pushVinculoOption);
+      if (opts.length === 0) {
+        sel.innerHTML = '<option value="" disabled selected>Sem matrículas disponíveis</option>';
+        sel.setAttribute('disabled', 'disabled');
+      } else {
+        sel.removeAttribute('disabled');
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Selecione...';
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        sel.appendChild(placeholder);
+        opts.forEach((optionData) => {
+          const option = document.createElement('option');
+          option.value = optionData.value;
+          option.textContent = optionData.text;
+          if (optionData.grupo) option.dataset.grupo = optionData.grupo;
+          if (optionData.ds) option.dataset.ds = optionData.ds;
+          sel.appendChild(option);
+        });
       }
+    }
 
-      function populateContatosEndereco() {
-        const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = (v && v !== 'undefined' && v !== 'null') ? v : ''; };
-        setVal('email', sanitizeValue(DATA.contatos.email).toLowerCase());
-        setVal('whatsapp', normalizeWhats(DATA.contatos.whatsapp));
-        setVal('telefonealternativo', DATA.contatos.telalternativo);
-        setVal('cep', DATA.endereco.cep);
-        setVal('logradouro', DATA.endereco.logradouro);
-        setVal('numero', DATA.endereco.numero);
-        setVal('complemento', DATA.endereco.complemento);
-        setVal('bairro', DATA.endereco.bairro);
-        setVal('cidade', DATA.endereco.cidade);
-        setVal('uf', sanitizeUF(DATA.endereco.uf));
+    function populateContatosEndereco() {
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = (v && v !== 'undefined' && v !== 'null') ? v : ''; };
+      setVal('email', sanitizeValue(DATA.contatos.email).toLowerCase());
+      setVal('whatsapp', normalizeWhats(DATA.contatos.whatsapp));
+      setVal('telefonealternativo', DATA.contatos.telalternativo);
+      setVal('cep', DATA.endereco.cep);
+      setVal('logradouro', DATA.endereco.logradouro);
+      setVal('numero', DATA.endereco.numero);
+      setVal('complemento', DATA.endereco.complemento);
+      setVal('bairro', DATA.endereco.bairro);
+      setVal('cidade', DATA.endereco.cidade);
+      setVal('uf', sanitizeUF(DATA.endereco.uf));
+    }
+
+    function renderVinculoCards(containerId, placeholderId, clickHandler) {
+      const wrap = document.getElementById(containerId);
+      const placeholder = document.getElementById(placeholderId);
+      if (!wrap || !placeholder) return;
+      wrap.innerHTML = '';
+      const entries = DATA.vinculos.filter((v) => v && v.matricula && v.matricula !== 'undefined' && v.matricula.trim() !== '');
+      if (entries.length === 0) {
+        placeholder.classList.remove('d-none');
+        return;
       }
-
-      function renderVinculoCards(containerId, placeholderId, clickHandler) {
-        const wrap = document.getElementById(containerId);
-        const placeholder = document.getElementById(placeholderId);
-        if (!wrap || !placeholder) return;
-        wrap.innerHTML = '';
-        const entries = DATA.vinculos.filter((v) => v && v.matricula && v.matricula !== 'undefined' && v.matricula.trim() !== '');
-        if (entries.length === 0) {
-          placeholder.classList.remove('d-none');
-          return;
-        }
-        placeholder.classList.add('d-none');
-        entries.forEach((vinculo) => {
-          const cargo = vinculo.cargo && vinculo.cargo !== 'undefined' ? vinculo.cargo : '';
-          const card = document.createElement('div');
-          card.className = 'col';
-          card.innerHTML = `
+      placeholder.classList.add('d-none');
+      entries.forEach((vinculo) => {
+        const cargo = vinculo.cargo && vinculo.cargo !== 'undefined' ? vinculo.cargo : '';
+        const card = document.createElement('div');
+        card.className = 'col';
+        card.innerHTML = `
             <div class="minha-card h-100">
               <div class="fw-bold mb-1">${vinculo.matricula}</div>
               <div class="text-muted small">${cargo}</div>
             </div>
           `;
-          card.querySelector('.minha-card').addEventListener('click', () => clickHandler(vinculo.matricula));
-          wrap.appendChild(card);
+        card.querySelector('.minha-card').addEventListener('click', () => clickHandler(vinculo.matricula));
+        wrap.appendChild(card);
+      });
+    }
+
+    function renderMinhasSolicitacoesCards() {
+      renderVinculoCards('minhasSolicitacoes', 'minhasPlaceholder', (matricula) => abrirRevisaoSolicitacao(matricula, 'solicitacoes'));
+    }
+
+    function renderMinhasRenovacoesCards() {
+      renderVinculoCards('minhasRenovacoes', 'minhasRenovacoesPlaceholder', (matricula) => abrirRevisaoSolicitacao(matricula, 'renovacoes'));
+    }
+
+    // ===== Encadeamento DS -> Unidade -> Turno/Regime =====
+    async function loadUnidades(ds, grupoFromParam) {
+      const sel = document.getElementById('unidadeSelect');
+      sel.innerHTML = '<option>Carregando...</option>';
+      sel.setAttribute('disabled', 'disabled');
+      document.getElementById('turnoSelect').innerHTML = '<option>Selecione a Unidade...</option>';
+      document.getElementById('turnoSelect').setAttribute('disabled', 'disabled');
+      document.getElementById('regimeSelect').innerHTML = '<option>Selecione a Unidade...</option>';
+      document.getElementById('regimeSelect').setAttribute('disabled', 'disabled');
+      try {
+        const hiddenGrupoInput = document.getElementById('grupoHidden');
+        const resolvedGrupo = sanitizeValue(grupoFromParam ?? (hiddenGrupoInput ? hiddenGrupoInput.value : ''));
+        const payload = { ds, grupo: resolvedGrupo || null };
+        const data = await postJSON('https://n8n.homolog.app.emprel.gov.br/webhook/unidades', payload);
+        sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+        (data || []).forEach(u => {
+          if (u && u.unidade) sel.insertAdjacentHTML('beforeend', `<option value="${u.unidade}">${u.unidade}</option>`);
         });
+        sel.removeAttribute('disabled');
+      } catch (e) {
+        sel.innerHTML = '<option>Falha ao carregar</option>';
       }
+    }
 
-      function renderMinhasSolicitacoesCards() {
-        renderVinculoCards('minhasSolicitacoes', 'minhasPlaceholder', (matricula) => abrirRevisaoSolicitacao(matricula, 'solicitacoes'));
+    async function loadTurnos(unidade) {
+      const sel = document.getElementById('turnoSelect');
+      sel.innerHTML = '<option>Carregando...</option>';
+      sel.setAttribute('disabled', 'disabled');
+      try {
+        const data = await postJSON('https://n8n.homolog.app.emprel.gov.br/webhook/turnos', { unidade });
+        sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+        (data || []).forEach(t => { if (t && t.turno) sel.insertAdjacentHTML('beforeend', `<option>${t.turno}</option>`); });
+        sel.removeAttribute('disabled');
+      } catch (e) {
+        sel.innerHTML = '<option>Falha ao carregar</option>';
       }
+    }
 
-      function renderMinhasRenovacoesCards() {
-        renderVinculoCards('minhasRenovacoes', 'minhasRenovacoesPlaceholder', (matricula) => abrirRevisaoSolicitacao(matricula, 'renovacoes'));
-      }
-
-      // ===== Encadeamento DS -> Unidade -> Turno/Regime =====
-      async function loadUnidades(ds, grupoFromParam) {
-        const sel = document.getElementById('unidadeSelect');
-        sel.innerHTML = '<option>Carregando...</option>';
-        sel.setAttribute('disabled', 'disabled');
-        document.getElementById('turnoSelect').innerHTML = '<option>Selecione a Unidade...</option>';
-        document.getElementById('turnoSelect').setAttribute('disabled', 'disabled');
-        document.getElementById('regimeSelect').innerHTML = '<option>Selecione a Unidade...</option>';
-        document.getElementById('regimeSelect').setAttribute('disabled', 'disabled');
-        try {
-          const hiddenGrupoInput = document.getElementById('grupoHidden');
-          const resolvedGrupo = sanitizeValue(grupoFromParam ?? (hiddenGrupoInput ? hiddenGrupoInput.value : ''));
-          const payload = { ds, grupo: resolvedGrupo || null };
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/unidades', payload);
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
-          (data || []).forEach(u => {
-            if (u && u.unidade) sel.insertAdjacentHTML('beforeend', `<option value="${u.unidade}">${u.unidade}</option>`);
-          });
-          sel.removeAttribute('disabled');
-        } catch (e) {
-          sel.innerHTML = '<option>Falha ao carregar</option>';
-        }
-      }
-
-      async function loadTurnos(unidade) {
-        const sel = document.getElementById('turnoSelect');
-        sel.innerHTML = '<option>Carregando...</option>';
-        sel.setAttribute('disabled', 'disabled');
-        try {
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/turnos', { unidade });
-          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
-          (data || []).forEach(t => { if (t && t.turno) sel.insertAdjacentHTML('beforeend', `<option>${t.turno}</option>`); });
-          sel.removeAttribute('disabled');
-        } catch (e) {
-          sel.innerHTML = '<option>Falha ao carregar</option>';
-        }
-      }
-
-      async function loadRegimes(unidade) {
-        const sel = document.getElementById('regimeSelect');
-        sel.innerHTML = '<option>Carregando...</option>';
-        sel.setAttribute('disabled', 'disabled');
-        try {
-          const data = await postJSON('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/regimes', { unidade });
-          const regimes = [];
-          const pushRegime = (value) => {
-            if (!value || value === 'undefined') return;
-            regimes.push(value);
-          };
-          if (Array.isArray(data)) {
-            data.forEach(item => {
-              if (typeof item === 'string') pushRegime(item);
-              else if (item && typeof item === 'object') pushRegime(item.regime || item.nome || item.Regime);
-            });
-          } else if (data && typeof data === 'object') {
-            if (Array.isArray(data.regimes)) data.regimes.forEach(pushRegime);
-            if (Array.isArray(data.Regimes)) data.Regimes.forEach(pushRegime);
-            if (Array.isArray(data.data)) data.data.forEach(pushRegime);
-          }
-          if (regimes.length) {
-            sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
-            regimes.forEach(reg => sel.insertAdjacentHTML('beforeend', `<option>${reg}</option>`));
-            sel.removeAttribute('disabled');
-          } else {
-            sel.innerHTML = '<option>Nenhum regime disponível</option>';
-          }
-        } catch (e) {
-          sel.innerHTML = '<option>Não foi possível carregar os regimes</option>';
-        }
-      }
-
-      function setModalActionsContext(context) {
-        const defaultActions = document.querySelector('.modal-actions-default');
-        const renovacoesActions = document.querySelector('.modal-actions-renovacoes');
-        if (!defaultActions || !renovacoesActions) return;
-        const showRenovacoes = context === 'renovacoes';
-        defaultActions.classList.toggle('d-none', showRenovacoes);
-        renovacoesActions.classList.toggle('d-none', !showRenovacoes);
-        defaultActions.setAttribute('aria-hidden', showRenovacoes ? 'true' : 'false');
-        renovacoesActions.setAttribute('aria-hidden', showRenovacoes ? 'false' : 'true');
-      }
-
-      // ===== Minhas Solicitações -> Modal =====
-      async function abrirRevisaoSolicitacao(matricula, origem = 'solicitacoes') {
-        const backdrop = document.getElementById('modalBackdrop');
-        const modalBody = document.getElementById('modalBody');
-        const contexto = origem === 'renovacoes' ? 'renovacoes' : 'solicitacoes';
-        const solicitacoesEndpoint = 'https://n8n.homolog.app.emprel.gov.br/webhook/comprovante-sesau';
-        const renovacoesEndpoint = 'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2';
-        const modalTitleEl = document.getElementById('modalTitle');
-        const modalSubtitleEl = document.getElementById('modalSubtitle');
-        const matriculaLimpa = sanitizeValue(matricula);
-
-        window.__modalContext = contexto;
-        window.__modalLastData = null;
-        window.__modalMatricula = matricula;
-        setModalActionsContext(contexto);
-        if (modalTitleEl) {
-          modalTitleEl.textContent =
-            contexto === 'solicitacoes'
-              ? 'Comprovante de solicitação'
-              : 'Pedidos próximos do vencimento';
-        }
-        if (modalSubtitleEl) {
-          modalSubtitleEl.textContent =
-            contexto === 'solicitacoes'
-              ? `Unidades selecionadas para a matrícula ${matriculaLimpa || '—'}`
-              : 'Relação de pedidos com vencimento nos próximos 30 dias';
-        }
-        document.getElementById('modalNumeroSolicitacao').textContent = '—';
-        modalBody.innerHTML = '<div class="text-muted">Carregando...</div>';
-        backdrop.classList.add('active');
-        backdrop.setAttribute('aria-hidden', 'false');
-
-        const normalizeList = (response) => {
-          if (Array.isArray(response)) return response;
-          if (response && Array.isArray(response.data)) return response.data;
-          if (response && Array.isArray(response.solicitacoes)) return response.solicitacoes;
-          if (response && Array.isArray(response.pedidos)) return response.pedidos;
-          return [];
+    async function loadRegimes(unidade) {
+      const sel = document.getElementById('regimeSelect');
+      sel.innerHTML = '<option>Carregando...</option>';
+      sel.setAttribute('disabled', 'disabled');
+      try {
+        const data = await postJSON('https://n8n.homolog.app.emprel.gov.br/webhook/regimes', { unidade });
+        const regimes = [];
+        const pushRegime = (value) => {
+          if (!value || value === 'undefined') return;
+          regimes.push(value);
         };
+        if (Array.isArray(data)) {
+          data.forEach(item => {
+            if (typeof item === 'string') pushRegime(item);
+            else if (item && typeof item === 'object') pushRegime(item.regime || item.nome || item.Regime);
+          });
+        } else if (data && typeof data === 'object') {
+          if (Array.isArray(data.regimes)) data.regimes.forEach(pushRegime);
+          if (Array.isArray(data.Regimes)) data.Regimes.forEach(pushRegime);
+          if (Array.isArray(data.data)) data.data.forEach(pushRegime);
+        }
+        if (regimes.length) {
+          sel.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+          regimes.forEach(reg => sel.insertAdjacentHTML('beforeend', `<option>${reg}</option>`));
+          sel.removeAttribute('disabled');
+        } else {
+          sel.innerHTML = '<option>Nenhum regime disponível</option>';
+        }
+      } catch (e) {
+        sel.innerHTML = '<option>Não foi possível carregar os regimes</option>';
+      }
+    }
 
-        const endpoint = contexto === 'renovacoes' ? renovacoesEndpoint : solicitacoesEndpoint;
+    function setModalActionsContext(context) {
+      const defaultActions = document.querySelector('.modal-actions-default');
+      const renovacoesActions = document.querySelector('.modal-actions-renovacoes');
+      if (!defaultActions || !renovacoesActions) return;
+      const showRenovacoes = context === 'renovacoes';
+      defaultActions.classList.toggle('d-none', showRenovacoes);
+      renovacoesActions.classList.toggle('d-none', !showRenovacoes);
+      defaultActions.setAttribute('aria-hidden', showRenovacoes ? 'true' : 'false');
+      renovacoesActions.setAttribute('aria-hidden', showRenovacoes ? 'false' : 'true');
+    }
 
-        try {
-          const data = await postJSON(endpoint, { matricula });
-          const lista = normalizeList(data);
-          if (!Array.isArray(lista) || lista.length === 0) {
-            modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
-            return;
-          }
+    // ===== Minhas Solicitações -> Modal =====
+    async function abrirRevisaoSolicitacao(matricula, origem = 'solicitacoes') {
+      const backdrop = document.getElementById('modalBackdrop');
+      const modalBody = document.getElementById('modalBody');
+      const contexto = origem === 'renovacoes' ? 'renovacoes' : 'solicitacoes';
+      const solicitacoesEndpoint = 'https://n8n.homolog.app.emprel.gov.br/webhook/comprovante-sesau';
+      const renovacoesEndpoint = 'https://n8n.homolog.app.emprel.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2';
+      const modalTitleEl = document.getElementById('modalTitle');
+      const modalSubtitleEl = document.getElementById('modalSubtitle');
+      const matriculaLimpa = sanitizeValue(matricula);
 
-          const numeroSolicitacao = sanitizeValue(
-            data?.protocolo || lista[0]?.protocolo || lista[0]?.numero_solicitacao || lista[0]?.numeroSolicitacao || ''
-          );
-          document.getElementById('modalNumeroSolicitacao').textContent = numeroSolicitacao || '—';
-          window.__modalLastData = lista;
+      window.__modalContext = contexto;
+      window.__modalLastData = null;
+      window.__modalMatricula = matricula;
+      setModalActionsContext(contexto);
+      if (modalTitleEl) {
+        modalTitleEl.textContent =
+          contexto === 'solicitacoes'
+            ? 'Comprovante de solicitação'
+            : 'Pedidos próximos do vencimento';
+      }
+      if (modalSubtitleEl) {
+        modalSubtitleEl.textContent =
+          contexto === 'solicitacoes'
+            ? `Unidades selecionadas para a matrícula ${matriculaLimpa || '—'}`
+            : 'Relação de pedidos com vencimento nos próximos 30 dias';
+      }
+      document.getElementById('modalNumeroSolicitacao').textContent = '—';
+      modalBody.innerHTML = '<div class="text-muted">Carregando...</div>';
+      backdrop.classList.add('active');
+      backdrop.setAttribute('aria-hidden', 'false');
 
-          const prefer = (obj, keys = []) => keys.map((k) => obj?.[k]).find((val) => val !== undefined && val !== null && val !== '');
-          const parsePrioridade = (value) => {
-            const num = Number(value);
-            return Number.isFinite(num) ? num : Infinity;
-          };
-          const orderedLista = [...lista].sort(
-            (a, b) => parsePrioridade(prefer(a, ['prioridade', 'prioridade_atual', 'prioridadeAtual'])) -
-              parsePrioridade(prefer(b, ['prioridade', 'prioridade_atual', 'prioridadeAtual']))
-          );
+      const normalizeList = (response) => {
+        if (Array.isArray(response)) return response;
+        if (response && Array.isArray(response.data)) return response.data;
+        if (response && Array.isArray(response.solicitacoes)) return response.solicitacoes;
+        if (response && Array.isArray(response.pedidos)) return response.pedidos;
+        return [];
+      };
 
-          const rows = orderedLista
-            .map((it) => {
-              const prioridade = prefer(it, ['prioridade', 'prioridade_atual', 'prioridadeAtual']);
-              const classificacao = prefer(it, ['classificacao', 'classificacao_atual', 'classificacaoAtual', 'class']);
-              const matriculaValue = prefer(it, ['matricula', 'Matricula']);
-              const cargo = prefer(it, ['cargo', 'Cargo']);
-              const distrito = prefer(it, ['distrito', 'ds', 'Distrito']);
-              const lotacao = prefer(it, ['lotacao', 'lotação', 'Lotacao']);
-              const cred = prefer(it, ['data_credenciamento', 'credenciamento', 'dataCredenciamento']);
-              const solic = prefer(it, ['data_solicitacao', 'dataSolicitacao', 'solicitacao']);
-              return `
+      const endpoint = contexto === 'renovacoes' ? renovacoesEndpoint : solicitacoesEndpoint;
+
+      try {
+        const data = await postJSON(endpoint, { matricula });
+        const lista = normalizeList(data);
+        if (!Array.isArray(lista) || lista.length === 0) {
+          modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
+          return;
+        }
+
+        const numeroSolicitacao = sanitizeValue(
+          data?.protocolo || lista[0]?.protocolo || lista[0]?.numero_solicitacao || lista[0]?.numeroSolicitacao || ''
+        );
+        document.getElementById('modalNumeroSolicitacao').textContent = numeroSolicitacao || '—';
+        window.__modalLastData = lista;
+
+        const prefer = (obj, keys = []) => keys.map((k) => obj?.[k]).find((val) => val !== undefined && val !== null && val !== '');
+        const rows = lista
+          .map((it) => {
+            const prioridade = prefer(it, ['prioridade', 'prioridade_atual', 'prioridadeAtual']);
+            const classificacao = prefer(it, ['classificacao', 'classificacao_atual', 'classificacaoAtual', 'class']);
+            const matriculaValue = prefer(it, ['matricula', 'Matricula']);
+            const cargo = prefer(it, ['cargo', 'Cargo']);
+            const distrito = prefer(it, ['distrito', 'ds', 'Distrito']);
+            const lotacao = prefer(it, ['lotacao', 'lotação', 'Lotacao']);
+            const cred = prefer(it, ['data_credenciamento', 'credenciamento', 'dataCredenciamento']);
+            const solic = prefer(it, ['data_solicitacao', 'dataSolicitacao', 'solicitacao']);
+            const id = prefer(it, ['id', 'identificador']);
+            return `
                 <tr>
                   <td class="text-center fw-semibold">${prioridade ?? ''}</td>
                   <td class="text-center fw-semibold">${classificacao ?? ''}</td>
@@ -1387,12 +1507,13 @@
                   <td>${lotacao || ''}</td>
                   <td>${toBRDate(cred)}</td>
                   <td>${toBRDate(solic)}</td>
+                  <td>${id || ''}</td>
                 </tr>
               `;
-            })
-            .join('');
+          })
+          .join('');
 
-          modalBody.innerHTML = `
+        modalBody.innerHTML = `
             <div class="table-responsive modal-table-wrapper">
               <table class="table table-sm table-hover align-middle">
                 <thead>
@@ -1405,6 +1526,7 @@
                     <th>Lotação</th>
                     <th>Credenciamento</th>
                     <th>Solicitação</th>
+                    <th>id</th>
                   </tr>
                 </thead>
                 <tbody>${rows}</tbody>
@@ -1412,1211 +1534,1252 @@
             </div>
             <div id="modalFeedback" class="small mt-3 text-muted"></div>
           `;
-        } catch (e) {
-          document.getElementById('modalNumeroSolicitacao').textContent = '—';
-          modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
-        }
+      } catch (e) {
+        document.getElementById('modalNumeroSolicitacao').textContent = '—';
+        modalBody.innerHTML = '<div class="text-danger">Não foi possível localizar nenhum pedido para a matrícula informada.</div>';
+      }
+    }
+
+    const updateModalFeedback = (msg, isError = false) => {
+      const feedback = document.getElementById('modalFeedback');
+      if (!feedback) return;
+      feedback.textContent = msg || '';
+      feedback.classList.toggle('text-danger', !!isError);
+      feedback.classList.toggle('text-success', !isError && !!msg);
+      feedback.classList.toggle('text-muted', !msg);
+    };
+
+    let redirectCountdownTimer = null;
+    let redirectInterval = null;
+    const limparTemporizadoresRedirect = () => {
+      if (redirectCountdownTimer) {
+        clearTimeout(redirectCountdownTimer);
+        redirectCountdownTimer = null;
+      }
+      if (redirectInterval) {
+        clearInterval(redirectInterval);
+        redirectInterval = null;
+      }
+    };
+
+    const executarFechamentoFluxo = () => {
+      limparTemporizadoresRedirect();
+      fecharModal();
+    };
+
+    const abrirModalRedirecionamento = (acao) => {
+      limparTemporizadoresRedirect();
+      redirectCountdownTimer = setTimeout(executarFechamentoFluxo, 2000);
+    };
+
+    const enviarRenovacao = async (acao) => {
+      const renovarBtn = document.getElementById('btnRenovarPedido');
+      const naoRenovarBtn = document.getElementById('btnNaoRenovarPedido');
+      const buttons = [renovarBtn, naoRenovarBtn];
+      const toggleButtons = (disabled, label) => {
+        buttons.forEach((btn) => {
+          if (!btn) return;
+          if (label && disabled) {
+            btn.dataset.originalText = btn.textContent;
+            btn.textContent = label;
+          }
+          if (!disabled && btn.dataset.originalText) {
+            btn.textContent = btn.dataset.originalText;
+            delete btn.dataset.originalText;
+          }
+          btn.disabled = disabled;
+        });
+      };
+
+      const payload = {
+        acao,
+        contexto: window.__modalContext || 'solicitacoes',
+        matricula: window.__modalMatricula || null,
+        protocolo: document.getElementById('modalNumeroSolicitacao')?.textContent || null,
+        solicitacoes: window.__modalLastData || [],
+      };
+
+      updateModalFeedback('Enviando sua resposta...', false);
+      toggleButtons(true, 'Enviando...');
+
+      try {
+        const response = await fetch('https://n8n.homolog.app.emprel.gov.br/webhook/renovar-pedido-mobilidade', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) throw new Error('Erro ao registrar decisão');
+        updateModalFeedback('Resposta registrada com sucesso.', false);
+
+        abrirModalRedirecionamento(acao);
+      } catch (error) {
+        console.error('Erro ao enviar decisão de renovação:', error);
+        updateModalFeedback('Não foi possível registrar sua resposta. Tente novamente.', true);
+      } finally {
+        toggleButtons(false);
+      }
+    };
+
+    async function gerarPdfModal() {
+      const triggerButton = document.getElementById('btnSalvarPDF');
+      const modalBody = document.getElementById('modalBody');
+      const { jsPDF } = window.jspdf || {};
+      if (!jsPDF) {
+        alert('Não foi possível gerar o PDF no momento. Tente novamente mais tarde.');
+        return;
       }
 
-      const updateModalFeedback = (msg, isError = false) => {
-        const feedback = document.getElementById('modalFeedback');
-        if (!feedback) return;
-        feedback.textContent = msg || '';
-        feedback.classList.toggle('text-danger', !!isError);
-        feedback.classList.toggle('text-success', !isError && !!msg);
-        feedback.classList.toggle('text-muted', !msg);
-      };
+      try {
+        if (triggerButton) triggerButton.setAttribute('aria-busy', 'true');
 
-      let redirectCountdownTimer = null;
-      let redirectInterval = null;
-      const limparTemporizadoresRedirect = () => {
-        if (redirectCountdownTimer) {
-          clearTimeout(redirectCountdownTimer);
-          redirectCountdownTimer = null;
-        }
-        if (redirectInterval) {
-          clearInterval(redirectInterval);
-          redirectInterval = null;
-        }
-      };
-
-      const executarFechamentoFluxo = () => {
-        const modal = document.getElementById('decisionRedirectModal');
-        if (modal) modal.classList.remove('active');
-        modal?.setAttribute('aria-hidden', 'true');
-        limparTemporizadoresRedirect();
-        fecharModal();
-      };
-
-      const abrirModalRedirecionamento = (acao) => {
-        const modal = document.getElementById('decisionRedirectModal');
-        const title = document.getElementById('decisionRedirectTitle');
-        const message = document.getElementById('decisionRedirectMessage');
-        const countdownEl = document.getElementById('decisionRedirectCountdown');
-
-        if (!modal || !title || !message || !countdownEl) return;
-
-        limparTemporizadoresRedirect();
-
-        const isRenovar = acao === 'renovar';
-        title.textContent = isRenovar ? 'Você optou por renovar seus pedidos.' : 'Você optou por não renovar os seus pedidos.';
-        message.textContent = isRenovar
-          ? 'Sua escolha foi registrada. Este aviso será fechado automaticamente.'
-          : 'Esta escolha é irreversível. Este aviso será fechado automaticamente.';
-
-        let remaining = 5;
-        countdownEl.textContent = `Fechando em ${remaining}s...`;
-
-        modal.classList.add('active');
-        modal.setAttribute('aria-hidden', 'false');
-
-        redirectInterval = setInterval(() => {
-          remaining -= 1;
-          countdownEl.textContent = `Fechando em ${Math.max(remaining, 0)}s...`;
-        }, 1000);
-
-        redirectCountdownTimer = setTimeout(executarFechamentoFluxo, remaining * 1000);
-      };
-
-      const enviarRenovacao = async (acao) => {
-        const renovarBtn = document.getElementById('btnRenovarPedido');
-        const naoRenovarBtn = document.getElementById('btnNaoRenovarPedido');
-        const buttons = [renovarBtn, naoRenovarBtn];
-        const toggleButtons = (disabled, label) => {
-          buttons.forEach((btn) => {
-            if (!btn) return;
-            if (label && disabled) {
-              btn.dataset.originalText = btn.textContent;
-              btn.textContent = label;
-            }
-            if (!disabled && btn.dataset.originalText) {
-              btn.textContent = btn.dataset.originalText;
-              delete btn.dataset.originalText;
-            }
-            btn.disabled = disabled;
-          });
-        };
-
-        const payload = {
-          acao,
-          contexto: window.__modalContext || 'solicitacoes',
-          matricula: window.__modalMatricula || null,
-          protocolo: document.getElementById('modalNumeroSolicitacao')?.textContent || null,
-          solicitacoes: window.__modalLastData || [],
-        };
-
-        updateModalFeedback('Enviando sua resposta...', false);
-        toggleButtons(true, 'Enviando...');
-
-        try {
-          const response = await fetch('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/renovacao-mobilidade-sesau', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
-          if (!response.ok) throw new Error('Erro ao registrar decisão');
-          updateModalFeedback('Resposta registrada com sucesso.', false);
-
-          abrirModalRedirecionamento(acao);
-        } catch (error) {
-          console.error('Erro ao enviar decisão de renovação:', error);
-          updateModalFeedback('Não foi possível registrar sua resposta. Tente novamente.', true);
-        } finally {
-          toggleButtons(false);
-        }
-      };
-
-      async function gerarPdfModal() {
-        const triggerButton = document.getElementById('btnSalvarPDF');
-        const modalBody = document.getElementById('modalBody');
-        const { jsPDF } = window.jspdf || {};
-        if (!jsPDF) {
-          alert('Não foi possível gerar o PDF no momento. Tente novamente mais tarde.');
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        if (typeof doc.autoTable !== 'function') {
+          alert('Recurso de tabela indisponível para gerar o PDF.');
           return;
         }
 
-        try {
-          if (triggerButton) triggerButton.setAttribute('aria-busy', 'true');
+        const numero = (document.getElementById('modalNumeroSolicitacao').textContent || '').trim();
+        const table = modalBody.querySelector('table');
 
-          const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-          if (typeof doc.autoTable !== 'function') {
-            alert('Recurso de tabela indisponível para gerar o PDF.');
-            return;
+        const headers = table
+          ? Array.from(table.querySelectorAll('thead th')).map((th) => th.textContent.trim())
+          : [];
+        const rows = table
+          ? Array.from(table.querySelectorAll('tbody tr')).map((tr) =>
+            Array.from(tr.children).map((td) => td.textContent.trim())
+          )
+          : [];
+
+        const matriculaColIndex = headers.findIndex((label) => /matr[íi]cula/i.test(label));
+        const cargoColIndex = headers.findIndex((label) => /cargo/i.test(label));
+        const firstRow = rows[0] || [];
+        const rawMatriculaFromTable = matriculaColIndex >= 0 ? firstRow[matriculaColIndex] : '';
+        const rawCargoFromTable = cargoColIndex >= 0 ? firstRow[cargoColIndex] : '';
+
+        const matriculaHidden = document.getElementById('novaSolicitacaoMatricula');
+        const matriculaFromHidden = sanitizeValue(matriculaHidden ? matriculaHidden.value : '');
+        const matriculaFromTable = sanitizeValue(rawMatriculaFromTable);
+        const matricula = matriculaFromTable || matriculaFromHidden;
+        const isSolicitacoesContext = (window.__modalContext || 'solicitacoes') === 'solicitacoes';
+        const subtitleText = isSolicitacoesContext
+          ? `Unidades selecionadas para a matrícula ${matricula || '—'}`
+          : 'Relação de pedidos com vencimento nos próximos 30 dias';
+        const tituloDocumento = isSolicitacoesContext ? 'Comprovante de solicitação' : 'Pedidos próximos do vencimento';
+        const nomeServidorHiddenEl = document.getElementById('servidorHidden');
+        const nomeServidor = sanitizeValue(
+          (nomeServidorHiddenEl && nomeServidorHiddenEl.value) || DATA.servidor || DATA.nome
+        );
+        const cpfServidor = formatCPF(DATA.cpf);
+        const cargoFromTable = sanitizeValue(rawCargoFromTable);
+        const cargoFromVinculo = (() => {
+          const vinculos = Array.isArray(DATA.vinculos) ? DATA.vinculos : [];
+          if (matricula) {
+            const vinculoEncontrado = vinculos.find(
+              (item) => sanitizeValue(item.matricula) === matricula
+            );
+            if (vinculoEncontrado) return sanitizeValue(vinculoEncontrado.cargo);
+          }
+          return sanitizeValue(vinculos[0]?.cargo);
+        })();
+        const cargoServidor = cargoFromTable || cargoFromVinculo;
+        const dataEmissao = new Date().toLocaleDateString('pt-BR');
+
+        const logoDataUrl = await getComprovanteLogoDataUrl();
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 36;
+        const cardWidth = pageWidth - margin * 2;
+        const cardHeight = pageHeight - margin * 2;
+        const cardPaddingX = 36;
+        const cardPaddingY = 30;
+        const headerBandHeight = 120;
+        const badgeWidth = 200;
+        const badgeHeight = 64;
+
+        const drawCardBase = () => {
+          doc.setDrawColor(214, 222, 234);
+          doc.setLineWidth(1.2);
+          doc.setFillColor(244, 247, 254);
+          doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18, 'F');
+          doc.setFillColor(255, 255, 255);
+          doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18);
+          doc.rect(margin, margin + headerBandHeight, cardWidth, Math.max(cardHeight - headerBandHeight, 0), 'F');
+          doc.setFillColor(0, 74, 173);
+          doc.roundedRect(margin, margin, cardWidth, headerBandHeight, 18, 18, 'F');
+
+          const contentX = margin + cardPaddingX;
+          const contentY = margin + cardPaddingY;
+
+          if (logoDataUrl) {
+            doc.addImage(logoDataUrl, 'PNG', contentX, contentY, 120, 38);
           }
 
-          const numero = (document.getElementById('modalNumeroSolicitacao').textContent || '').trim();
-          const table = modalBody.querySelector('table');
+          const headerTextX = contentX + (logoDataUrl ? 136 : 0);
+          const headerTextY = contentY + 16;
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(13);
+          doc.setTextColor(255, 255, 255);
+          doc.text('PREFEITURA DO RECIFE', headerTextX, headerTextY);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(11);
+          doc.text('Secretaria de Saúde (SESAU)', headerTextX, headerTextY + 20);
+          doc.text('Portal do Servidor • Mobilidade Interna', headerTextX, headerTextY + 38);
 
-          const headers = table
-            ? Array.from(table.querySelectorAll('thead th')).map((th) => th.textContent.trim())
-            : [];
-          const rows = table
-            ? Array.from(table.querySelectorAll('tbody tr')).map((tr) =>
-                Array.from(tr.children).map((td) => td.textContent.trim())
-              )
-            : [];
+          const badgeX = margin + cardWidth - cardPaddingX - badgeWidth;
+          const badgeY = margin + cardPaddingY;
+          doc.setFillColor(255, 255, 255);
+          doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 12, 12, 'F');
+          doc.setDrawColor(0, 74, 173);
+          doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 12, 12);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.setTextColor(0, 74, 173);
+          doc.setFontSize(22);
+          doc.setTextColor(17, 24, 39);
+          doc.text(numero || '—', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
+        };
 
-          const matriculaColIndex = headers.findIndex((label) => /matr[íi]cula/i.test(label));
-          const cargoColIndex = headers.findIndex((label) => /cargo/i.test(label));
-          const firstRow = rows[0] || [];
-          const rawMatriculaFromTable = matriculaColIndex >= 0 ? firstRow[matriculaColIndex] : '';
-          const rawCargoFromTable = cargoColIndex >= 0 ? firstRow[cargoColIndex] : '';
+        drawCardBase();
 
-          const matriculaHidden = document.getElementById('novaSolicitacaoMatricula');
-          const matriculaFromHidden = sanitizeValue(matriculaHidden ? matriculaHidden.value : '');
-          const matriculaFromTable = sanitizeValue(rawMatriculaFromTable);
-          const matricula = matriculaFromTable || matriculaFromHidden;
-          const isSolicitacoesContext = (window.__modalContext || 'solicitacoes') === 'solicitacoes';
-          const subtitleText = isSolicitacoesContext
-            ? `Unidades selecionadas para a matrícula ${matricula || '—'}`
-            : 'Relação de pedidos com vencimento nos próximos 30 dias';
-          const tituloDocumento = isSolicitacoesContext ? 'Comprovante de solicitação' : 'Pedidos próximos do vencimento';
-          const nomeServidorHiddenEl = document.getElementById('servidorHidden');
-          const nomeServidor = sanitizeValue(
-            (nomeServidorHiddenEl && nomeServidorHiddenEl.value) || DATA.servidor || DATA.nome
-          );
-          const cpfServidor = formatCPF(DATA.cpf);
-          const cargoFromTable = sanitizeValue(rawCargoFromTable);
-          const cargoFromVinculo = (() => {
-            const vinculos = Array.isArray(DATA.vinculos) ? DATA.vinculos : [];
-            if (matricula) {
-              const vinculoEncontrado = vinculos.find(
-                (item) => sanitizeValue(item.matricula) === matricula
-              );
-              if (vinculoEncontrado) return sanitizeValue(vinculoEncontrado.cargo);
-            }
-            return sanitizeValue(vinculos[0]?.cargo);
-          })();
-          const cargoServidor = cargoFromTable || cargoFromVinculo;
-          const dataEmissao = new Date().toLocaleDateString('pt-BR');
+        let currentY = margin + headerBandHeight + 38;
+        const contentX = margin + cardPaddingX;
+        const contentMaxX = margin + cardWidth - cardPaddingX;
 
-          const logoDataUrl = await getComprovanteLogoDataUrl();
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(20);
+        doc.setTextColor(0, 74, 173);
+        doc.text(tituloDocumento, contentX, currentY);
+        currentY += 28;
 
-          const pageWidth = doc.internal.pageSize.getWidth();
-          const pageHeight = doc.internal.pageSize.getHeight();
-          const margin = 36;
-          const cardWidth = pageWidth - margin * 2;
-          const cardHeight = pageHeight - margin * 2;
-          const cardPaddingX = 36;
-          const cardPaddingY = 30;
-          const headerBandHeight = 120;
-          const badgeWidth = 200;
-          const badgeHeight = 64;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor(55, 65, 81);
+        const subtitleLines = doc.splitTextToSize(subtitleText, contentMaxX - contentX);
+        subtitleLines.forEach((line) => {
+          doc.text(line, contentX, currentY);
+          currentY += 18;
+        });
 
-          const drawCardBase = () => {
-            doc.setDrawColor(214, 222, 234);
-            doc.setLineWidth(1.2);
-            doc.setFillColor(244, 247, 254);
-            doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18, 'F');
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18);
-            doc.rect(margin, margin + headerBandHeight, cardWidth, Math.max(cardHeight - headerBandHeight, 0), 'F');
-            doc.setFillColor(0, 74, 173);
-            doc.roundedRect(margin, margin, cardWidth, headerBandHeight, 18, 18, 'F');
+        currentY += 6;
+        const infoRows = [
+          [
+            { label: 'Nome do servidor', value: nomeServidor || '—' },
+            { label: 'CPF', value: cpfServidor || '—' }
+          ],
+          [
+            { label: 'Matrícula', value: matricula || '—' },
+            { label: 'Cargo', value: cargoServidor || '—' }
+          ],
+          [
+            { label: 'Data de emissão', value: dataEmissao },
+            null
+          ]
+        ];
 
-            const contentX = margin + cardPaddingX;
-            const contentY = margin + cardPaddingY;
-
-            if (logoDataUrl) {
-              doc.addImage(logoDataUrl, 'PNG', contentX, contentY, 120, 38);
-            }
-
-            const headerTextX = contentX + (logoDataUrl ? 136 : 0);
-            const headerTextY = contentY + 16;
+        const columnGap = 16;
+        const infoRowHeight = 34;
+        const infoColumnWidth = (contentMaxX - contentX - columnGap) / 2;
+        infoRows.forEach((rowItems, rowIndex) => {
+          rowItems.forEach((item, columnIndex) => {
+            if (!item) return;
+            const x = contentX + columnIndex * (infoColumnWidth + columnGap);
+            const y = currentY + rowIndex * infoRowHeight;
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(13);
-            doc.setTextColor(255, 255, 255);
-            doc.text('PREFEITURA DO RECIFE', headerTextX, headerTextY);
+            doc.setFontSize(11);
+            doc.setTextColor(0, 74, 173);
+            doc.text(item.label.toUpperCase(), x, y);
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(11);
-            doc.text('Secretaria de Saúde (SESAU)', headerTextX, headerTextY + 20);
-            doc.text('Portal do Servidor • Mobilidade Interna', headerTextX, headerTextY + 38);
+            doc.setTextColor(31, 41, 55);
+            doc.text(item.value || '—', x, y + 16);
+          });
+        });
 
-            const badgeX = margin + cardWidth - cardPaddingX - badgeWidth;
-            const badgeY = margin + cardPaddingY;
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 12, 12, 'F');
-            doc.setDrawColor(0, 74, 173);
-            doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 12, 12);
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(10);
-            doc.setTextColor(0, 74, 173);
-            doc.text('PROTOCOLO DA SOLICITAÇÃO', badgeX + 18, badgeY + 24);
-            doc.setFontSize(22);
-            doc.setTextColor(17, 24, 39);
-            doc.text(numero || '—', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
-          };
+        currentY += infoRows.length * infoRowHeight + 18;
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(1);
+        doc.line(contentX, currentY, contentMaxX, currentY);
+        currentY += 24;
 
-          drawCardBase();
+        const indicesToRemove = [matriculaColIndex, cargoColIndex].filter((idx) => idx >= 0);
+        const pdfHeaders = headers.filter((_, idx) => !indicesToRemove.includes(idx));
+        const pdfRows = rows.map((row) => row.filter((_, idx) => !indicesToRemove.includes(idx)));
 
-          let currentY = margin + headerBandHeight + 38;
-          const contentX = margin + cardPaddingX;
-          const contentMaxX = margin + cardWidth - cardPaddingX;
-
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(20);
-          doc.setTextColor(0, 74, 173);
-          doc.text(tituloDocumento, contentX, currentY);
-          currentY += 28;
-
+        let footerBaseY = currentY;
+        if (pdfHeaders.length && pdfRows.length) {
+          const columnStyles = {};
+          pdfHeaders.forEach((header, index) => {
+            const key = header.toLowerCase();
+            if (key.includes('prioridade') || key === 'class') {
+              columnStyles[index] = { halign: 'center', cellWidth: 55 };
+            } else if (key.includes('distrito')) {
+              columnStyles[index] = { cellWidth: 90 };
+            } else if (key.includes('lotação')) {
+              columnStyles[index] = { cellWidth: 150 };
+            } else if (key.includes('credenciamento')) {
+              columnStyles[index] = { halign: 'center', cellWidth: 75 };
+            } else if (key.includes('solicitação')) {
+              columnStyles[index] = { halign: 'center', cellWidth: 75 };
+            }
+          });
+          doc.autoTable({
+            head: [pdfHeaders],
+            body: pdfRows,
+            startY: currentY,
+            theme: 'plain',
+            margin: { left: contentX, right: pageWidth - contentMaxX },
+            tableWidth: contentMaxX - contentX,
+            styles: {
+              font: 'helvetica',
+              fontSize: 10,
+              textColor: [31, 41, 55],
+              cellPadding: { top: 6, right: 8, bottom: 6, left: 8 },
+              lineWidth: 0.6,
+              lineColor: [226, 232, 240],
+              overflow: 'linebreak'
+            },
+            headStyles: {
+              fontStyle: 'bold',
+              fontSize: 10,
+              fillColor: [226, 235, 255],
+              textColor: [0, 74, 173],
+              halign: 'left',
+              cellPadding: { top: 8, right: 8, bottom: 8, left: 8 },
+              lineWidth: 0,
+            },
+            alternateRowStyles: {
+              fillColor: [248, 250, 255],
+            },
+            columnStyles,
+            pageBreak: 'avoid',
+            rowPageBreak: 'avoid',
+          });
+          footerBaseY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || currentY;
+        } else {
           doc.setFont('helvetica', 'normal');
           doc.setFontSize(12);
-          doc.setTextColor(55, 65, 81);
-          const subtitleLines = doc.splitTextToSize(subtitleText, contentMaxX - contentX);
-          subtitleLines.forEach((line) => {
-            doc.text(line, contentX, currentY);
-            currentY += 18;
-          });
-
-          currentY += 6;
-          const infoRows = [
-            [
-              { label: 'Nome do servidor', value: nomeServidor || '—' },
-              { label: 'CPF', value: cpfServidor || '—' }
-            ],
-            [
-              { label: 'Matrícula', value: matricula || '—' },
-              { label: 'Cargo', value: cargoServidor || '—' }
-            ],
-            [
-              { label: 'Data de emissão', value: dataEmissao },
-              null
-            ]
-          ];
-
-          const columnGap = 16;
-          const infoRowHeight = 34;
-          const infoColumnWidth = (contentMaxX - contentX - columnGap) / 2;
-          infoRows.forEach((rowItems, rowIndex) => {
-            rowItems.forEach((item, columnIndex) => {
-              if (!item) return;
-              const x = contentX + columnIndex * (infoColumnWidth + columnGap);
-              const y = currentY + rowIndex * infoRowHeight;
-              doc.setFont('helvetica', 'bold');
-              doc.setFontSize(11);
-              doc.setTextColor(0, 74, 173);
-              doc.text(item.label.toUpperCase(), x, y);
-              doc.setFont('helvetica', 'normal');
-              doc.setFontSize(11);
-              doc.setTextColor(31, 41, 55);
-              doc.text(item.value || '—', x, y + 16);
-            });
-          });
-
-          currentY += infoRows.length * infoRowHeight + 18;
-          doc.setDrawColor(226, 232, 240);
-          doc.setLineWidth(1);
-          doc.line(contentX, currentY, contentMaxX, currentY);
-          currentY += 24;
-
-          const indicesToRemove = [matriculaColIndex, cargoColIndex].filter((idx) => idx >= 0);
-          const pdfHeaders = headers.filter((_, idx) => !indicesToRemove.includes(idx));
-          const pdfRows = rows.map((row) => row.filter((_, idx) => !indicesToRemove.includes(idx)));
-
-          let footerBaseY = currentY;
-          if (pdfHeaders.length && pdfRows.length) {
-            const columnStyles = {};
-            pdfHeaders.forEach((header, index) => {
-              const key = header.toLowerCase();
-              if (key.includes('prioridade') || key === 'class') {
-                columnStyles[index] = { halign: 'center', cellWidth: 55 };
-              } else if (key.includes('distrito')) {
-                columnStyles[index] = { cellWidth: 90 };
-              } else if (key.includes('lotação')) {
-                columnStyles[index] = { cellWidth: 150 };
-              } else if (key.includes('credenciamento')) {
-                columnStyles[index] = { halign: 'center', cellWidth: 75 };
-              } else if (key.includes('solicitação')) {
-                columnStyles[index] = { halign: 'center', cellWidth: 75 };
-              }
-            });
-            doc.autoTable({
-              head: [pdfHeaders],
-              body: pdfRows,
-              startY: currentY,
-              theme: 'plain',
-              margin: { left: contentX, right: pageWidth - contentMaxX },
-              tableWidth: contentMaxX - contentX,
-              styles: {
-                font: 'helvetica',
-                fontSize: 10,
-                textColor: [31, 41, 55],
-                cellPadding: { top: 6, right: 8, bottom: 6, left: 8 },
-                lineWidth: 0.6,
-                lineColor: [226, 232, 240],
-                overflow: 'linebreak'
-              },
-              headStyles: {
-                fontStyle: 'bold',
-                fontSize: 10,
-                fillColor: [226, 235, 255],
-                textColor: [0, 74, 173],
-                halign: 'left',
-                cellPadding: { top: 8, right: 8, bottom: 8, left: 8 },
-                lineWidth: 0,
-              },
-              alternateRowStyles: {
-                fillColor: [248, 250, 255],
-              },
-              columnStyles,
-              pageBreak: 'avoid',
-              rowPageBreak: 'avoid',
-            });
-            footerBaseY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || currentY;
-          } else {
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(12);
-            doc.setTextColor(107, 114, 128);
-            doc.text('Não há dados para exportar.', contentX, currentY + 12);
-            footerBaseY = currentY + 12;
-          }
-
-          const footerY = Math.min(pageHeight - margin - 12, footerBaseY + 32);
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(9);
           doc.setTextColor(107, 114, 128);
-          doc.text('Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.', contentX, footerY);
-
-          const safeNumero = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
-          doc.save(`solicitacao-${safeNumero}.pdf`);
-        } catch (error) {
-          console.error('Erro ao gerar PDF:', error);
-          alert('Não foi possível gerar o PDF no momento. Tente novamente mais tarde.');
-        } finally {
-          if (triggerButton) triggerButton.removeAttribute('aria-busy');
+          doc.text('Não há dados para exportar.', contentX, currentY + 12);
+          footerBaseY = currentY + 12;
         }
-      }
 
-      function fecharModal() {
-        const backdrop = document.getElementById('modalBackdrop');
-        const modalBody = document.getElementById('modalBody');
-        modalBody.innerHTML = '';
-        backdrop.classList.remove('active');
-        backdrop.setAttribute('aria-hidden', 'true');
-        document.getElementById('modalNumeroSolicitacao').textContent = '—';
-        setModalActionsContext('solicitacoes');
-      }
+        const footerY = Math.min(pageHeight - margin - 12, footerBaseY + 32);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(107, 114, 128);
+        doc.text('Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.', contentX, footerY);
 
-      // ===== Orientações (TXT) =====
-      function renderOrientacoes(texto) {
-        const el = document.getElementById('orientacoesContainer');
-        if (!texto) { el.textContent = 'Conteúdo indisponível.'; return; }
-        const parts = String(texto).split(/\n\n+/).map(p => `<p class="mb-2">${p.replace(/\n/g, '<br>')}</p>`);
-        el.innerHTML = parts.join('');
+        const safeNumero = numero && numero !== '—' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
+        doc.save(`solicitacao-${safeNumero}.pdf`);
+      } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        alert('Não foi possível gerar o PDF no momento. Tente novamente mais tarde.');
+      } finally {
+        if (triggerButton) triggerButton.removeAttribute('aria-busy');
       }
+    }
 
-      // ===== Publicações =====
-      function renderPublicacoes(list) {
-        const wrap = document.getElementById('publicacoesLista');
-        wrap.innerHTML = '';
-        (list || []).forEach((pub) => {
-          const titulo = pub.titulo || 'Sem título';
-          const descricao = pub.descricao || '';
-          const url = pub.url || '#';
-          const item = document.createElement('div');
-          item.className = 'download-card';
-          item.innerHTML = `
+    function fecharModal() {
+      const backdrop = document.getElementById('modalBackdrop');
+      const modalBody = document.getElementById('modalBody');
+      modalBody.innerHTML = '';
+      backdrop.classList.remove('active');
+      backdrop.setAttribute('aria-hidden', 'true');
+      document.getElementById('modalNumeroSolicitacao').textContent = '—';
+      setModalActionsContext('solicitacoes');
+    }
+
+    // ===== Orientações (TXT) =====
+    function renderOrientacoes(texto) {
+      const el = document.getElementById('orientacoesContainer');
+      if (!texto) { el.textContent = 'Conteúdo indisponível.'; return; }
+      const parts = String(texto).split(/\n\n+/).map(p => `<p class="mb-2">${p.replace(/\n/g, '<br>')}</p>`);
+      el.innerHTML = parts.join('');
+    }
+
+    // ===== Publicações =====
+    function renderPublicacoes(list) {
+      const wrap = document.getElementById('publicacoesLista');
+      wrap.innerHTML = '';
+      (list || []).forEach((pub) => {
+        const titulo = pub.titulo || 'Sem título';
+        const descricao = pub.descricao || '';
+        const url = pub.url || '#';
+        const item = document.createElement('div');
+        item.className = 'download-card';
+        item.innerHTML = `
             <div class="fw-semibold"><a href="${url}" target="_blank" rel="noopener">${titulo}</a></div>
             <div class="text-muted small">${descricao}</div>
           `;
-          wrap.appendChild(item);
-        });
-        if (!wrap.children.length) {
-          wrap.innerHTML = '<div class="text-muted">Nenhuma publicação disponível.</div>';
+        wrap.appendChild(item);
+      });
+      if (!wrap.children.length) {
+        wrap.innerHTML = '<div class="text-muted">Nenhuma publicação disponível.</div>';
+      }
+    }
+
+    // ===== Validação simples do formulário =====
+    function validarFormulario() {
+      const requiredFields = [
+        { id: 'matriculaSelect', label: 'Matrícula' },
+        { id: 'email', label: 'E-mail' },
+        { id: 'whatsapp', label: 'WhatsApp' },
+        { id: 'cep', label: 'CEP' },
+        { id: 'logradouro', label: 'Logradouro' },
+        { id: 'numero', label: 'Número' },
+        { id: 'complemento', label: 'Complemento' },
+        { id: 'bairro', label: 'Bairro' },
+        { id: 'cidade', label: 'Cidade' },
+        { id: 'uf', label: 'UF' },
+        { id: 'dsSelect', label: 'DS/Executiva atual' },
+        { id: 'unidadeSelect', label: 'Unidade atual' },
+        { id: 'turnoSelect', label: 'Turno atual' },
+        { id: 'regimeSelect', label: 'Regime atual' }
+      ];
+
+      const missing = [];
+      const invalid = [];
+
+      requiredFields.forEach((field) => {
+        const el = document.getElementById(field.id);
+        if (!el) return;
+        const rawValue = el.value != null ? String(el.value).trim() : '';
+        let hasValue = rawValue !== '';
+        if (el.tagName === 'SELECT') {
+          const selectedOption = el.selectedOptions[0];
+          hasValue = Boolean(selectedOption && !selectedOption.disabled && sanitizeValue(selectedOption.value));
+        }
+        if (!hasValue) {
+          missing.push(field.label);
+          markInvalid(el);
+        } else {
+          markValid(el);
+        }
+      });
+
+      const emailEl = document.getElementById('email');
+      if (emailEl) {
+        const emailVal = sanitizeValue(emailEl.value);
+        emailEl.value = emailVal;
+        if (emailVal && !isEmail(emailVal)) {
+          invalid.push('E-mail (ex.: servidor@recife.pe.gov.br)');
+          markInvalid(emailEl);
+        } else if (emailVal) {
+          markValid(emailEl);
         }
       }
 
-      // ===== Validação simples do formulário =====
-      function validarFormulario() {
-        const requiredFields = [
-          { id: 'matriculaSelect', label: 'Matrícula' },
-          { id: 'email', label: 'E-mail' },
-          { id: 'whatsapp', label: 'WhatsApp' },
-          { id: 'cep', label: 'CEP' },
-          { id: 'logradouro', label: 'Logradouro' },
-          { id: 'numero', label: 'Número' },
-          { id: 'complemento', label: 'Complemento' },
-          { id: 'bairro', label: 'Bairro' },
-          { id: 'cidade', label: 'Cidade' },
-          { id: 'uf', label: 'UF' },
-          { id: 'dsSelect', label: 'DS/Executiva atual' },
-          { id: 'unidadeSelect', label: 'Unidade atual' },
-          { id: 'turnoSelect', label: 'Turno atual' },
-          { id: 'regimeSelect', label: 'Regime atual' }
-        ];
-
-        const missing = [];
-        const invalid = [];
-
-        requiredFields.forEach((field) => {
-          const el = document.getElementById(field.id);
-          if (!el) return;
-          const rawValue = el.value != null ? String(el.value).trim() : '';
-          let hasValue = rawValue !== '';
-          if (el.tagName === 'SELECT') {
-            const selectedOption = el.selectedOptions[0];
-            hasValue = Boolean(selectedOption && !selectedOption.disabled && sanitizeValue(selectedOption.value));
-          }
-          if (!hasValue) {
-            missing.push(field.label);
-            markInvalid(el);
-          } else {
-            markValid(el);
-          }
-        });
-
-        const emailEl = document.getElementById('email');
-        if (emailEl) {
-          const emailVal = sanitizeValue(emailEl.value);
-          emailEl.value = emailVal;
-          if (emailVal && !isEmail(emailVal)) {
-            invalid.push('E-mail (ex.: servidor@recife.pe.gov.br)');
-            markInvalid(emailEl);
-          } else if (emailVal) {
-            markValid(emailEl);
-          }
+      const whatsappEl = document.getElementById('whatsapp');
+      if (whatsappEl) {
+        const trimmed = sanitizeValue(whatsappEl.value);
+        const normalized = normalizeWhats(trimmed);
+        whatsappEl.value = normalized;
+        if (trimmed && !normalized) {
+          invalid.push('WhatsApp (somente números, ex.: 81999999999)');
+          markInvalid(whatsappEl);
+        } else if (normalized && !isWhats(normalized)) {
+          invalid.push('WhatsApp (11 dígitos numéricos, ex.: 81999999999)');
+          markInvalid(whatsappEl);
+        } else if (normalized) {
+          markValid(whatsappEl);
         }
-
-        const whatsappEl = document.getElementById('whatsapp');
-        if (whatsappEl) {
-          const trimmed = sanitizeValue(whatsappEl.value);
-          const normalized = normalizeWhats(trimmed);
-          whatsappEl.value = normalized;
-          if (trimmed && !normalized) {
-            invalid.push('WhatsApp (somente números, ex.: 81999999999)');
-            markInvalid(whatsappEl);
-          } else if (normalized && !isWhats(normalized)) {
-            invalid.push('WhatsApp (11 dígitos numéricos, ex.: 81999999999)');
-            markInvalid(whatsappEl);
-          } else if (normalized) {
-            markValid(whatsappEl);
-          }
-        }
-
-        const cepEl = document.getElementById('cep');
-        if (cepEl && sanitizeValue(cepEl.value) && !isCEP(cepEl.value)) {
-          invalid.push('CEP (use 00000-000 ou somente números, ex.: 50000999)');
-          markInvalid(cepEl);
-        }
-
-        const ufEl = document.getElementById('uf');
-        if (ufEl) {
-          ufEl.value = sanitizeUF(ufEl.value);
-          if (sanitizeValue(ufEl.value) && !isUF(ufEl.value)) {
-            invalid.push('UF (2 letras, ex.: PE)');
-            markInvalid(ufEl);
-          }
-        }
-
-        const ok = missing.length === 0 && invalid.length === 0;
-        return { ok, missing, invalid };
       }
 
-      // ===== Eventos =====
-      const whatsappInput = document.getElementById('whatsapp');
-      if (whatsappInput) {
-        whatsappInput.addEventListener('input', (event) => {
-          const digits = normalizeWhats(event.target.value);
-          event.target.value = digits;
-        });
+      const cepEl = document.getElementById('cep');
+      if (cepEl && sanitizeValue(cepEl.value) && !isCEP(cepEl.value)) {
+        invalid.push('CEP (use 00000-000 ou somente números, ex.: 50000999)');
+        markInvalid(cepEl);
       }
 
-      document.getElementById('dsSelect').addEventListener('change', (e) => {
-        const v = e.target.value;
-        if (v) {
-          const grupoAtual = sanitizeValue(document.getElementById('grupoHidden')?.value || '');
-          loadUnidades(v, grupoAtual);
+      const ufEl = document.getElementById('uf');
+      if (ufEl) {
+        ufEl.value = sanitizeUF(ufEl.value);
+        if (sanitizeValue(ufEl.value) && !isUF(ufEl.value)) {
+          invalid.push('UF (2 letras, ex.: PE)');
+          markInvalid(ufEl);
         }
-        const hiddenDs = document.getElementById('dsHidden');
-        if (hiddenDs) hiddenDs.value = sanitizeValue(v);
+      }
+
+      const ok = missing.length === 0 && invalid.length === 0;
+      return { ok, missing, invalid };
+    }
+
+    // ===== Eventos =====
+    const whatsappInput = document.getElementById('whatsapp');
+    if (whatsappInput) {
+      whatsappInput.addEventListener('input', (event) => {
+        const digits = normalizeWhats(event.target.value);
+        event.target.value = digits;
       });
+    }
 
-      document.getElementById('matriculaSelect').addEventListener('change', (e) => {
-        const selected = e.target.selectedOptions[0];
-        const grupoSelecionado = selected ? sanitizeValue(selected.dataset.grupo || '') : '';
-        const hiddenGrupo = document.getElementById('grupoHidden');
-        if (hiddenGrupo) hiddenGrupo.value = grupoSelecionado;
-        const hiddenDs = document.getElementById('dsHidden');
-        if (hiddenDs && selected) hiddenDs.value = sanitizeValue(selected.dataset.ds || hiddenDs.value || '');
-        const hiddenMatricula = document.getElementById('novaSolicitacaoMatricula');
-        if (hiddenMatricula && selected) hiddenMatricula.value = sanitizeValue(selected.value || hiddenMatricula.value || '');
-        const dsAtual = document.getElementById('dsSelect').value;
-        if (dsAtual) loadUnidades(dsAtual, grupoSelecionado);
-      });
+    document.getElementById('dsSelect').addEventListener('change', (e) => {
+      const v = e.target.value;
+      if (v) {
+        const grupoAtual = sanitizeValue(document.getElementById('grupoHidden')?.value || '');
+        loadUnidades(v, grupoAtual);
+      }
+      const hiddenDs = document.getElementById('dsHidden');
+      if (hiddenDs) hiddenDs.value = sanitizeValue(v);
+    });
 
-      document.getElementById('unidadeSelect').addEventListener('change', (e) => {
-        const unidade = e.target.value;
-        if (unidade) {
-          loadTurnos(unidade);
-          loadRegimes(unidade);
-        }
-      });
+    document.getElementById('matriculaSelect').addEventListener('change', (e) => {
+      const selected = e.target.selectedOptions[0];
+      const grupoSelecionado = selected ? sanitizeValue(selected.dataset.grupo || '') : '';
+      const hiddenGrupo = document.getElementById('grupoHidden');
+      if (hiddenGrupo) hiddenGrupo.value = grupoSelecionado;
+      const hiddenDs = document.getElementById('dsHidden');
+      if (hiddenDs && selected) hiddenDs.value = sanitizeValue(selected.dataset.ds || hiddenDs.value || '');
+      const hiddenMatricula = document.getElementById('novaSolicitacaoMatricula');
+      if (hiddenMatricula && selected) hiddenMatricula.value = sanitizeValue(selected.value || hiddenMatricula.value || '');
+      const dsAtual = document.getElementById('dsSelect').value;
+      if (dsAtual) loadUnidades(dsAtual, grupoSelecionado);
+    });
 
-      document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const validation = validarFormulario();
-        if (!validation.ok) {
-          setStatus('Revise os campos destacados.', false);
-          showFormFeedbackPopup('error', validation);
-          return;
-        }
+    document.getElementById('unidadeSelect').addEventListener('change', (e) => {
+      const unidade = e.target.value;
+      if (unidade) {
+        loadTurnos(unidade);
+        loadRegimes(unidade);
+      }
+    });
 
-        const numeroRaw = sanitizeValue(document.getElementById('numero')?.value || '');
-        const numeroParsed = numeroRaw ? Number(numeroRaw.replace(/\D+/g, '')) : null;
-        const telefoneAlternativo = sanitizeValue(document.getElementById('telefonealternativo')?.value || '');
-        const cepValor = sanitizeValue(document.getElementById('cep')?.value || '');
-        const cepNumeros = cepValor.replace(/\D+/g, '');
-        const cidadeValor = sanitizeValue(document.getElementById('cidade')?.value || '');
-        const bairroValor = sanitizeValue(document.getElementById('bairro')?.value || '');
-        const payload = {
-          whatsapp: normalizeWhats(document.getElementById('whatsapp')?.value || '') || null,
-          nascimento: null,
-          cidade: cidadeValor ? cidadeValor.toUpperCase() : null,
-          telefone_2: onlyDigits(telefoneAlternativo) || null,
-          numero: Number.isFinite(numeroParsed) ? numeroParsed : null,
-          regime: sanitizeValue(document.getElementById('regimeSelect')?.value || '') || null,
-          bairro: bairroValor ? bairroValor.toUpperCase() : null,
-          unidade: sanitizeValue(document.getElementById('unidadeSelect')?.value || '') || null,
-          nome: sanitizeValue(document.getElementById('servidorHidden')?.value || DATA.nome) || null,
-          turno: sanitizeValue(document.getElementById('turnoSelect')?.value || '') || null,
-          ds: sanitizeValue(document.getElementById('dsSelect')?.value || document.getElementById('dsHidden')?.value || '') || null,
-          cep: cepNumeros || cepValor || null,
-          protocolo: null,
-          uf: sanitizeUF(document.getElementById('uf')?.value || '') || null,
-          complemento: sanitizeValue(document.getElementById('complemento')?.value || '') || null,
-          logradouro: sanitizeValue(document.getElementById('logradouro')?.value || '') || null,
-          matricula: sanitizeValue(document.getElementById('matriculaSelect')?.value || '') || null,
-          cpf: onlyDigits(document.getElementById('cpfHidden')?.value || '') || null,
-          email: sanitizeValue(document.getElementById('email')?.value || '').toLowerCase() || null,
-        };
+    document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const validation = validarFormulario();
+      if (!validation.ok) {
+        setStatus('Revise os campos destacados.', false);
+        showFormFeedbackPopup('error', validation);
+        return;
+      }
 
-        setStatus('Enviando dados...', true);
-        try {
-          const response = await fetch('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/atualizar-cadastro', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
-          if (!response.ok) throw new Error('Erro ao enviar dados');
-
-          setStatus('Dados de atualização enviados.', true);
-          showFormFeedbackPopup('success');
-        } catch (error) {
-          console.error('Erro ao enviar atualização cadastral:', error);
-          setStatus('Falha ao enviar dados. Tente novamente.', false);
-          showFormFeedbackPopup('error', { invalid: ['Falha ao enviar dados ao servidor.'] });
-        }
-      });
-
-      document.getElementById('btnNovaSolicitacao').addEventListener('click', () => {
-        const matriculaSelect = document.getElementById('matriculaSelect');
-        const selected = matriculaSelect?.selectedOptions?.[0];
-        const fallbackMatricula = sanitizeValue(document.getElementById('novaSolicitacaoMatricula')?.value || '');
-        const matriculaValue = sanitizeValue(selected?.value || fallbackMatricula);
-        const grupoValue = sanitizeValue(selected?.dataset?.grupo || document.getElementById('grupoHidden')?.value || '');
-        const dsSelectValue = sanitizeValue(document.getElementById('dsSelect')?.value || '');
-        const hiddenDsValue = sanitizeValue(document.getElementById('dsHidden')?.value || '');
-        const cpfValue = sanitizeValue(document.getElementById('cpfHidden')?.value || '');
-        const dsValue = dsSelectValue || hiddenDsValue;
-        const form = document.getElementById('novaSolicitacaoForm');
-        if (!form) return;
-        const dsField = document.getElementById('novaSolicitacaoDs');
-        const grupoField = document.getElementById('novaSolicitacaoGrupo');
-        const cpfField = document.getElementById('novaSolicitacaoCpf');
-        const matriculaField = document.getElementById('novaSolicitacaoMatricula');
-        if (dsField) dsField.value = dsValue;
-        if (grupoField) grupoField.value = grupoValue;
-        if (cpfField) cpfField.value = cpfValue;
-        if (matriculaField) matriculaField.value = matriculaValue;
-        if (document.getElementById('grupoHidden')) document.getElementById('grupoHidden').value = grupoValue;
-        form.submit();
-      });
-
-      document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
-      document.getElementById('btnFecharRenovacao').addEventListener('click', fecharModal);
-      document.getElementById('btnRenovarPedido').addEventListener('click', () => enviarRenovacao('renovar'));
-      document.getElementById('btnNaoRenovarPedido').addEventListener('click', () => enviarRenovacao('nao_renovar'));
-      document.getElementById('btnImprimir').addEventListener('click', () => window.print());
-      document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
-      document.getElementById('decisionRedirectClose').addEventListener('click', executarFechamentoFluxo);
-      document.getElementById('decisionRedirectNow').addEventListener('click', executarFechamentoFluxo);
-      document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
-      document.getElementById('formFeedbackClose').addEventListener('click', closeFormFeedback);
-      document.getElementById('formFeedback').addEventListener('click', (e) => {
-        if (e.target && e.target.id === 'formFeedback') closeFormFeedback();
-      });
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') closeFormFeedback();
-      });
-
-      const scrollHeroIntoView = () => {
-        if (window.location.hash) return;
-        if (window.scrollY > 16) return;
-        if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        const heroRow = document.getElementById('heroCardsRow');
-        if (!heroRow) return;
-        const rect = heroRow.getBoundingClientRect();
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-        const midpoint = window.scrollY + rect.top + rect.height / 2;
-        const target = Math.max(midpoint - viewportHeight / 2, 0);
-        window.scrollTo({ top: target, behavior: 'smooth' });
+      const numeroRaw = sanitizeValue(document.getElementById('numero')?.value || '');
+      const numeroParsed = numeroRaw ? Number(numeroRaw.replace(/\D+/g, '')) : null;
+      const telefoneAlternativo = sanitizeValue(document.getElementById('telefonealternativo')?.value || '');
+      const cepValor = sanitizeValue(document.getElementById('cep')?.value || '');
+      const cepNumeros = cepValor.replace(/\D+/g, '');
+      const cidadeValor = sanitizeValue(document.getElementById('cidade')?.value || '');
+      const bairroValor = sanitizeValue(document.getElementById('bairro')?.value || '');
+      const payload = {
+        whatsapp: normalizeWhats(document.getElementById('whatsapp')?.value || '') || null,
+        nascimento: null,
+        cidade: cidadeValor ? cidadeValor.toUpperCase() : null,
+        telefone_2: onlyDigits(telefoneAlternativo) || null,
+        numero: Number.isFinite(numeroParsed) ? numeroParsed : null,
+        regime: sanitizeValue(document.getElementById('regimeSelect')?.value || '') || null,
+        bairro: bairroValor ? bairroValor.toUpperCase() : null,
+        unidade: sanitizeValue(document.getElementById('unidadeSelect')?.value || '') || null,
+        nome: sanitizeValue(document.getElementById('servidorHidden')?.value || DATA.nome) || null,
+        turno: sanitizeValue(document.getElementById('turnoSelect')?.value || '') || null,
+        ds: sanitizeValue(document.getElementById('dsSelect')?.value || document.getElementById('dsHidden')?.value || '') || null,
+        cep: cepNumeros || cepValor || null,
+        protocolo: null,
+        uf: sanitizeUF(document.getElementById('uf')?.value || '') || null,
+        complemento: sanitizeValue(document.getElementById('complemento')?.value || '') || null,
+        logradouro: sanitizeValue(document.getElementById('logradouro')?.value || '') || null,
+        matricula: sanitizeValue(document.getElementById('matriculaSelect')?.value || '') || null,
+        cpf: onlyDigits(document.getElementById('cpfHidden')?.value || '') || null,
+        email: sanitizeValue(document.getElementById('email')?.value || '').toLowerCase() || null,
       };
 
-      // ===== Bootstrap inicial =====
-      (function init() {
-        populateMatriculas();
-        populateContatosEndereco();
-        renderMinhasSolicitacoesCards();
-        renderMinhasRenovacoesCards();
-        setModalActionsContext('solicitacoes');
-        document.querySelectorAll('.collapsible-form').forEach((details) => {
-          details.open = false;
+      setStatus('Enviando dados...', true);
+      try {
+        const response = await fetch('https://n8n.homolog.app.emprel.gov.br/webhook/atualizar-cadastro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
         });
-        // Orientações: use window.ORIENTACOES_TXT = '...'; em produção
-        if (window.ORIENTACOES_TXT) renderOrientacoes(window.ORIENTACOES_TXT);
-        else renderOrientacoes('Carregaremos aqui as orientações do processo.');
-        // Publicações: use window.PUBLICACOES = [{titulo, descricao, url}, ...]; em produção
-        renderPublicacoes(window.PUBLICACOES || []);
-      })();
-    </script>
+        if (!response.ok) throw new Error('Erro ao enviar dados');
 
-    <!-- SUSi chat floating button and modal -->
-    <div class="susi-chat-root">
-      <button
-        type="button"
-        class="susi-chat-toggle"
-        aria-label="Abrir chat SUSi"
-        aria-expanded="false"
-        aria-haspopup="dialog"
-      >
-        <img
-          src="https://statics.recife.pe.gov.br/images/dynamics/automacao/susi.png"
-          alt=""
-          class="susi-chat-toggle__icon"
-          decoding="async"
-        />
-      </button>
+        setStatus('Dados de atualização enviados.', true);
+        showFormFeedbackPopup('success');
+      } catch (error) {
+        console.error('Erro ao enviar atualização cadastral:', error);
+        setStatus('Falha ao enviar dados. Tente novamente.', false);
+        showFormFeedbackPopup('error', { invalid: ['Falha ao enviar dados ao servidor.'] });
+      }
+    });
 
-      <div
-        class="susi-chat-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="susi-chat-title"
-        aria-hidden="true"
-        tabindex="-1"
-      >
-        <div class="susi-chat-modal__header">
-          <h2 class="susi-chat-modal__title" id="susi-chat-title" tabindex="-1">SUSi • Atendimento</h2>
-          <button type="button" class="susi-chat-close" aria-label="Fechar chat">&times;</button>
-        </div>
-        <div class="susi-chat-modal__body">
-          <iframe
-            class="susi-chat-iframe"
-            src="about:blank"
-            data-src="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/susi"
-            title="Atendimento SUSi"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-          ></iframe>
-        </div>
-        <div class="susi-chat-modal__fallback" hidden aria-hidden="true">
-          <p>Não foi possível carregar o chat embutido.</p>
-          <a
-            class="susi-chat-fallback-link"
-            href="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/susi"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Abrir chat em nova aba
-          </a>
-        </div>
+    document.getElementById('btnNovaSolicitacao').addEventListener('click', () => {
+      const matriculaSelect = document.getElementById('matriculaSelect');
+      const selected = matriculaSelect?.selectedOptions?.[0];
+      const fallbackMatricula = sanitizeValue(document.getElementById('novaSolicitacaoMatricula')?.value || '');
+      const matriculaValue = sanitizeValue(selected?.value || fallbackMatricula);
+      const grupoValue = sanitizeValue(selected?.dataset?.grupo || document.getElementById('grupoHidden')?.value || '');
+      const dsSelectValue = sanitizeValue(document.getElementById('dsSelect')?.value || '');
+      const hiddenDsValue = sanitizeValue(document.getElementById('dsHidden')?.value || '');
+      const cpfValue = sanitizeValue(document.getElementById('cpfHidden')?.value || '');
+      const dsValue = dsSelectValue || hiddenDsValue;
+      const form = document.getElementById('novaSolicitacaoForm');
+      if (!form) return;
+      const dsField = document.getElementById('novaSolicitacaoDs');
+      const grupoField = document.getElementById('novaSolicitacaoGrupo');
+      const cpfField = document.getElementById('novaSolicitacaoCpf');
+      const matriculaField = document.getElementById('novaSolicitacaoMatricula');
+      if (dsField) dsField.value = dsValue;
+      if (grupoField) grupoField.value = grupoValue;
+      if (cpfField) cpfField.value = cpfValue;
+      if (matriculaField) matriculaField.value = matriculaValue;
+      form.submit();
+    });
+
+    document.getElementById('btnFecharModal').addEventListener('click', fecharModal);
+    document.getElementById('btnFecharRenovacao').addEventListener('click', fecharModal);
+    document.getElementById('btnRenovarPedido').addEventListener('click', () => enviarRenovacao('renovar'));
+    document.getElementById('btnNaoRenovarPedido').addEventListener('click', () => enviarRenovacao('nao_renovar'));
+    document.getElementById('btnImprimir').addEventListener('click', () => window.print());
+    document.getElementById('btnSalvarPDF').addEventListener('click', gerarPdfModal);
+    document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') fecharModal(); });
+    document.getElementById('formFeedbackClose').addEventListener('click', closeFormFeedback);
+    document.getElementById('formFeedback').addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'formFeedback') closeFormFeedback();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeFormFeedback();
+    });
+
+    // ===== Bootstrap inicial =====
+    (function init() {
+      populateMatriculas();
+      populateContatosEndereco();
+      renderMinhasSolicitacoesCards();
+      renderMinhasRenovacoesCards();
+      setModalActionsContext('solicitacoes');
+      document.querySelectorAll('.collapsible-form').forEach((details) => {
+        details.open = false;
+      });
+      if (window.ORIENTACOES_TXT) renderOrientacoes(window.ORIENTACOES_TXT);
+      else renderOrientacoes('Carregaremos aqui as orientações do processo.');
+      renderPublicacoes(window.PUBLICACOES || []);
+    })();
+  </script>
+
+  <div class="susi-chat-root">
+    <button type="button" class="susi-chat-toggle" aria-label="Abrir chat SUSi" aria-expanded="false"
+      aria-haspopup="dialog">
+      <img src="https://statics.recife.pe.gov.br/images/dynamics/automacao/susi.png" alt=""
+        class="susi-chat-toggle__icon susi-icon-fakecut" decoding="async" />
+    </button>
+
+    <div class="susi-chat-modal" role="dialog" aria-modal="true" aria-labelledby="susi-chat-title" aria-hidden="true"
+      tabindex="-1">
+      <div class="susi-chat-modal__header">
+        <h2 class="susi-chat-modal__title" id="susi-chat-title" tabindex="-1">SUSi • Atendimento</h2>
+        <button type="button" class="susi-chat-close" aria-label="Fechar chat">&times;</button>
       </div>
-
-      <p class="susi-chat-status" aria-live="polite" aria-atomic="true"></p>
+      <div class="susi-chat-modal__body">
+        <iframe class="susi-chat-iframe" src="about:blank" data-src="https://n8n.homolog.app.emprel.gov.br/webhook/susi"
+          title="Atendimento SUSi" loading="lazy" referrerpolicy="no-referrer"></iframe>
+      </div>
+      <div class="susi-chat-modal__fallback" hidden aria-hidden="true">
+        <p>Não foi possível carregar o chat embutido.</p>
+        <a class="susi-chat-fallback-link" href="https://n8n.homolog.app.emprel.gov.br/webhook/susi" target="_blank"
+          rel="noopener noreferrer">
+          Abrir chat em nova aba
+        </a>
+      </div>
     </div>
 
-    <style>
-      .decision-redirect-backdrop {
-        position: fixed;
-        inset: 0;
-        background: rgba(31, 41, 55, 0.75);
-        display: grid;
-        place-items: center;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.25s ease, visibility 0.25s ease;
-        z-index: 12000;
-        padding: 1rem;
-      }
+    <p class="susi-chat-status" aria-live="polite" aria-atomic="true"></p>
+  </div>
 
-      .decision-redirect-backdrop.active {
-        opacity: 1;
-        visibility: visible;
-      }
+  <style>
+    .decision-redirect-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(31, 41, 55, 0.75);
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+      z-index: 12000;
+      padding: 1rem;
+    }
 
-      .decision-redirect-dialog {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 1.5rem;
-        max-width: 480px;
-        width: min(90vw, 480px);
-        box-shadow: 0 24px 64px rgba(15, 37, 78, 0.25);
-        border: 1px solid rgba(0, 74, 173, 0.08);
-      }
+    .decision-redirect-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
 
-      .decision-redirect-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 0.5rem;
-      }
+    .decision-redirect-dialog {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 1.5rem;
+      max-width: 480px;
+      width: min(90vw, 480px);
+      box-shadow: 0 24px 64px rgba(15, 37, 78, 0.25);
+      border: 1px solid rgba(0, 74, 173, 0.08);
+    }
 
-      .decision-redirect-title {
-        margin: 0;
-        font-size: 1.1rem;
-        color: var(--brand-secondary);
-        font-weight: 700;
-      }
+    .decision-redirect-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
 
-      .decision-redirect-message {
-        margin: 0 0 0.75rem;
-        color: var(--text-strong);
-      }
+    .decision-redirect-title {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--brand-secondary);
+      font-weight: 700;
+    }
 
-      .decision-redirect-countdown {
-        margin: 0 0 1rem;
-        color: var(--brand-primary);
-        font-weight: 600;
-      }
+    .decision-redirect-message {
+      margin: 0 0 0.75rem;
+      color: var(--text-strong);
+    }
 
-      .decision-redirect-close {
-        border: none;
-        background: transparent;
-        color: var(--text-muted);
-        font-size: 1.5rem;
-        cursor: pointer;
-        line-height: 1;
-        width: 2rem;
-        height: 2rem;
-        border-radius: 999px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.2s ease;
-      }
+    .decision-redirect-countdown {
+      margin: 0 0 1rem;
+      color: var(--brand-primary);
+      font-weight: 600;
+    }
 
-      .decision-redirect-close:hover {
-        background-color: rgba(0, 74, 173, 0.08);
-      }
+    .decision-redirect-close {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
+    }
 
-      .decision-redirect-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-      }
+    .decision-redirect-close:hover {
+      background-color: rgba(0, 74, 173, 0.08);
+    }
 
-      /* Layout geral do widget SUSi */
+    .decision-redirect-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* Layout geral do widget SUSi */
+    .susi-chat-root {
+      position: relative;
+      z-index: 11000;
+      --susi-chat-toggle-height: 176px;
+      isolation: isolate;
+    }
+
+    .susi-chat-toggle {
+      position: fixed;
+      bottom: 0;
+      right: 24px;
+      width: 128px;
+      height: var(--susi-chat-toggle-height);
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent !important;
+      box-shadow: none;
+      display: inline-flex;
+      align-items: flex-end;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      z-index: 11001;
+    }
+
+    .susi-chat-toggle:hover {
+      transform: scale(1.03);
+    }
+
+    .susi-chat-toggle:focus-visible {
+      outline: 3px solid rgba(0, 163, 255, 0.9);
+      outline-offset: 4px;
+    }
+
+    .susi-chat-toggle__icon {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: bottom center;
+      display: block;
+      background: transparent !important;
+      border-radius: 0;
+      box-shadow: none !important;
+      filter: none !important;
+      mix-blend-mode: normal !important;
+    }
+
+    /* Máscara/recorte para disfarçar fundo branco do PNG */
+    .susi-chat-toggle__icon.susi-icon-fakecut {
+      background: transparent;
+      padding: 10px;
+      border-radius: 999px;
+      box-sizing: border-box;
+      filter: drop-shadow(0 10px 18px rgba(15, 37, 78, 0.14));
+    }
+
+    .susi-chat-modal {
+      position: fixed;
+      bottom: calc(24px + var(--susi-chat-toggle-height));
+      right: 24px;
+      width: min(360px, 90vw);
+      height: min(520px, 70vh);
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(15, 37, 78, 0.24);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translate3d(0, 12px, 0);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 11002;
+    }
+
+    .susi-chat-modal--open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .susi-chat-modal__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.9rem 1.25rem;
+      background: linear-gradient(180deg, rgba(0, 74, 173, 0.08), rgba(0, 163, 255, 0.08));
+      border-bottom: 1px solid rgba(0, 74, 173, 0.12);
+    }
+
+    .susi-chat-modal__title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #003579;
+      margin: 0;
+    }
+
+    .susi-chat-modal__title:focus-visible {
+      outline: 3px solid rgba(0, 163, 255, 0.55);
+      outline-offset: 2px;
+    }
+
+    .susi-chat-close {
+      border: none;
+      background: transparent;
+      color: #003579;
+      font-size: 1.75rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+      width: 2rem;
+      height: 2rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      transition: background-color 0.2s ease;
+    }
+
+    .susi-chat-close:hover {
+      background-color: rgba(0, 74, 173, 0.08);
+    }
+
+    .susi-chat-close:focus-visible {
+      outline: 3px solid rgba(0, 74, 173, 0.45);
+      outline-offset: 2px;
+    }
+
+    .susi-chat-modal__body {
+      flex: 1;
+      position: relative;
+      background: #f7fbff;
+    }
+
+    .susi-chat-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: transparent;
+    }
+
+    .susi-chat-iframe[hidden] {
+      display: none !important;
+    }
+
+    .susi-chat-modal__fallback {
+      padding: 1.2rem 1.4rem 1.6rem;
+      background: #ffffff;
+      text-align: center;
+    }
+
+    .susi-chat-modal__fallback p {
+      margin-bottom: 0.75rem;
+      color: #1f2937;
+    }
+
+    .susi-chat-fallback-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.55rem 1.1rem;
+      border-radius: 999px;
+      background: #004aad;
+      color: #ffffff;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .susi-chat-fallback-link:hover {
+      background: #003579;
+      transform: translateY(-1px);
+    }
+
+    .susi-chat-fallback-link:focus-visible {
+      outline: 3px solid rgba(0, 163, 255, 0.6);
+      outline-offset: 3px;
+    }
+
+    .susi-chat-modal__fallback[hidden] {
+      display: none !important;
+    }
+
+    .susi-chat-status {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 768px) {
       .susi-chat-root {
-        position: relative;
-        z-index: 11000;
-        --susi-chat-toggle-height: 176px;
-        isolation: isolate;
+        --susi-chat-toggle-height: 150px;
       }
 
       .susi-chat-toggle {
-        position: fixed;
         bottom: 0;
-        right: 24px;
-        width: 128px;
-        height: var(--susi-chat-toggle-height);
-        padding: 0;
-        border: none;
-        border-radius: 0;
-        background: transparent !important;
-        box-shadow: none;
-        display: inline-flex;
-        align-items: flex-end;
-        justify-content: center;
-        cursor: pointer;
-        transition: transform 0.2s ease, opacity 0.2s ease;
-        z-index: 11001;
-      }
-
-      .susi-chat-toggle:hover {
-        transform: scale(1.03);
-      }
-
-      .susi-chat-toggle:focus-visible {
-        outline: 3px solid rgba(0, 163, 255, 0.9);
-        outline-offset: 4px;
-      }
-
-      .susi-chat-toggle__icon {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        object-position: bottom center;
-        display: block;
-        background: transparent !important;
-        border-radius: 0;
-        box-shadow: none !important;
-        filter: none !important;
-        mix-blend-mode: normal !important;
+        right: 16px;
+        width: 112px;
       }
 
       .susi-chat-modal {
-        position: fixed;
-        bottom: calc(24px + var(--susi-chat-toggle-height));
-        right: 24px;
-        width: min(360px, 90vw);
-        height: min(520px, 70vh);
-        background: #ffffff;
-        border-radius: 18px;
-        box-shadow: 0 24px 60px rgba(15, 37, 78, 0.24);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transform: translate3d(0, 12px, 0);
-        transition: opacity 0.25s ease, transform 0.25s ease;
-        z-index: 11002;
+        bottom: calc(16px + var(--susi-chat-toggle-height));
+        right: 16px;
+        width: min(420px, 92vw);
+        height: min(520px, 72vh);
       }
+    }
 
-      .susi-chat-modal--open {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-        transform: translate3d(0, 0, 0);
-      }
+    @media (prefers-reduced-motion: reduce) {
 
-      .susi-chat-modal__header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-        padding: 0.9rem 1.25rem;
-        background: linear-gradient(180deg, rgba(0, 74, 173, 0.08), rgba(0, 163, 255, 0.08));
-        border-bottom: 1px solid rgba(0, 74, 173, 0.12);
-      }
-
-      .susi-chat-modal__title {
-        font-size: 1.05rem;
-        font-weight: 600;
-        color: #003579;
-        margin: 0;
-      }
-
-      .susi-chat-modal__title:focus-visible {
-        outline: 3px solid rgba(0, 163, 255, 0.55);
-        outline-offset: 2px;
-      }
-
-      .susi-chat-close {
-        border: none;
-        background: transparent;
-        color: #003579;
-        font-size: 1.75rem;
-        line-height: 1;
-        cursor: pointer;
-        padding: 0;
-        width: 2rem;
-        height: 2rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 999px;
-        transition: background-color 0.2s ease;
-      }
-
-      .susi-chat-close:hover {
-        background-color: rgba(0, 74, 173, 0.08);
-      }
-
-      .susi-chat-close:focus-visible {
-        outline: 3px solid rgba(0, 74, 173, 0.45);
-        outline-offset: 2px;
-      }
-
-      .susi-chat-modal__body {
-        flex: 1;
-        position: relative;
-        background: #f7fbff;
-      }
-
-      .susi-chat-iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-        background: transparent;
-      }
-
-      .susi-chat-iframe[hidden] {
-        display: none !important;
-      }
-
-      .susi-chat-modal__fallback {
-        padding: 1.2rem 1.4rem 1.6rem;
-        background: #ffffff;
-        text-align: center;
-      }
-
-      .susi-chat-modal__fallback p {
-        margin-bottom: 0.75rem;
-        color: #1f2937;
-      }
-
+      .susi-chat-toggle,
+      .susi-chat-modal,
       .susi-chat-fallback-link {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.35rem;
-        padding: 0.55rem 1.1rem;
-        border-radius: 999px;
-        background: #004aad;
-        color: #ffffff;
-        font-weight: 600;
-        text-decoration: none;
-        transition: background-color 0.2s ease, transform 0.2s ease;
+        transition: none !important;
       }
+    }
+  </style>
 
-      .susi-chat-fallback-link:hover {
-        background: #003579;
-        transform: translateY(-1px);
-      }
+  <script>
+    // Controle de abertura, foco e fallback do chat SUSi
+    (function () {
+      const root = document.querySelector('.susi-chat-root');
+      if (!root) return;
 
-      .susi-chat-fallback-link:focus-visible {
-        outline: 3px solid rgba(0, 163, 255, 0.6);
-        outline-offset: 3px;
-      }
+      const toggleButton = root.querySelector('.susi-chat-toggle');
+      const modal = root.querySelector('.susi-chat-modal');
+      const closeButton = root.querySelector('.susi-chat-close');
+      const iframe = root.querySelector('.susi-chat-iframe');
+      const fallback = root.querySelector('.susi-chat-modal__fallback');
+      const status = root.querySelector('.susi-chat-status');
+      const modalTitle = root.querySelector('.susi-chat-modal__title');
+      const chatUrl = iframe ? iframe.dataset.src || iframe.getAttribute('src') || '' : '';
 
-      .susi-chat-modal__fallback[hidden] {
-        display: none !important;
-      }
+      const focusableSelectors = [
+        'button',
+        '[href]',
+        'input',
+        'select',
+        'textarea',
+        '[tabindex]:not([tabindex="-1"])'
+      ].join(', ');
 
-      .susi-chat-status {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0 0 0 0);
-        white-space: nowrap;
-        border: 0;
-      }
+      let isOpen = false;
+      let previouslyFocusedElement = null;
+      let watchdogTimer = null;
+      let iframeLoaded = false;
 
-      @media (max-width: 768px) {
-        .susi-chat-root {
-          --susi-chat-toggle-height: 150px;
+      const announce = (message) => {
+        if (status) status.textContent = message;
+      };
+
+      const getFocusableElements = () => {
+        return Array.from(modal.querySelectorAll(focusableSelectors)).filter((element) => {
+          return (
+            !element.hasAttribute('disabled') &&
+            element.getAttribute('aria-hidden') !== 'true' &&
+            element.offsetParent !== null
+          );
+        });
+      };
+
+      const requestIframeLoad = () => {
+        if (!iframe || !chatUrl) return;
+        const currentSrc = iframe.getAttribute('src');
+        const alreadyLoaded = iframe.dataset.loaded === 'true';
+        if (!alreadyLoaded || !currentSrc || currentSrc === 'about:blank') {
+          iframe.setAttribute('src', chatUrl);
         }
+      };
 
-        .susi-chat-toggle {
-          bottom: 0;
-          right: 16px;
-          width: 112px;
+      const resetFallback = () => {
+        if (fallback) {
+          fallback.hidden = true;
+          fallback.setAttribute('aria-hidden', 'true');
         }
-
-        .susi-chat-modal {
-          bottom: calc(16px + var(--susi-chat-toggle-height));
-          right: 16px;
-          width: min(420px, 92vw);
-          height: min(520px, 72vh);
-        }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .susi-chat-toggle,
-        .susi-chat-modal,
-        .susi-chat-fallback-link {
-          transition: none !important;
-        }
-      }
-    </style>
-
-    <script>
-      // Controle de abertura, foco e fallback do chat SUSi
-      (function () {
-        const root = document.querySelector('.susi-chat-root');
-        if (!root) return;
-
-        const toggleButton = root.querySelector('.susi-chat-toggle');
-        const modal = root.querySelector('.susi-chat-modal');
-        const closeButton = root.querySelector('.susi-chat-close');
-        const iframe = root.querySelector('.susi-chat-iframe');
-        const fallback = root.querySelector('.susi-chat-modal__fallback');
-        const status = root.querySelector('.susi-chat-status');
-        const modalTitle = root.querySelector('.susi-chat-modal__title');
-        const chatUrl = iframe ? iframe.dataset.src || iframe.getAttribute('src') || '' : '';
-
-        const focusableSelectors = [
-          'button',
-          '[href]',
-          'input',
-          'select',
-          'textarea',
-          '[tabindex]:not([tabindex="-1"])'
-        ].join(', ');
-
-        let isOpen = false;
-        let previouslyFocusedElement = null;
-        let watchdogTimer = null;
-        let iframeLoaded = false;
-
-        const announce = (message) => {
-          if (status) status.textContent = message;
-        };
-
-        const getFocusableElements = () => {
-          return Array.from(modal.querySelectorAll(focusableSelectors)).filter((element) => {
-            return (
-              !element.hasAttribute('disabled') &&
-              element.getAttribute('aria-hidden') !== 'true' &&
-              element.offsetParent !== null
-            );
-          });
-        };
-
-        const requestIframeLoad = () => {
-          if (!iframe || !chatUrl) return;
-          const currentSrc = iframe.getAttribute('src');
-          const alreadyLoaded = iframe.dataset.loaded === 'true';
-          if (!alreadyLoaded || !currentSrc || currentSrc === 'about:blank') {
-            iframe.setAttribute('src', chatUrl);
-          }
-        };
-
-        const resetFallback = () => {
-          if (fallback) {
-            fallback.hidden = true;
-            fallback.setAttribute('aria-hidden', 'true');
-          }
-          if (iframe) {
-            iframe.hidden = false;
-            iframe.removeAttribute('aria-hidden');
-          }
-        };
-
-        const showFallback = () => {
-          if (fallback) {
-            fallback.hidden = false;
-            fallback.setAttribute('aria-hidden', 'false');
-          }
-          if (iframe) {
-            iframe.hidden = true;
-            iframe.setAttribute('aria-hidden', 'true');
-            iframe.dataset.loaded = 'false';
-            iframe.setAttribute('src', 'about:blank');
-          }
-        };
-
-        const startWatchdog = () => {
-          if (!iframe || !chatUrl) return;
-          resetFallback();
-          window.clearTimeout(watchdogTimer);
-          if (iframe.dataset.loaded === 'true') {
-            iframeLoaded = true;
-            return;
-          }
-          iframeLoaded = false;
-          watchdogTimer = window.setTimeout(() => {
-            if (!iframeLoaded) {
-              showFallback();
-            }
-          }, 4500);
-        };
-
-        const handleKeydown = (event) => {
-          if (!isOpen) return;
-          if (event.key === 'Escape') {
-            event.preventDefault();
-            closeChat();
-            return;
-          }
-          if (event.key !== 'Tab') return;
-
-          const focusable = getFocusableElements();
-          if (!focusable.length) {
-            event.preventDefault();
-            modal.focus();
-            return;
-          }
-
-          const first = focusable[0];
-          const last = focusable[focusable.length - 1];
-          if (event.shiftKey) {
-            if (document.activeElement === first || document.activeElement === modal) {
-              event.preventDefault();
-              last.focus();
-            }
-          } else if (document.activeElement === last) {
-            event.preventDefault();
-            first.focus();
-          }
-        };
-
-        const handleFocusIn = (event) => {
-          if (!isOpen) return;
-          if (!modal.contains(event.target)) {
-            const focusable = getFocusableElements();
-            const focusTarget = focusable[0] || modal;
-            requestAnimationFrame(() => focusTarget.focus());
-          }
-        };
-
-        const openChat = () => {
-          if (isOpen) return;
-          previouslyFocusedElement = document.activeElement;
-          isOpen = true;
-          modal.setAttribute('aria-hidden', 'false');
-          toggleButton.setAttribute('aria-expanded', 'true');
-          modal.classList.add('susi-chat-modal--open');
-          const firstFocusable = getFocusableElements()[0];
-          const focusTarget = modalTitle || firstFocusable || modal;
-          requestAnimationFrame(() => focusTarget.focus());
-          document.addEventListener('keydown', handleKeydown);
-          document.addEventListener('focusin', handleFocusIn);
-          announce('Janela do chat SUSi aberta.');
-          requestIframeLoad();
-          startWatchdog();
-        };
-
-        const closeChat = () => {
-          if (!isOpen) return;
-          isOpen = false;
-          modal.setAttribute('aria-hidden', 'true');
-          toggleButton.setAttribute('aria-expanded', 'false');
-          modal.classList.remove('susi-chat-modal--open');
-          document.removeEventListener('keydown', handleKeydown);
-          document.removeEventListener('focusin', handleFocusIn);
-          window.clearTimeout(watchdogTimer);
-          announce('Janela do chat SUSi fechada.');
-          const returnFocusTarget = previouslyFocusedElement && previouslyFocusedElement.focus ? previouslyFocusedElement : toggleButton;
-          requestAnimationFrame(() => returnFocusTarget.focus());
-        };
-
-        const toggleChat = () => (isOpen ? closeChat() : openChat());
-
-        if (toggleButton) toggleButton.addEventListener('click', toggleChat);
-        if (closeButton) closeButton.addEventListener('click', closeChat);
-
         if (iframe) {
-          iframe.addEventListener('load', () => {
-            iframeLoaded = true;
-            iframe.dataset.loaded = 'true';
-            window.clearTimeout(watchdogTimer);
-            resetFallback();
-          });
-          iframe.addEventListener('error', () => {
-            iframeLoaded = false;
-            iframe.dataset.loaded = 'false';
-            window.clearTimeout(watchdogTimer);
-            showFallback();
-          });
+          iframe.hidden = false;
+          iframe.removeAttribute('aria-hidden');
         }
-      })();
-    </script>
-  </body>
+      };
+
+      const showFallback = () => {
+        if (fallback) {
+          fallback.hidden = false;
+          fallback.setAttribute('aria-hidden', 'false');
+        }
+        if (iframe) {
+          iframe.hidden = true;
+          iframe.setAttribute('aria-hidden', 'true');
+          iframe.dataset.loaded = 'false';
+          iframe.setAttribute('src', 'about:blank');
+        }
+      };
+
+      const startWatchdog = () => {
+        if (!iframe || !chatUrl) return;
+        resetFallback();
+        window.clearTimeout(watchdogTimer);
+        if (iframe.dataset.loaded === 'true') {
+          iframeLoaded = true;
+          return;
+        }
+        iframeLoaded = false;
+        watchdogTimer = window.setTimeout(() => {
+          if (!iframeLoaded) {
+            showFallback();
+          }
+        }, 4500);
+      };
+
+      const handleKeydown = (event) => {
+        if (!isOpen) return;
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          closeChat();
+          return;
+        }
+        if (event.key !== 'Tab') return;
+
+        const focusable = getFocusableElements();
+        if (!focusable.length) {
+          event.preventDefault();
+          modal.focus();
+          return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey) {
+          if (document.activeElement === first || document.activeElement === modal) {
+            event.preventDefault();
+            last.focus();
+          }
+        } else if (document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      };
+
+      const handleFocusIn = (event) => {
+        if (!isOpen) return;
+        if (!modal.contains(event.target)) {
+          const focusable = getFocusableElements();
+          const focusTarget = focusable[0] || modal;
+          requestAnimationFrame(() => focusTarget.focus());
+        }
+      };
+
+      const openChat = () => {
+        if (isOpen) return;
+        previouslyFocusedElement = document.activeElement;
+        isOpen = true;
+        modal.setAttribute('aria-hidden', 'false');
+        toggleButton.setAttribute('aria-expanded', 'true');
+        modal.classList.add('susi-chat-modal--open');
+        const firstFocusable = getFocusableElements()[0];
+        const focusTarget = modalTitle || firstFocusable || modal;
+        requestAnimationFrame(() => focusTarget.focus());
+        document.addEventListener('keydown', handleKeydown);
+        document.addEventListener('focusin', handleFocusIn);
+        announce('Janela do chat SUSi aberta.');
+        requestIframeLoad();
+        startWatchdog();
+      };
+
+      const closeChat = () => {
+        if (!isOpen) return;
+        isOpen = false;
+        modal.setAttribute('aria-hidden', 'true');
+        toggleButton.setAttribute('aria-expanded', 'false');
+        modal.classList.remove('susi-chat-modal--open');
+        document.removeEventListener('keydown', handleKeydown);
+        document.removeEventListener('focusin', handleFocusIn);
+        window.clearTimeout(watchdogTimer);
+        announce('Janela do chat SUSi fechada.');
+        const returnFocusTarget = previouslyFocusedElement && previouslyFocusedElement.focus ? previouslyFocusedElement : toggleButton;
+        requestAnimationFrame(() => returnFocusTarget.focus());
+      };
+
+      const toggleChat = () => (isOpen ? closeChat() : openChat());
+
+      if (toggleButton) toggleButton.addEventListener('click', toggleChat);
+      if (closeButton) closeButton.addEventListener('click', closeChat);
+
+      if (iframe) {
+        iframe.addEventListener('load', () => {
+          iframeLoaded = true;
+          iframe.dataset.loaded = 'true';
+          window.clearTimeout(watchdogTimer);
+          resetFallback();
+        });
+        iframe.addEventListener('error', () => {
+          iframeLoaded = false;
+          iframe.dataset.loaded = 'false';
+          window.clearTimeout(watchdogTimer);
+          showFallback();
+        });
+      }
+    })();
+  </script>
+
+  <div id="avisoModalBackdrop" class="aviso-modal-backdrop" role="dialog" aria-modal="true"
+    aria-labelledby="avisoModalTitle" aria-hidden="true">
+    <div class="aviso-modal">
+      <div id="avisoModalHeader" class="aviso-modal-header">
+        <span id="avisoModalIcon" class="aviso-modal-icon">📢</span>
+        <h2 id="avisoModalTitle" class="aviso-modal-title">Aviso</h2>
+      </div>
+      <div id="avisoModalBody" class="aviso-modal-body"></div>
+      <div class="aviso-modal-footer">
+        <button type="button" id="avisoModalClose" class="aviso-modal-btn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* === Modal de Aviso === */
+    (function initAvisoModal() {
+      const AVISO_ENDPOINT = 'https://n8n.homolog.app.emprel.gov.br/webhook/avisos';
+
+      const backdrop = document.getElementById('avisoModalBackdrop');
+      const header = document.getElementById('avisoModalHeader');
+      const icon = document.getElementById('avisoModalIcon');
+      const title = document.getElementById('avisoModalTitle');
+      const body = document.getElementById('avisoModalBody');
+      const closeBtn = document.getElementById('avisoModalClose');
+      const portalContent = document.getElementById('portal-content');
+
+      if (!backdrop || !header || !icon || !title || !body || !closeBtn) return;
+
+      const closeModal = () => {
+        backdrop.classList.remove('active');
+        backdrop.setAttribute('aria-hidden', 'true');
+        if (portalContent) portalContent.classList.remove('portal-blur');
+      };
+
+      const openModal = () => {
+        backdrop.classList.add('active');
+        backdrop.setAttribute('aria-hidden', 'false');
+        if (portalContent) portalContent.classList.add('portal-blur');
+        closeBtn.focus();
+      };
+
+      closeBtn.addEventListener('click', closeModal);
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) closeModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && backdrop.classList.contains('active')) closeModal();
+      });
+
+      const highlightTerms = [
+        'mobilidade', 'Sistema de Mobilidade Interna', 'SESAU', 'fechado', 'aberto', 'período', 'Portaria', 'DOM', 'análises', 'vagas', 'nomeações', 'importante', 'atenção', 'prazo', 'data', 'inscrições', 'inscrição', 'servidor', 'resultado', 'classificação'
+      ];
+
+      const highlightRelevantTerms = (text) => {
+        let result = text;
+        highlightTerms.forEach((term) => {
+          const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+          result = result.replace(regex, '<strong>$1</strong>');
+        });
+        result = result.replace(/(\d{2}\/\d{2}\/\d{4})/g, '<strong>$1</strong>');
+        result = result.replace(/(de\s+\d{2}\/\d{2}\/\d{4}\s+a\s+\d{2}\/\d{2}\/\d{4})/gi, '<strong>$1</strong>');
+        result = result.replace(/(\d{2}[:h]\d{2}(?:h)?|\b\d{2}h\b)/gi, '<strong>$1</strong>');
+        return result;
+      };
+
+      const isDicaDoDia = (text) => /dica\s*(do)?\s*dia/i.test(text);
+
+      const removeDicaDoDiaPrefix = (text) => text.replace(/^dica\s*(do)?\s*dia[:\-–—!\s]*/i, '').trim();
+
+      const configureModal = (rawMessage) => {
+        if (isDicaDoDia(rawMessage)) {
+          header.classList.add('dica');
+          icon.textContent = '💡';
+          title.textContent = 'Dica do dia';
+          const cleanMessage = removeDicaDoDiaPrefix(rawMessage);
+          body.innerHTML = highlightRelevantTerms(cleanMessage);
+        } else {
+          header.classList.remove('dica');
+          icon.textContent = '📢';
+          title.textContent = 'Aviso';
+          body.innerHTML = highlightRelevantTerms(rawMessage);
+        }
+      };
+
+      const fetchAndShowAviso = async () => {
+        try {
+          const response = await fetch(AVISO_ENDPOINT, { method: 'GET' });
+          if (!response.ok) return;
+          const text = await response.text();
+          if (!text || !text.trim()) return;
+          configureModal(text.trim());
+          openModal();
+        } catch (err) {
+          console.warn('[AvisoModal] Falha ao carregar aviso:', err);
+        }
+      };
+
+      // Inicia a busca imediatamente
+      fetchAndShowAviso();
+    })();
+  </script>
+</body>
+
 </html>

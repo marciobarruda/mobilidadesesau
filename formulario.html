@@ -1,575 +1,2636 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SESAU • Formulário de Mobilidade Interna</title>
-    <link
-      rel="icon"
-      href="https://statics.recife.pe.gov.br/images/dynamics/conecta/icons/favicon.png?w=32&h=32&fit=fill&border=2,transparent,shrink"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <style>
-      :root {
-        --brand-primary: #0053a4;
-        --brand-secondary: #003a73;
-        --brand-highlight: #00a3ff;
-        --surface: #f4f7fb;
-        --surface-strong: #ffffff;
-        --border-color: #d0d7e2;
-        --text-strong: #1b263b;
-        --text-muted: #5b6c8c;
-      }
-      *,*::before,*::after{box-sizing:border-box}
-      body{
-        font-family:"Public Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-        background:var(--surface);color:var(--text-strong);min-height:100vh
-      }
-      header.site-header{
-        background:url("https://statics.recife.pe.gov.br/images/dynamics/automacao/header.png?w=3000") center/cover no-repeat;
-        color:#fff;padding:3rem 0 2.25rem
-      }
-      header .lead{color:rgba(255,255,255,.9);font-size:1rem;line-height:1.65;max-width:100%}
-      .badge-open{display:inline-flex;align-items:center;gap:.5rem;font-size:.95rem;font-weight:600;padding:.45rem .9rem;border-radius:999px;background:rgba(255,255,255,.14)}
-      .section-title{display:flex;align-items:center;gap:.65rem;font-weight:700;font-size:1.2rem;color:var(--text-strong)}
-      .section-title::before{content:"";display:inline-block;width:32px;height:3px;border-radius:999px;background:var(--brand-highlight)}
-      .card{border-radius:4px;overflow:hidden}
-      .card-programa{border:1px solid rgba(0,83,164,.08);border-radius:4px;background:var(--surface-strong);box-shadow:0 16px 34px rgba(0,45,98,.08)}
-      .card-programa .card-header{border-bottom:1px solid rgba(0,83,164,.08);background:linear-gradient(180deg,#fff 0%,#f5f8fc 100%);padding:1.25rem 1.25rem 1rem}
-      .collapsible-form{border:1px solid rgba(0,83,164,.15);border-radius:4px;background:rgba(0,83,164,.05);padding:1rem 1.25rem}
-      .collapsible-form summary{font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.5rem}
-      .collapsible-form summary::marker,.collapsible-form summary::-webkit-details-marker{display:none}
-      .collapsible-form summary::before{content:"➕";font-size:.9rem;transition:transform .2s ease}
-      .collapsible-form[open] summary::before{transform:rotate(45deg)}
-      .table-editable input, .table-editable select{width:100%;border:1px solid var(--border-color);border-radius:.25rem;padding:.35rem .5rem}
-      .table thead th{white-space:nowrap}
-      .actions-cell button{min-width:38px}
-      .muted{color:var(--text-muted)}
-      footer{color:var(--text-muted);padding:2rem 0 1.5rem;font-size:.9rem}
-      @media (max-width: 768px){header.site-header{padding:2.25rem 0 1.75rem}.badge-open{width:100%;justify-content:center}}
-    </style>
-  </head>
-  <body>
-    <!-- Campos ocultos carregados com a página -->
-    <input type="hidden" id="cpf" value="02763108458" />
-    <input type="hidden" id="grupo" value="" />
 
-    <header class="site-header">
-      <div class="container">
-        <span class="badge-open">Secretaria de Saúde — SESAU • Prefeitura do Recife</span>
-        <h1 class="display-6 fw-semibold mt-3">Formulário — Mobilidade Interna</h1>
-        <p class="lead mt-2">Preencha os dados para cadastrar ou atualizar sua solicitação de mobilidade.</p>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SESAU • Formulário de Mobilidade Interna</title>
+  <link rel="icon"
+    href="https://statics.recife.pe.gov.br/images/dynamics/conecta/icons/favicon.png?w=32&h=32&fit=fill&border=2,transparent,shrink" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <style>
+    :root {
+      --brand-primary: #0053a4;
+      --brand-secondary: #003a73;
+      --brand-highlight: #00a3ff;
+      --surface: #f4f7fb;
+      --surface-strong: #ffffff;
+      --border-color: #d0d7e2;
+      --text-strong: #1b263b;
+      --text-muted: #5b6c8c;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Public Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--surface);
+      color: var(--text-strong);
+      min-height: 100vh;
+    }
+
+    header.site-header {
+      background: url("https://statics.recife.pe.gov.br/images/dynamics/automacao/header.png?w=3000") center/cover no-repeat;
+      color: #fff;
+      padding: 3rem 0 2.25rem;
+    }
+
+    header .lead {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      line-height: 1.65;
+      max-width: 100%;
+    }
+
+    .badge-open {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--text-strong);
+    }
+
+    .section-title::before {
+      content: "";
+      display: inline-block;
+      width: 32px;
+      height: 3px;
+      border-radius: 999px;
+      background: var(--brand-highlight);
+    }
+
+    .card {
+      border-radius: 4px;
+      overflow: visible;
+    }
+
+    .card-programa {
+      border: 1px solid rgba(0, 83, 164, 0.08);
+      border-radius: 4px;
+      background: var(--surface-strong);
+      box-shadow: 0 16px 34px rgba(0, 45, 98, 0.08);
+    }
+
+    .card-programa .card-header {
+      border-bottom: 1px solid rgba(0, 83, 164, 0.08);
+      background: linear-gradient(180deg, #fff 0%, #f5f8fc 100%);
+      padding: 1.25rem 1.25rem 1rem;
+    }
+
+    .muted {
+      color: var(--text-muted);
+    }
+
+    .actions-cell {
+      white-space: normal;
+      vertical-align: middle;
+    }
+
+    .actions-cell .actions-wrapper {
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      min-width: 2.5rem;
+      min-height: 2.5rem;
+      line-height: 1;
+    }
+
+    .btn-locked {
+      opacity: 0.65;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-icon span[aria-hidden='true'] {
+      font-size: 1.05rem;
+    }
+
+    .prefs-responsive .table> :not(caption)>*>* {
+      padding: 0.85rem 1.1rem;
+      vertical-align: middle;
+    }
+
+    .uppercase {
+      text-transform: uppercase;
+    }
+
+    .small-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .table thead th {
+      white-space: nowrap;
+    }
+
+    .table-fixed {
+      table-layout: fixed;
+    }
+
+    .modal-alert-title {
+      color: #dc3545;
+    }
+
+    .alert-list {
+      padding-left: 1.1rem;
+    }
+
+    .modal-branding {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .modal-branding img {
+      height: 48px;
+      width: auto;
+    }
+
+    .choices {
+      width: 100%;
+      margin-bottom: 0;
+      position: relative;
+    }
+
+    .choices.is-open {
+      overflow: visible;
+    }
+
+    .choices__inner {
+      border-radius: 0.375rem;
+      border: 1px solid var(--border-color);
+      background-color: #fff;
+      min-height: calc(2.25rem + 2px);
+      padding: 0.375rem 0.75rem;
+      display: flex;
+      align-items: center;
+      box-shadow: none;
+    }
+
+    .choices__placeholder {
+      color: var(--text-muted);
+      opacity: 1;
+    }
+
+    .choices__list--single {
+      padding: 0;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .choices__list--single .choices__item {
+      padding: 0;
+      width: 100%;
+      white-space: normal;
+      line-height: 1.35;
+    }
+
+    .choices[data-type*='select-one']::after {
+      border-color: var(--text-muted) transparent transparent transparent;
+      right: 0.9rem;
+    }
+
+    .choices__list--dropdown {
+      border-radius: 0.375rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 12px 24px rgba(0, 35, 79, 0.16);
+      margin-top: 0.15rem;
+      position: absolute;
+      width: 100%;
+      z-index: 1040;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .choices__list[aria-expanded] {
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .choices__list--dropdown .choices__item--selectable {
+      padding: 0.55rem 0.75rem;
+      white-space: normal;
+    }
+
+    .choices__input {
+      padding: 0.35rem 0.75rem;
+      margin-bottom: 0.35rem;
+      border-radius: 0.375rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .choices__list--dropdown .choices__input {
+      background-color: #f8fafc;
+    }
+
+    .choices.is-focused .choices__inner,
+    .choices.is-open .choices__inner {
+      border-color: #86b7fe;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .resumo-card {
+      border: 1px solid rgba(0, 83, 164, 0.12);
+      border-radius: 12px;
+      background: linear-gradient(180deg, #ffffff 0%, rgba(244, 247, 251, 0.8) 100%);
+      box-shadow: 0 18px 46px rgba(0, 35, 79, 0.15);
+    }
+
+    .resumo-card .meta-label {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .resumo-card .meta-value {
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--text-strong);
+    }
+
+    .resumo-table thead {
+      background: #0053a4;
+      color: #fff;
+    }
+
+    .resumo-table th {
+      font-weight: 600;
+    }
+
+    .solicitacao-box {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.25rem;
+      padding: 0.65rem 1.65rem 0.75rem;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #eaf1ff 0%, #d5e2ff 100%);
+      border: 1px solid rgba(0, 83, 164, 0.15);
+      box-shadow: 0 18px 32px rgba(21, 56, 128, 0.12);
+      min-width: 260px;
+    }
+
+    .solicitacao-box .solicitacao-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(15, 44, 102, 0.7);
+      font-weight: 700;
+    }
+
+    .solicitacao-box .solicitacao-value {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #0f2c66;
+      word-break: break-word;
+      text-align: right;
+      align-self: stretch;
+      line-height: 1.05;
+    }
+
+    #printComprovante {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 83, 164, 0.12);
+      box-shadow: 0 24px 80px rgba(0, 37, 84, 0.18);
+      overflow: hidden;
+      max-width: 960px;
+      margin: 0 auto;
+      color: var(--text-strong);
+    }
+
+    #printComprovante .receipt-header {
+      background: linear-gradient(135deg, #0053a4, #003a73);
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      gap: 2rem;
+      padding: 1.75rem 2rem;
+      align-items: flex-start;
+    }
+
+    #printComprovante .receipt-header .brand {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    #printComprovante .receipt-header .brand img {
+      height: 60px;
+      width: auto;
+    }
+
+    #printComprovante .receipt-header .brand strong {
+      display: block;
+      font-size: 1.1rem;
+      letter-spacing: 0.02em;
+    }
+
+    #printComprovante .receipt-header .brand span {
+      display: block;
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    #printComprovante .receipt-header .protocol {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      text-align: right;
+      min-width: 180px;
+    }
+
+    #printComprovante .receipt-header .protocol .label {
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    #printComprovante .receipt-header .protocol .value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    #printComprovante .receipt-body {
+      padding: 2rem;
+    }
+
+    #printComprovante .receipt-body h5,
+    #printComprovante .receipt-body h4 {
+      font-weight: 700;
+      color: #003a73;
+    }
+
+    #printComprovante .receipt-intro p {
+      margin-bottom: 0;
+      color: var(--text-muted);
+    }
+
+    #printComprovante .receipt-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    #printComprovante .receipt-info-item {
+      background: rgba(0, 83, 164, 0.06);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+    }
+
+    #printComprovante .receipt-info-item .info-label {
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #003a73;
+      font-weight: 600;
+    }
+
+    #printComprovante .receipt-info-item .info-value {
+      display: block;
+      margin-top: 0.35rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    #printComprovante .receipt-table {
+      width: 100%;
+      border-collapse: collapse;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    }
+
+    #printComprovante .receipt-table thead {
+      background: #0053a4;
+      color: #fff;
+    }
+
+    #printComprovante .receipt-table th,
+    #printComprovante .receipt-table td {
+      font-size: 0.9rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(0, 83, 164, 0.12);
+    }
+
+    #printComprovante .receipt-table tbody tr:nth-child(even) {
+      background: rgba(0, 83, 164, 0.03);
+    }
+
+    #printComprovante .receipt-footer {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+
+      #printComprovante,
+      #printComprovante * {
+        visibility: visible !important;
+      }
+
+      #printComprovante {
+        position: absolute;
+        inset: 0;
+        margin: 0 auto;
+        box-shadow: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header.site-header {
+        padding: 2.25rem 0 1.75rem;
+      }
+
+      .badge-open {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .prefs-responsive {
+        overflow-x: visible;
+      }
+
+      .solicitacao-box {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .solicitacao-box .solicitacao-value {
+        font-size: 1.75rem;
+      }
+
+      #tabelaPrefs {
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      #tabelaPrefs thead {
+        display: none;
+      }
+
+      #tabelaPrefs tbody {
+        display: block;
+      }
+
+      #tabelaPrefs tbody tr {
+        display: block;
+        border-radius: 16px;
+        background: var(--surface-strong);
+        border: 1px solid rgba(0, 83, 164, 0.12);
+        box-shadow: 0 18px 40px rgba(0, 35, 79, 0.12);
+        padding: 1.35rem 1.5rem;
+        margin-bottom: 1.15rem;
+      }
+
+      #tabelaPrefs tbody tr:last-child {
+        margin-bottom: 0;
+      }
+
+      #tabelaPrefs tbody td {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid rgba(0, 83, 164, 0.08);
+        text-align: left;
+      }
+
+      #tabelaPrefs tbody td:last-child {
+        border-bottom: 0;
+      }
+
+      #tabelaPrefs tbody td::before {
+        content: attr(data-label);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 0.1rem;
+      }
+
+      #tabelaPrefs tbody td.actions-cell {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: left;
+      }
+
+      #tabelaPrefs tbody td.actions-cell::before {
+        margin-bottom: 0.75rem;
+      }
+
+      #tabelaPrefs tbody td.actions-cell .actions-wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+      }
+
+      #tabelaPrefs tbody td.actions-cell .actions-wrapper .btn {
+        width: auto;
+      }
+    }
+
+    @media (max-width: 576px) {
+      #tabelaPrefs {
+        table-layout: fixed;
+        width: 100%;
+      }
+
+      #tabelaPrefs thead th,
+      #tabelaPrefs tbody td {
+        padding: 0.5rem;
+        line-height: 1.3;
+        font-size: 0.95rem;
+        word-break: break-word;
+        white-space: normal;
+      }
+
+      #tabelaPrefs tbody tr {
+        padding: 0.85rem 1rem;
+      }
+
+      #tabelaPrefs tbody td {
+        min-height: 44px;
+      }
+
+      #tabelaPrefs tbody td.actions-cell .actions-wrapper {
+        gap: 0.6rem;
+      }
+
+      #tabelaPrefs tbody td.actions-cell .actions-wrapper .btn {
+        margin: 0.1rem 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container">
+      <span class="badge-open">Secretaria de Saúde • SESAU • Prefeitura do Recife</span>
+      <h1 class="display-6 h1-title mt-3 mb-2">Formulário • Mobilidade Interna</h1>
+      <p class="lead mb-0">
+        Preencha os dados para cadastrar ou atualizar sua solicitação de mobilidade.
+      </p>
+    </div>
+  </header>
+
+  <main class="container py-4">
+    <div class="d-flex justify-content-end mb-3">
+      <div class="solicitacao-box" role="status" aria-live="polite">
+        <span class="solicitacao-label">Solicitação</span>
+        <span class="solicitacao-value" id="numeroSolicitacaoDisplay">•</span>
       </div>
-    </header>
+    </div>
+    <!-- Identificação -->
+    <section class="card card-programa mb-4" aria-labelledby="identificacaoTitulo">
+      <div class="card-header py-3">
+        <div class="section-title" id="identificacaoTitulo">Identificação</div>
+      </div>
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-lg-3">
+            <label class="form-label" for="matricula">Matrícula</label>
+            <select id="matricula" class="form-select" required data-required="true" aria-required="true"></select>
+          </div>
+          <div class="col-12 col-lg-6">
+            <label class="form-label" for="nome">Nome</label>
+            <input id="nome" class="form-control" readonly aria-readonly="true" />
+          </div>
+          <div class="col-12 col-lg-3">
+            <label class="form-label" for="nascimento">Data de nascimento</label>
+            <input id="nascimento" class="form-control" readonly aria-readonly="true" />
+          </div>
+        </div>
+        <div class="row g-3 align-items-end mt-0">
+          <div class="col-12 col-xl-5 col-lg-6">
+            <label class="form-label" for="cargo">Cargo</label>
+            <input id="cargo" class="form-control" readonly aria-readonly="true" />
+          </div>
+          <div class="col-6 col-xl-1 col-lg-1 col-md-3">
+            <label class="form-label" for="grupo">Grupo</label>
+            <input id="grupo" class="form-control" readonly aria-readonly="true" />
+          </div>
+          <div class="col-6 col-xl-1 col-lg-2 col-md-3">
+            <label class="form-label" for="vinculo">Vínculo</label>
+            <input id="vinculo" class="form-control" readonly aria-readonly="true" />
+          </div>
+          <div class="col-6 col-xl-2 col-lg-2 col-md-4">
+            <label class="form-label" for="admissao">Data de admissão</label>
+            <input id="admissao" class="form-control" readonly aria-readonly="true" />
+          </div>
+          <div class="col-6 col-xl-1 col-lg-1 col-md-3">
+            <label class="form-label" for="carga">CH</label>
+            <input id="carga" class="form-control" readonly aria-readonly="true" />
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <main class="container my-5">
-      <section class="mb-4">
-        <h2 class="section-title">Identificação</h2>
-        <div class="card card-programa mb-4">
-          <div class="card-header"><strong>Dados pessoais e funcionais</strong></div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label for="sel-matricula" class="form-label">Matrícula</label>
-                <select id="sel-matricula" class="form-select" required></select>
-                <div class="form-text">Opções carregadas via CPF.</div>
-              </div>
+    <!-- Endereço e Contatos -->
+    <section class="card card-programa mb-4" aria-labelledby="enderecoTitulo">
+      <div class="card-header py-3">
+        <div class="section-title" id="enderecoTitulo">Endereço e Contatos</div>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12 col-sm-4 col-lg-3">
+            <label class="form-label" for="cep">CEP</label>
+            <input id="cep" class="form-control" placeholder="00000000" inputmode="numeric" data-required="true"
+              data-numeric="true" aria-required="true" />
+          </div>
+          <div class="col-12 col-md-6 col-lg-5">
+            <label class="form-label" for="logradouro">Logradouro</label>
+            <input id="logradouro" class="form-control" data-required="true" aria-required="true" />
+          </div>
+          <div class="col-6 col-md-3 col-lg-2">
+            <label class="form-label" for="numero">Número</label>
+            <input id="numero" class="form-control" data-required="true" data-numeric="true" inputmode="numeric"
+              aria-required="true" />
+          </div>
+          <div class="col-6 col-md-3 col-lg-2">
+            <label class="form-label" for="complemento">Complemento</label>
+            <input id="complemento" class="form-control" data-required="true" aria-required="true" />
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="bairro">Bairro</label>
+            <input id="bairro" class="form-control" data-required="true" aria-required="true" />
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="cidade">Cidade</label>
+            <input id="cidade" class="form-control" data-required="true" aria-required="true" />
+          </div>
+          <div class="col-12 col-md-2 col-lg-1">
+            <label class="form-label" for="uf">UF</label>
+            <input id="uf" maxlength="2" class="form-control" placeholder="PE" data-required="true"
+              aria-required="true" />
+          </div>
+          <div class="col-12 col-lg-3 col-md-4">
+            <label class="form-label" for="whatsapp">WhatsApp</label>
+            <input id="whatsapp" class="form-control" placeholder="DDD + número" data-required="true"
+              data-numeric="true" inputmode="numeric" aria-required="true" />
+          </div>
+          <div class="col-12 col-lg-3 col-md-4">
+            <label class="form-label" for="telalt">Telefone alternativo</label>
+            <input id="telalt" class="form-control" placeholder="DDD + número" data-numeric="true" inputmode="numeric"
+              aria-describedby="telaltHelp" />
+            <div id="telaltHelp" class="small-note">Campo opcional.</div>
+          </div>
+          <div class="col-12 col-lg-3 col-md-4">
+            <label class="form-label" for="email">E-mail</label>
+            <input id="email" class="form-control" type="email" autocomplete="email" data-required="true"
+              aria-required="true" data-uppercase="false" />
+          </div>
+          <div class="col-12 col-lg-3 col-md-4">
+            <label class="form-label" for="email2">Confirme o e-mail</label>
+            <input id="email2" class="form-control" type="email" autocomplete="email" data-required="true"
+              aria-required="true" data-uppercase="false" />
+          </div>
+        </div>
+      </div>
+    </section>
 
-              <div class="col-md-4">
-                <label for="in-dt-admissao" class="form-label">Data de admissão</label>
-                <input id="in-dt-admissao" class="form-control" type="text" readonly />
-              </div>
+    <!-- Dados de Lotação Atual -->
+    <section class="card card-programa mb-4" aria-labelledby="lotacaoAtualTitulo">
+      <div class="card-header py-3">
+        <div class="section-title" id="lotacaoAtualTitulo">Dados de Lotação Atual</div>
+      </div>
+      <div class="card-body">
+        <div class="mb-2 muted">Dependentes por seleção</div>
+        <div class="row g-3">
+          <div class="col-12 col-lg-3 col-md-4">
+            <label class="form-label" for="dsSelect">Distrito atual</label>
+            <select id="dsSelect" class="form-select" data-required="true" aria-required="true">
+              <option value="" selected disabled>Selecione...</option>
+              <option>DS I</option>
+              <option>DS II</option>
+              <option>DS III</option>
+              <option>DS IV</option>
+              <option>DS V</option>
+              <option>DS VI</option>
+              <option>DS VII</option>
+              <option>DS VIII</option>
+              <option>GABINETE SESAU</option>
+              <option>SEAA - JURIDICO</option>
+              <option>SEAB</option>
+              <option>SEAF</option>
+              <option>SECOGE</option>
+              <option>SEGTES</option>
+              <option>SEINFRA</option>
+              <option>SERMAC</option>
+              <option>SEVS</option>
+            </select>
+          </div>
+          <div class="col-12 col-lg-4 col-md-4">
+            <label class="form-label" for="unidadeSelect">Lotação atual</label>
+            <select id="unidadeSelect" class="form-select" disabled data-required="true" aria-required="true">
+              <option>Selecione o distrito...</option>
+            </select>
+          </div>
+          <div class="col-12 col-lg-3 col-md-4">
+            <label class="form-label" for="turnoSelect">Horário atual</label>
+            <select id="turnoSelect" class="form-select" disabled data-required="true" aria-required="true">
+              <option>Selecione a unidade...</option>
+            </select>
+          </div>
+          <div class="col-12 col-lg-2 col-md-4">
+            <label class="form-label" for="regimeSelect">Regime de trabalho</label>
+            <select id="regimeSelect" class="form-select" disabled data-required="true" aria-required="true">
+              <option>Selecione a unidade...</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
 
-              <div class="col-md-4">
-                <label for="in-dt-nascimento" class="form-label">Data de nascimento</label>
-                <input id="in-dt-nascimento" class="form-control" type="text" readonly />
-              </div>
+    <!-- Preferências -->
+    <section class="card card-programa mb-4" aria-labelledby="preferenciasTitulo">
+      <div class="card-header py-3 d-flex align-items-center justify-content-between">
+        <div class="section-title" id="preferenciasTitulo">Seleção de Unidades</div>
+        <button id="btnAddLinha" class="btn btn-primary" type="button">Adicionar Unidade</button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive prefs-responsive">
+          <table class="table table-sm align-middle table-fixed" id="tabelaPrefs">
+            <thead>
+              <tr>
+                <th style="width: 90px">Prioridade</th>
+                <th style="width: 170px">Distrito</th>
+                <th>Lotação</th>
+                <th style="width: 170px">Data de solicitação</th>
+                <th style="width: 190px">Data de credenciamento</th>
+                <th class="text-center" style="width: 220px">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="prefsBody" aria-live="polite"></tbody>
+          </table>
+        </div>
+        <div class="small-note mt-2">
+          Linhas carregadas automaticamente não podem ser editadas (apenas removidas). A ordenação segue a prioridade
+          (numérica).
+        </div>
+      </div>
+    </section>
 
-              <div class="col-md-6">
-                <label for="in-nome" class="form-label">Nome</label>
-                <input id="in-nome" class="form-control" type="text" readonly />
-              </div>
+    <div class="d-flex justify-content-end mb-5">
+      <button class="btn btn-success" id="btnEnviar" type="button">Enviar formulário</button>
+    </div>
+  </main>
 
-              <div class="col-md-6">
-                <label for="in-cargo" class="form-label">Cargo</label>
-                <input id="in-cargo" class="form-control" type="text" readonly />
-              </div>
-
-              <div class="col-md-3 d-none">
-                <label for="in-grupo" class="form-label">Grupo</label>
-                <input id="in-grupo" class="form-control" type="text" readonly />
-              </div>
-
-              <div class="col-md-3">
-                <label for="in-vinculo" class="form-label">Vínculo</label>
-                <input id="in-vinculo" class="form-control" type="text" readonly />
-              </div>
-
-              <div class="col-md-3">
-                <label for="in-carga-horaria" class="form-label">Carga horária de atuação</label>
-                <input id="in-carga-horaria" class="form-control" type="text" readonly />
-              </div>
+  <!-- Modal Unidade -->
+  <div class="modal fade" id="modalUnidade" tabindex="-1" aria-labelledby="modalUnidadeTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalUnidadeTitulo">Adicionar unidade</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="mDs">Distrito</label>
+              <select id="mDs" class="form-select">
+                <option value="" selected disabled>Selecione...</option>
+                <option>DS I</option>
+                <option>DS II</option>
+                <option>DS III</option>
+                <option>DS IV</option>
+                <option>DS V</option>
+                <option>DS VI</option>
+                <option>DS VII</option>
+                <option>DS VIII</option>
+                <option>GABINETE SESAU</option>
+                <option>SEAA - JURIDICO</option>
+                <option>SEAB</option>
+                <option>SEAF</option>
+                <option>SECOGE</option>
+                <option>SEGTES</option>
+                <option>SEINFRA</option>
+                <option>SERMAC</option>
+                <option>SEVS</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="mUnidade">Unidade</label>
+              <select id="mUnidade" class="form-select" disabled>
+                <option>Selecione o distrito...</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="mTurno">Turno</label>
+              <select id="mTurno" class="form-select" disabled>
+                <option>Selecione a unidade...</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="mRegime">Regime</label>
+              <select id="mRegime" class="form-select" disabled>
+                <option>Selecione a unidade...</option>
+              </select>
             </div>
           </div>
         </div>
-      </section>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" id="btnModalCancelar"
+            data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btnModalConfirmar">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      <section class="mb-4">
-        <h2 class="section-title">Endereço e Contatos</h2>
-        <div class="card card-programa mb-4">
-          <div class="card-header"><strong>Endereço</strong></div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-3">
-                <label for="in-cep" class="form-label">CEP</label>
-                <input id="in-cep" class="form-control" type="text" inputmode="numeric" maxlength="8" />
-                <div class="form-text">Autopreenche via BrasilAPI.</div>
-              </div>
-              <div class="col-md-5">
-                <label for="in-logradouro" class="form-label">Logradouro</label>
-                <input id="in-logradouro" class="form-control" type="text" />
-              </div>
-              <div class="col-md-2">
-                <label for="in-numero" class="form-label">Número</label>
-                <input id="in-numero" class="form-control" type="text" />
-              </div>
-              <div class="col-md-2">
-                <label for="in-complemento" class="form-label">Complemento</label>
-                <input id="in-complemento" class="form-control" type="text" />
-              </div>
-              <div class="col-md-4">
-                <label for="in-bairro" class="form-label">Bairro</label>
-                <input id="in-bairro" class="form-control" type="text" />
-              </div>
-              <div class="col-md-4">
-                <label for="in-cidade" class="form-label">Cidade</label>
-                <input id="in-cidade" class="form-control" type="text" />
-              </div>
-              <div class="col-md-2">
-                <label for="in-uf" class="form-label">UF</label>
-                <input id="in-uf" class="form-control text-uppercase" type="text" maxlength="2" />
-              </div>
-              <div class="col-md-4">
-                <label for="in-whatsapp" class="form-label">WhatsApp</label>
-                <input id="in-whatsapp" class="form-control" type="tel" inputmode="numeric" maxlength="11" placeholder="DDD + número" />
-              </div>
-              <div class="col-md-4">
-                <label for="in-telefone-alt" class="form-label">Telefone alternativo</label>
-                <input id="in-telefone-alt" class="form-control" type="tel" inputmode="numeric" maxlength="11" placeholder="DDD + número" />
-              </div>
-              <div class="col-md-4">
-                <label for="in-email" class="form-label">E-mail</label>
-                <input id="in-email" class="form-control" type="email" autocomplete="email" />
-              </div>
-              <div class="col-md-4">
-                <label for="in-email-2" class="form-label">Confirme o e-mail</label>
-                <input id="in-email-2" class="form-control" type="email" autocomplete="email" />
-                <div class="form-text" id="email-help"></div>
-              </div>
+  <!-- Modal de Alerta -->
+  <div class="modal fade" id="modalAlerta" tabindex="-1" aria-labelledby="modalAlertaTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <span role="img" aria-label="alerta">⚠️</span>
+            <span id="modalAlertaTitulo" class="modal-alert-title">Alerta</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p>Revise os campos listados antes de prosseguir:</p>
+          <ul id="alertList" class="alert-list"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação de Envio do Comprovante -->
+  <div class="modal fade" id="modalEmailConfirmacao" tabindex="-1" aria-labelledby="modalEmailConfirmacaoTitulo"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body text-center py-4">
+          <h5 class="mb-3" id="modalEmailConfirmacaoTitulo">Comprovante enviado por e-mail</h5>
+          <p class="mb-3">O comprovante da solicitação foi enviado para o e-mail informado pelo usuário.</p>
+          <p class="text-muted mb-0">
+            Este aviso será fechado automaticamente em <strong><span id="emailCountdown">5</span>s</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Sucesso -->
+  <div class="modal fade" id="modalSucesso" tabindex="-1" aria-labelledby="modalSucessoTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header bg-light-subtle border-0 border-bottom">
+          <div class="modal-branding">
+            <img src="https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200"
+              alt="Prefeitura do Recife" />
+            <div>
+              <h5 class="modal-title mb-0" id="modalSucessoTitulo">Comprovante de solicitação</h5>
+              <small class="text-muted">Resumo da solicitação enviada</small>
             </div>
           </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
         </div>
-      </section>
+        <div class="modal-body">
+          <div id="resumoSolicitacao"></div>
+          <div id="printWrapper" class="d-none">
+            <div id="printComprovante" aria-live="polite"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" id="btnSalvarPDF">Salvar em PDF</button>
+          <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      <section class="mb-4">
-        <h2 class="section-title">Dados de Lotação Atual</h2>
-        <div class="card card-programa mb-4">
-          <div class="card-header"><strong>Dependentes por seleção</strong></div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-3">
-                <label for="sel-distrito" class="form-label">Distrito atual</label>
-                <select id="sel-distrito" class="form-select"></select>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script>
+    const PORTAL_REDIRECT_URL =
+      'https://n8n.homolog.app.emprel.gov.br/webhook/portal-sesau-servidores';
+
+    const postJSON = async (url, body) => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body || {})
+      });
+      if (!res.ok) throw new Error('Erro de rede');
+      try {
+        return await res.json();
+      } catch (err) {
+        return null;
+      }
+    };
+    const toBRDate = (d) => {
+      if (!d) return '';
+
+      const parseDate = (value) => {
+        if (!value) return null;
+        if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+
+        const str = String(value).trim();
+        if (!str) return null;
+
+        const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (isoMatch) {
+          const [, y, m, d] = isoMatch.map((n) => Number(n));
+          const dt = new Date(y, m - 1, d);
+          return Number.isNaN(dt.getTime()) ? null : dt;
+        }
+
+        const slashParts = str.split(/[\/]/);
+        if (slashParts.length === 3) {
+          const [p1, p2, p3] = slashParts.map((p) => Number(p));
+          const [day, month, year] = [p1, p2, p3];
+          if (year && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+            const dt = new Date(year, month - 1, day);
+            return Number.isNaN(dt.getTime()) ? null : dt;
+          }
+        }
+
+        const fallback = new Date(str);
+        return Number.isNaN(fallback.getTime()) ? null : fallback;
+      };
+
+      const dt = parseDate(d);
+      if (!dt) return '';
+
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${pad(dt.getDate())}/${pad(dt.getMonth() + 1)}/${dt.getFullYear()}`;
+    };
+
+    const SEARCHABLE_SELECT_IDS = [
+      'matricula',
+      'dsSelect',
+      'unidadeSelect',
+      'turnoSelect',
+      'regimeSelect',
+      'mDs',
+      'mUnidade',
+      'mTurno',
+      'mRegime'
+    ];
+    const choicesInstances = {};
+
+    function createChoicesInstance(el) {
+      return new Choices(el, {
+        searchEnabled: true,
+        shouldSort: false,
+        itemSelectText: '',
+        searchPlaceholderValue: 'Digite para buscar',
+        noResultsText: 'Nenhum resultado encontrado',
+        noChoicesText: 'Nenhuma opção disponível',
+        allowHTML: false
+      });
+    }
+
+    function initSearchableSelects() {
+      SEARCHABLE_SELECT_IDS.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const instance = createChoicesInstance(el);
+        choicesInstances[id] = instance;
+        if (el.disabled) instance.disable();
+      });
+    }
+
+    function syncChoicesOptions(id, options = [], placeholderText = 'Selecione...') {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const instance = choicesInstances[id];
+      if (instance) {
+        instance.clearChoices();
+        instance.removeActiveItems();
+        const prepared = [];
+        if (placeholderText) {
+          prepared.push({ value: '', label: placeholderText, disabled: true, selected: true });
+        }
+        prepared.push(...options.map((value) => ({ value, label: value })));
+        instance.setChoices(prepared, 'value', 'label', true);
+        return;
+      }
+      el.innerHTML = '';
+      if (placeholderText) {
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = placeholderText;
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        el.appendChild(placeholder);
+      }
+      options.forEach((value) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        el.appendChild(option);
+      });
+    }
+
+    function setChoiceDisabled(id, disabled) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.disabled = disabled;
+      const instance = choicesInstances[id];
+      if (instance) {
+        if (disabled) instance.disable();
+        else instance.enable();
+      }
+    }
+
+    function refreshTooltips(selector = '[data-bs-toggle="tooltip"]') {
+      if (!window.bootstrap?.Tooltip) return;
+      if (!state.tooltips) state.tooltips = [];
+      state.tooltips.forEach((t) => t.dispose());
+      state.tooltips = Array.from(document.querySelectorAll(selector)).map(
+        (el) => new bootstrap.Tooltip(el)
+      );
+    }
+
+    function setChoiceValue(id, value) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = value || '';
+      const instance = choicesInstances[id];
+      if (!instance) return;
+      if (!value) {
+        instance.removeActiveItems();
+      } else {
+        instance.setChoiceByValue(value);
+      }
+    }
+    const todayBR = () => toBRDate(new Date());
+    const isCEP = (v) => /^(\d{5}\-?\d{3})$/.test((v || '').trim());
+    const sanitizeUF = (v) => (v || '').toUpperCase().slice(0, 2);
+    const onlyDigits = (value) => (value || '').replace(/\D+/g, '');
+    const ensureWhatsapp = (value) => {
+      const digits = onlyDigits(value);
+      return digits.length >= 10 && digits.length <= 11;
+    };
+
+    const sanitizeValue = (val) => {
+      if (val === null || val === undefined) return '';
+      const str = String(val).trim();
+      return str === 'undefined' || str === 'null' ? '' : str;
+    };
+
+    const FIELD_LABELS = {
+      matricula: 'Matrícula',
+      cep: 'CEP',
+      logradouro: 'Logradouro',
+      numero: 'Número',
+      complemento: 'Complemento',
+      bairro: 'Bairro',
+      cidade: 'Cidade',
+      uf: 'UF',
+      whatsapp: 'WhatsApp',
+      telalt: 'Telefone alternativo',
+      email: 'E-mail',
+      email2: 'Confirme o e-mail',
+      dsSelect: 'Distrito atual',
+      unidadeSelect: 'Lotação atual',
+      turnoSelect: 'Horário atual',
+      regimeSelect: 'Regime de trabalho'
+    };
+
+    const PREFERENCE_PREREQUISITE_IDS = [
+      'matricula',
+      'email',
+      'email2',
+      'dsSelect',
+      'cep',
+      'logradouro',
+      'numero',
+      'complemento',
+      'bairro',
+      'cidade',
+      'uf',
+      'whatsapp',
+      'unidadeSelect',
+      'turnoSelect',
+      'regimeSelect'
+    ];
+
+    const hasValue = (field) => {
+      if (!field) return false;
+      const value = sanitizeValue(field.value);
+      if (!value) return false;
+      const lower = value.toLowerCase();
+      return !(
+        lower.startsWith('selecione') ||
+        lower === 'selecione o distrito...' ||
+        lower === 'selecione a unidade...'
+      );
+    };
+
+    const isPlaceholderOption = (texto) => {
+      const lower = sanitizeValue(texto).toLowerCase();
+      return (
+        lower.startsWith('selecione') ||
+        lower === 'selecione o distrito...' ||
+        lower === 'selecione a unidade...'
+      );
+    };
+
+    const getFieldLabel = (fieldOrId) => {
+      const field = typeof fieldOrId === 'string' ? document.getElementById(fieldOrId) : fieldOrId;
+      if (field?.dataset?.label) return field.dataset.label;
+      const label = field?.labels?.[0]?.textContent;
+      if (label) return label.trim();
+      const fromMap = field?.id ? FIELD_LABELS[field.id] : FIELD_LABELS[fieldOrId];
+      return fromMap || (field?.id || 'Campo obrigatório');
+    };
+
+    const normalizeDateValue = (value) => {
+      if (!value) return null;
+      if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+      const str = String(value).trim();
+      if (!str) return null;
+      const slashParts = str.includes('/') ? str.split('/') : null;
+      if (slashParts && slashParts.length === 3) {
+        const [d, m, y] = slashParts.map((p) => Number(p));
+        if (y && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+          const dt = new Date(y, m - 1, d);
+          return Number.isNaN(dt.getTime()) ? null : dt;
+        }
+      }
+      if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+        const [y, m, d] = str.split('-').map((p) => Number(p));
+        if (y && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+          const dt = new Date(y, m - 1, d);
+          return Number.isNaN(dt.getTime()) ? null : dt;
+        }
+      }
+      const direct = new Date(str);
+      return Number.isNaN(direct.getTime()) ? null : direct;
+    };
+
+    const formatDateISO = (value) => {
+      const dt = normalizeDateValue(value);
+      if (!dt) return null;
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
+    };
+
+    const formatDateTimeISO = (value) => {
+      const dt = normalizeDateValue(value) || new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const date = `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
+      const time = `${pad(dt.getHours())}:${pad(dt.getMinutes())}:${pad(dt.getSeconds())}`;
+      return `${date} ${time}`;
+    };
+
+    const formatCPF = (value) => {
+      const digits = (value || '').replace(/\D+/g, '');
+      if (digits.length !== 11) return sanitizeValue(value);
+      return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    };
+
+    const COMPROVANTE_LOGO_URL = 'https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200';
+    let comprovanteLogoDataUrlPromise = null;
+
+    const getComprovanteLogoDataUrl = async () => {
+      if (!comprovanteLogoDataUrlPromise) {
+        comprovanteLogoDataUrlPromise = fetch(COMPROVANTE_LOGO_URL)
+          .then((response) => {
+            if (!response.ok) throw new Error('Erro ao carregar logotipo');
+            return response.blob();
+          })
+          .then(
+            (blob) =>
+              new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Falha ao converter logotipo'));
+                reader.readAsDataURL(blob);
+              })
+          )
+          .catch(() => null);
+      }
+      return comprovanteLogoDataUrlPromise;
+    };
+
+    const WEBHOOK_MOBILIDADE_URL =
+      'https://n8n.homolog.app.emprel.gov.br/webhook/mobilidade-html';
+
+    const BIND = {
+      dadosComuns: {
+        nome: `{{ $json.data.dadosComuns.nome_servidor }}`,
+        nascimento: `{{ $json.data.dadosComuns.nascimento }}`,
+        cpf: `{{ $json.data.dadosComuns.cpf }}`,
+        whatsapp: `{{ $json.data.dadosComuns.whatsapp }}`,
+        telalternativo: `{{ $json.data.dadosComuns.telalternativo }}`,
+        endereco: {
+          cep: `{{ $json.data.dadosComuns.endereco.cep }}`,
+          logradouro: `{{ $json.data.dadosComuns.endereco.logradouro }}`,
+          numero: `{{ $json.data.dadosComuns.endereco.numero }}`,
+          complemento: `{{ $json.data.dadosComuns.endereco.complemento }}`,
+          bairro: `{{ $json.data.dadosComuns.endereco.bairro }}`,
+          cidade: `{{ $json.data.dadosComuns.endereco.cidade }}`,
+          uf: `{{ $json.data.dadosComuns.endereco.uf }}`
+        },
+        email: `{{ $json.data.dadosComuns.email }}`,
+        recordId: `{{ $json.data.dadosComuns.recordid }}`
+      },
+      vinculos: [
+        {
+          matricula: `{{ $json.data.vinculos[0].matricula }}`,
+          nome: `{{ $json.data.vinculos[0].nome }}`,
+          cargo: `{{ $json.data.vinculos[0].cargo }}`,
+          grupo: `{{ $json.data.vinculos[0].grupo }}`,
+          admissao: `{{ $json.data.vinculos[0].admissao }}`,
+          nascimento: `{{ $json.data.vinculos[0].nascimento }}`,
+          vinculo: `{{ $json.data.vinculos[0].vinculo }}`,
+          carga_horaria: `{{ $json.data.vinculos[0].carga_horaria }}`
+        },
+        {
+          matricula: `{{ $json.data.vinculos[1].matricula }}`,
+          nome: `{{ $json.data.vinculos[1].nome }}`,
+          cargo: `{{ $json.data.vinculos[1].cargo }}`,
+          grupo: `{{ $json.data.vinculos[1].grupo }}`,
+          admissao: `{{ $json.data.vinculos[1].admissao }}`,
+          nascimento: `{{ $json.data.vinculos[1].nascimento }}`,
+          vinculo: `{{ $json.data.vinculos[1].vinculo }}`,
+          carga_horaria: `{{ $json.data.vinculos[1].carga_horaria }}`
+        }
+      ]
+    };
+
+    const state = {
+      prefs: [],
+      max: 10,
+      modalMode: 'create',
+      editingIndex: null,
+      protocolo: sanitizeValue(BIND?.dadosComuns?.recordId) || null,
+      printMode: 'print',
+      pendingFocusId: null,
+      lastPayload: null,
+      shouldShowEmailModal: false,
+      tooltips: []
+    };
+
+    const modalUnidade = new bootstrap.Modal(document.getElementById('modalUnidade'));
+    const modalAlerta = new bootstrap.Modal(document.getElementById('modalAlerta'));
+    const modalSucesso = new bootstrap.Modal(document.getElementById('modalSucesso'));
+    const modalEmailConfirmacao = new bootstrap.Modal(document.getElementById('modalEmailConfirmacao'));
+    const emailCountdownEl = document.getElementById('emailCountdown');
+    const modalEmailConfirmacaoEl = document.getElementById('modalEmailConfirmacao');
+    let emailCountdownTimer = null;
+    let emailRedirectTimer = null;
+    let emailRedirectScheduled = false;
+
+    function resetEmailCountdown() {
+      if (emailCountdownTimer) {
+        clearInterval(emailCountdownTimer);
+        emailCountdownTimer = null;
+      }
+      if (emailRedirectTimer) {
+        clearTimeout(emailRedirectTimer);
+        emailRedirectTimer = null;
+      }
+      emailRedirectScheduled = false;
+    }
+
+    function navigateAfterEmailModal() {
+      if (emailRedirectScheduled) return;
+      emailRedirectScheduled = true;
+      try {
+        window.close();
+      } catch (err) { }
+      setTimeout(() => {
+        window.location.href = PORTAL_REDIRECT_URL;
+      }, 150);
+    }
+
+    function showEmailConfirmationModal() {
+      resetEmailCountdown();
+      let remaining = 5;
+      if (emailCountdownEl) emailCountdownEl.textContent = remaining;
+      modalEmailConfirmacao.show();
+      emailCountdownTimer = setInterval(() => {
+        remaining -= 1;
+        if (emailCountdownEl) emailCountdownEl.textContent = Math.max(remaining, 0);
+        if (remaining <= 0) {
+          modalEmailConfirmacao.hide();
+        }
+      }, 1000);
+      emailRedirectTimer = setTimeout(() => {
+        modalEmailConfirmacao.hide();
+      }, remaining * 1000);
+    }
+
+    if (modalEmailConfirmacaoEl) {
+      modalEmailConfirmacaoEl.addEventListener('hidden.bs.modal', () => {
+        resetEmailCountdown();
+        navigateAfterEmailModal();
+      });
+    }
+
+    async function fillByCEP(cep) {
+      if (!isCEP(cep)) return;
+      try {
+        const clean = onlyDigits(cep);
+        const r = await fetch(`https://brasilapi.com.br/api/cep/v2/${clean}`);
+        if (!r.ok) return;
+        const j = await r.json();
+        document.getElementById('logradouro').value = j.street || '';
+        document.getElementById('bairro').value = j.neighborhood || '';
+        document.getElementById('cidade').value = j.city || '';
+        document.getElementById('uf').value = sanitizeUF(j.state);
+        updateAddBtn();
+      } catch (err) {
+        console.warn('CEP não encontrado', err);
+      }
+    }
+
+    function renderPrefs() {
+      const tbody = document.getElementById('prefsBody');
+      tbody.innerHTML = '';
+      state.prefs.sort((a, b) => (Number(a.prioridade) || 999) - (Number(b.prioridade) || 999));
+      state.prefs.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        if (row.imported) tr.classList.add('table-light');
+
+        const priorityCell = document.createElement('td');
+        priorityCell.textContent = row.prioridade || '';
+        priorityCell.dataset.label = 'Prioridade';
+
+        const distritoCell = document.createElement('td');
+        distritoCell.textContent = row.distrito || '';
+        distritoCell.dataset.label = 'Distrito';
+
+        const lotacaoCell = document.createElement('td');
+        lotacaoCell.textContent = [row.unidade, row.turno, row.regime].filter(Boolean).join(' • ');
+        lotacaoCell.dataset.label = 'Lotação';
+
+        const dataSolicCell = document.createElement('td');
+        dataSolicCell.textContent = toBRDate(row.data_solicitacao);
+        dataSolicCell.dataset.label = 'Data de solicitação';
+
+        const dataCredCell = document.createElement('td');
+        dataCredCell.textContent = toBRDate(row.data_credenciamento);
+        dataCredCell.dataset.label = 'Data de credenciamento';
+
+        const actionsCell = document.createElement('td');
+        actionsCell.className = 'actions-cell text-center';
+        actionsCell.dataset.label = 'Ações';
+        const actionsWrapper = document.createElement('div');
+        actionsWrapper.className = 'actions-wrapper';
+
+        const viewBtn = document.createElement('button');
+        viewBtn.type = 'button';
+        viewBtn.className = 'btn btn-sm btn-outline-secondary btn-icon';
+        viewBtn.innerHTML = "<span aria-hidden='true'>👁️</span><span class='visually-hidden'>Visualizar</span>";
+        viewBtn.setAttribute('aria-label', 'Visualizar unidade');
+        viewBtn.title = 'Visualizar unidade';
+        viewBtn.dataset.bsToggle = 'tooltip';
+        viewBtn.dataset.bsTitle = 'Visualizar';
+        viewBtn.addEventListener('click', () => openModalUnidade('view', idx));
+
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'btn btn-sm btn-outline-primary btn-icon';
+        editBtn.innerHTML = "<span aria-hidden='true'>✏️</span><span class='visually-hidden'>Editar</span>";
+        editBtn.setAttribute('aria-label', 'Editar unidade');
+        editBtn.title = 'Editar unidade';
+        editBtn.dataset.bsToggle = 'tooltip';
+        editBtn.dataset.bsTitle = 'Editar';
+        editBtn.disabled = !!row.imported;
+        editBtn.addEventListener('click', () => {
+          if (!row.imported) openModalUnidade('edit', idx);
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn btn-sm btn-outline-danger btn-icon';
+        deleteBtn.innerHTML = "<span aria-hidden='true'>🗑️</span><span class='visually-hidden'>Excluir</span>";
+        deleteBtn.setAttribute('aria-label', 'Excluir unidade');
+        deleteBtn.title = 'Excluir unidade';
+        deleteBtn.dataset.bsToggle = 'tooltip';
+        deleteBtn.dataset.bsTitle = 'Excluir';
+        deleteBtn.addEventListener('click', () => {
+          state.prefs.splice(idx, 1);
+          renumberPriorities();
+          updateAddBtn();
+          renderPrefs();
+        });
+
+        actionsWrapper.append(viewBtn, editBtn, deleteBtn);
+        actionsCell.append(actionsWrapper);
+        tr.append(priorityCell, distritoCell, lotacaoCell, dataSolicCell, dataCredCell, actionsCell);
+        tbody.appendChild(tr);
+      });
+
+      refreshTooltips('.actions-wrapper [data-bs-toggle="tooltip"]');
+    }
+
+    function renumberPriorities() {
+      state.prefs
+        .sort((a, b) => (Number(a.prioridade) || 999) - (Number(b.prioridade) || 999))
+        .forEach((pref, idx) => {
+          pref.prioridade = idx + 1;
+        });
+    }
+
+    function collectPreferencePrerequisiteErrors() {
+      const seen = new Set();
+      const errors = [];
+      PREFERENCE_PREREQUISITE_IDS.forEach((id) => {
+        if (seen.has(id)) return;
+        seen.add(id);
+        const field = document.getElementById(id);
+        if (!hasValue(field)) {
+          errors.push({ fieldId: id, message: getFieldLabel(field || id) });
+        }
+      });
+      return errors;
+    }
+
+    function updateAddBtn() {
+      const btn = document.getElementById('btnAddLinha');
+      const missing = collectPreferencePrerequisiteErrors();
+      const reachedLimit = state.prefs.length >= state.max;
+      if (reachedLimit) {
+        btn.textContent = 'Limite atingido';
+        btn.disabled = true;
+        btn.classList.add('btn-locked');
+        btn.setAttribute('aria-disabled', 'true');
+        btn.removeAttribute('title');
+        return;
+      }
+
+      btn.textContent = 'Adicionar Unidade';
+      btn.disabled = false;
+      btn.classList.toggle('btn-locked', !!missing.length);
+      btn.setAttribute('aria-disabled', missing.length ? 'true' : 'false');
+      if (missing.length) {
+        btn.title = 'Preencha os campos obrigatórios antes de adicionar uma unidade.';
+      } else {
+        btn.removeAttribute('title');
+      }
+    }
+
+    function bindPreferencePrerequisiteListeners() {
+      const handler = () => updateAddBtn();
+      PREFERENCE_PREREQUISITE_IDS.forEach((id) => {
+        const field = document.getElementById(id);
+        if (!field) return;
+        const eventName = field.tagName === 'SELECT' ? 'change' : 'input';
+        field.addEventListener(eventName, handler);
+      });
+    }
+
+    function mapPreferencias(importedPrefs = []) {
+      return importedPrefs.slice(0, state.max).map((item) => ({
+        prioridade: item.prioridade,
+        distrito: item.distrito,
+        unidade: item.unidade || item.lotacao || '',
+        turno: item.turno || '',
+        regime: item.regime || '',
+        data_solicitacao: item.data_solicitacao,
+        data_credenciamento: item.data_credenciamento,
+        imported: true
+      }));
+    }
+
+    async function loadUnidades(ds, targetSel, selectedValue = '') {
+      const sel = document.getElementById(targetSel);
+      syncChoicesOptions(targetSel, [], 'Selecione...');
+      setChoiceDisabled(targetSel, true);
+      const grupo = document.getElementById('grupo').value || null;
+      try {
+        const data = await postJSON(
+          'https://n8n.homolog.app.emprel.gov.br/webhook/unidades',
+          { ds, grupo }
+        );
+        const unidadesOrdenadas = (data || [])
+          .map((u) => sanitizeValue(u?.unidade))
+          .filter((texto) => !!texto && !isPlaceholderOption(texto))
+          .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+        syncChoicesOptions(targetSel, unidadesOrdenadas, 'Selecione...');
+        setChoiceDisabled(targetSel, false);
+        if (selectedValue) setChoiceValue(targetSel, selectedValue);
+      } catch (err) {
+        console.error(err);
+        syncChoicesOptions(targetSel, [], 'Falha ao carregar');
+        setChoiceDisabled(targetSel, true);
+      }
+    }
+
+    async function loadTurnos(unidade, targetSel, ds, selectedValue = '') {
+      const sel = document.getElementById(targetSel);
+      syncChoicesOptions(targetSel, [], 'Selecione...');
+      setChoiceDisabled(targetSel, true);
+      const grupo = document.getElementById('grupo').value || null;
+      try {
+        const data = await postJSON(
+          'https://n8n.homolog.app.emprel.gov.br/webhook/turnos',
+          { unidade, ds, grupo }
+        );
+        const turnosOrdenados = (data || [])
+          .map((t) => sanitizeValue(t?.turno))
+          .filter((texto) => !!texto && !isPlaceholderOption(texto))
+          .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+        syncChoicesOptions(targetSel, turnosOrdenados, 'Selecione...');
+        setChoiceDisabled(targetSel, false);
+        if (selectedValue) setChoiceValue(targetSel, selectedValue);
+      } catch (err) {
+        console.error(err);
+        syncChoicesOptions(targetSel, [], 'Falha ao carregar');
+        setChoiceDisabled(targetSel, true);
+      }
+    }
+
+    async function loadRegimes(unidade, targetSel, ds, selectedValue = '') {
+      const sel = document.getElementById(targetSel);
+      syncChoicesOptions(targetSel, [], 'Selecione...');
+      setChoiceDisabled(targetSel, true);
+      const grupo = document.getElementById('grupo').value || null;
+      try {
+        const data = await postJSON(
+          'https://n8n.homolog.app.emprel.gov.br/webhook/regimes',
+          { unidade, ds, grupo }
+        );
+        const regimesOrdenados = (data || [])
+          .map((r) => sanitizeValue(r?.regime))
+          .filter((texto) => !!texto && !isPlaceholderOption(texto))
+          .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+        syncChoicesOptions(targetSel, regimesOrdenados, 'Selecione...');
+        setChoiceDisabled(targetSel, false);
+        if (selectedValue) setChoiceValue(targetSel, selectedValue);
+      } catch (err) {
+        console.error(err);
+        syncChoicesOptions(targetSel, [], 'Falha ao carregar');
+        setChoiceDisabled(targetSel, true);
+      }
+    }
+
+    function safeValue(v) {
+      return v && v !== 'undefined' && v !== 'null' ? v : '';
+    }
+
+    function fillIdentificacaoFromVinculo(matricula) {
+      const vinculo = (BIND.vinculos || []).find((x) => x && x.matricula && x.matricula.toString() === matricula.toString());
+      if (!vinculo) return;
+      document.getElementById('nome').value = safeValue(vinculo.nome) || document.getElementById('nome').value;
+      document.getElementById('nascimento').value = toBRDate(safeValue(vinculo.nascimento)) || document.getElementById('nascimento').value;
+      document.getElementById('admissao').value = toBRDate(safeValue(vinculo.admissao));
+      document.getElementById('cargo').value = safeValue(vinculo.cargo);
+      document.getElementById('grupo').value = safeValue(vinculo.grupo);
+      document.getElementById('vinculo').value = safeValue(vinculo.vinculo);
+      document.getElementById('carga').value = safeValue(vinculo.carga_horaria || vinculo.carga);
+    }
+
+    async function loadPreferenciasByMatricula(matricula) {
+      try {
+        const data = await postJSON(
+          'https://n8n.homolog.app.emprel.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2',
+          { matricula }
+        );
+        state.prefs = mapPreferencias(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.warn('Não foi possível carregar preferências', err);
+        state.prefs = [];
+      }
+      updateAddBtn();
+      renderPrefs();
+    }
+
+    function populateMatriculas() {
+      const sel = document.getElementById('matricula');
+      const opts = [
+        safeValue(BIND.vinculos?.[0]?.matricula),
+        safeValue(BIND.vinculos?.[1]?.matricula)
+      ]
+        .filter((valor) => !!valor)
+        .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+      syncChoicesOptions(
+        'matricula',
+        opts,
+        opts.length ? 'Selecione...' : 'Sem matrículas disponíveis'
+      );
+      setChoiceDisabled('matricula', !opts.length);
+    }
+
+    function populateEnderecoContato() {
+      const dc = BIND.dadosComuns || {};
+      const e = dc.endereco || {};
+      const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = safeValue(val);
+      };
+      set('cep', e.cep);
+      set('logradouro', e.logradouro);
+      set('numero', e.numero);
+      set('complemento', e.complemento);
+      set('bairro', e.bairro);
+      set('cidade', e.cidade);
+      set('uf', sanitizeUF(e.uf));
+      set('whatsapp', dc.whatsapp);
+      set('telalt', dc.telalternativo);
+      set('email', dc.email);
+      const email2 = document.getElementById('email2');
+      if (email2) email2.value = '';
+    }
+
+    function applyUppercaseBehaviour() {
+      document.querySelectorAll('input[type="text"], input:not([data-uppercase="false"])').forEach((input) => {
+        if (input.dataset.uppercase === 'false' || input.type === 'email' || input.readOnly) return;
+        input.classList.add('uppercase');
+        if (input.value) input.value = input.value.toUpperCase();
+        input.addEventListener('input', () => {
+          const cursor = input.selectionStart;
+          input.value = input.value.toUpperCase();
+          if (document.activeElement === input && typeof cursor === 'number') {
+            input.setSelectionRange(cursor, cursor);
+          }
+        });
+      });
+    }
+
+    function applyNumericBehaviour() {
+      document.querySelectorAll('[data-numeric="true"]').forEach((input) => {
+        input.addEventListener('input', () => {
+          const cursor = input.selectionStart;
+          input.value = onlyDigits(input.value);
+          if (document.activeElement === input && typeof cursor === 'number') {
+            const newPos = Math.min(cursor, input.value.length);
+            input.setSelectionRange(newPos, newPos);
+          }
+        });
+      });
+    }
+
+    function markInvalidField(field) {
+      if (!field) return;
+      field.classList.add('is-invalid');
+      field.setAttribute('aria-invalid', 'true');
+    }
+
+    function clearInvalidMarkers() {
+      document.querySelectorAll('.is-invalid').forEach((el) => {
+        el.classList.remove('is-invalid');
+        el.removeAttribute('aria-invalid');
+      });
+    }
+
+    function validateForm() {
+      clearInvalidMarkers();
+      const errors = [];
+      const requiredFields = Array.from(document.querySelectorAll('[data-required="true"]'));
+
+      requiredFields.forEach((field) => {
+        if (field.disabled || field.readOnly) return;
+        if (!field.value || !field.value.toString().trim()) {
+          errors.push({ fieldId: field.id, message: getFieldLabel(field) });
+          markInvalidField(field);
+        }
+      });
+
+      const cepField = document.getElementById('cep');
+      if (cepField && cepField.value && onlyDigits(cepField.value).length !== 8) {
+        errors.push({ fieldId: 'cep', message: 'CEP deve conter 8 dígitos.' });
+        markInvalidField(cepField);
+      }
+
+      const whatsappField = document.getElementById('whatsapp');
+      if (whatsappField && !ensureWhatsapp(whatsappField.value)) {
+        errors.push({ fieldId: 'whatsapp', message: 'Informe o WhatsApp com DDD.' });
+        markInvalidField(whatsappField);
+      }
+
+      const telAltField = document.getElementById('telalt');
+      if (telAltField && telAltField.value) {
+        const digits = onlyDigits(telAltField.value);
+        if (digits.length < 10 || digits.length > 11) {
+          errors.push({ fieldId: 'telalt', message: 'Telefone alternativo deve conter DDD.' });
+          markInvalidField(telAltField);
+        }
+      }
+
+      const email = (document.getElementById('email')?.value || '').trim();
+      const email2 = (document.getElementById('email2')?.value || '').trim();
+      if (email && email2 && email !== email2) {
+        errors.push({ fieldId: 'email2', message: 'Os e-mails devem coincidir.' });
+        markInvalidField(document.getElementById('email'));
+        markInvalidField(document.getElementById('email2'));
+      }
+
+      if (!state.prefs.length) {
+        errors.push({ fieldId: 'prefsBody', message: 'Inclua ao menos uma unidade na seleção.' });
+      }
+
+      return {
+        isValid: errors.length === 0,
+        errors
+      };
+    }
+
+    function resolveFirstInvalidFieldId(errors = []) {
+      for (const err of errors) {
+        if (!err || !err.fieldId) continue;
+        if (err.fieldId === 'prefsBody') {
+          return 'btnAddLinha';
+        }
+        const field = document.getElementById(err.fieldId);
+        if (field) {
+          return err.fieldId;
+        }
+      }
+      return null;
+    }
+
+    function fillResumo(payload) {
+      const resumoEl = document.getElementById('resumoSolicitacao');
+      const printEl = document.getElementById('printComprovante');
+      const fallbackNumero = sanitizeValue(BIND?.dadosComuns?.recordId);
+      const numeroSolicitacao =
+        sanitizeValue(payload.numeroSolicitacao) || fallbackNumero || state.protocolo || `22${Date.now().toString().slice(-5)}`;
+      state.protocolo = numeroSolicitacao || null;
+      const solicitacaoDisplay = document.getElementById('numeroSolicitacaoDisplay');
+      if (solicitacaoDisplay) solicitacaoDisplay.textContent = numeroSolicitacao || '•';
+
+      const prefsRows = payload.preferencias
+        .map(
+          (p, index) => `
+              <tr>
+                <td>${p.prioridade || index + 1}</td>
+                <td>${p.distrito || '-'}</td>
+                <td>${p.unidade || '-'}</td>
+                <td>${p.turno || '-'}</td>
+                <td>${p.regime || '-'}</td>
+                <td>${toBRDate(p.data_credenciamento) || '-'}</td>
+              </tr>
+            `
+        )
+        .join('');
+
+      resumoEl.innerHTML = `
+          <div class="resumo-card p-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-4">
+              <div class="d-flex align-items-center gap-3">
+                <img
+                  src="https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200"
+                  alt="Prefeitura do Recife"
+                  class="d-none d-md-block"
+                  height="48"
+                />
+                <div>
+                  <span class="text-muted d-block mb-1">Solicitação registrada</span>
+                  <h4 class="mb-0">${payload.dadosPessoais.nome || 'Servidor(a)'}</h4>
+                  <span class="text-muted small">Matrícula ${payload.matricula || '-'}</span>
+                </div>
               </div>
-              <div class="col-md-3">
-                <label for="sel-lotacao" class="form-label">Lotação atual</label>
-                <select id="sel-lotacao" class="form-select"></select>
-              </div>
-              <div class="col-md-3">
-                <label for="sel-horario" class="form-label">Horário atual</label>
-                <select id="sel-horario" class="form-select"></select>
-              </div>
-              <div class="col-md-3">
-                <label for="sel-regime" class="form-label">Regime de trabalho</label>
-                <select id="sel-regime" class="form-select"></select>
+              <div class="text-lg-end">
+                <span class="meta-label">Número da solicitação</span>
+                <span class="meta-value">${numeroSolicitacao || '-'}</span>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="mb-4">
-        <h2 class="section-title">Preferências (máx. 10)</h2>
-        <div class="card card-programa">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <strong>Tabela de preferências</strong>
-            <button id="btn-add-row" class="btn btn-sm btn-primary rounded-pill">Adicionar linha</button>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-striped align-middle table-editable" id="prefs-table">
+            <hr class="my-4" />
+            <div class="row g-4">
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Cargo</span>
+                <span class="meta-value">${payload.dadosPessoais.cargo || '-'}</span>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Grupo</span>
+                <span class="meta-value">${payload.dadosPessoais.grupo || '-'}</span>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Distrito atual</span>
+                <span class="meta-value">${payload.lotacaoAtual.ds || '-'}</span>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Lotação atual</span>
+                <span class="meta-value">${payload.lotacaoAtual.unidade || '-'}</span>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Data de admissão</span>
+                <span class="meta-value">${payload.dadosPessoais.admissao || '-'}</span>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <span class="meta-label">Última atualização</span>
+                <span class="meta-value">${todayBR()}</span>
+              </div>
+            </div>
+            <div class="table-responsive mt-4">
+              <table class="table table-sm align-middle resumo-table">
                 <thead>
                   <tr>
-                    <th style="width: 100px;">Prioridade</th>
+                    <th>Prioridade</th>
                     <th>Distrito</th>
                     <th>Lotação</th>
-                    <th>Data de solicitação</th>
-                    <th>Data de credenciamento</th>
-                    <th class="text-center" style="width: 120px;">Ações</th>
+                    <th>Horário</th>
+                    <th>Regime</th>
+                    <th>Credenciamento</th>
                   </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>${prefsRows}</tbody>
               </table>
             </div>
-            <p class="muted mb-0">Linhas carregadas automaticamente não podem ser editadas (apenas removidas). A ordenação segue a prioridade (numérica).</p>
           </div>
-        </div>
-      </section>
-    </main>
+        `;
 
-    <footer class="bg-white border-top">
-      <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
-        <span>Secretaria de Saúde — SESAU • Prefeitura do Recife</span>
-        <span class="text-muted">© 2025 • Gestão do Trabalho e Educação na Saúde</span>
-      </div>
-    </footer>
-
-    <template id="row-template">
-      <tr>
-        <td><input type="number" class="form-control" min="1" step="1" /></td>
-        <td><input type="text" class="form-control" /></td>
-        <td><input type="text" class="form-control" /></td>
-        <td><input type="date" class="form-control" /></td>
-        <td><input type="date" class="form-control" /></td>
-        <td class="text-center actions-cell">
-          <div class="btn-group">
-            <button type="button" class="btn btn-sm btn-outline-danger btn-delete" title="Excluir linha">Excluir</button>
+      printEl.innerHTML = `
+          <div class="receipt-header">
+            <div class="brand">
+              <img
+                src="https://statics.recife.pe.gov.br/images/dynamics/logo_gestao_pcr.png?w=200"
+                alt="Prefeitura do Recife"
+              />
+              <div>
+                <strong>PREFEITURA DO RECIFE</strong>
+                <span>Secretaria de Saúde (SESAU)</span>
+                <span>Portal do Servidor · Mobilidade Interna</span>
+              </div>
+            </div>
+            <div class="protocol">
+              <div class="label">Número da solicitação</div>
+              <div class="value">${numeroSolicitacao || '-'}</div>
+            </div>
           </div>
-        </td>
-      </tr>
-    </template>
+          <div class="receipt-body">
+            <div class="receipt-intro mb-4">
+              <h4 class="mb-1">Comprovante de solicitação</h4>
+              <p>Solicitação registrada em banco de dados para a matrícula <strong>${payload.matricula || '-'}</strong>.</p>
+            </div>
+            <div class="receipt-info-grid">
+              <div class="receipt-info-item">
+                <span class="info-label">Nome do servidor</span>
+                <span class="info-value">${payload.dadosPessoais.nome || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">CPF</span>
+                <span class="info-value">${payload.dadosPessoais.cpf || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Matrícula</span>
+                <span class="info-value">${payload.matricula || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Cargo</span>
+                <span class="info-value">${payload.dadosPessoais.cargo || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Grupo</span>
+                <span class="info-value">${payload.dadosPessoais.grupo || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Distrito atual</span>
+                <span class="info-value">${payload.lotacaoAtual.ds || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Lotação atual</span>
+                <span class="info-value">${payload.lotacaoAtual.unidade || '-'}</span>
+              </div>
+              <div class="receipt-info-item">
+                <span class="info-label">Data de emissão</span>
+                <span class="info-value">${todayBR()}</span>
+              </div>
+            </div>
+            <table class="receipt-table">
+              <thead>
+                <tr>
+                  <th>Prioridade</th>
+                  <th>Distrito</th>
+                  <th>Lotação</th>
+                  <th>Horário</th>
+                  <th>Regime</th>
+                  <th>Credenciamento</th>
+                </tr>
+              </thead>
+              <tbody>${prefsRows}</tbody>
+            </table>
+            <div class="receipt-footer">Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.</div>
+          </div>
+        `;
+    }
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const cpf = (document.getElementById("cpf")?.value || "").replace(/\\D/g, "");
-        const grupoHidden = document.getElementById("grupo");
-        const inGrupo = document.getElementById("in-grupo");
-
-        // ENDPOINTS
-        const matriculasEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/cbda8a38-3a07-4b85-9d63-7ebda0294f6a";
-        const lotacaoOpcoesEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/d594b31c-8ca0-4cbe-a380-4e5112128402";
-        const preferenciasEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/76b1b27c-408b-4717-b6c8-faed4f07c0a2";
-
-        // ELEMENTOS
-        const selMatricula = document.getElementById("sel-matricula");
-        const inDtAdm = document.getElementById("in-dt-admissao");
-        const inDtNasc = document.getElementById("in-dt-nascimento");
-        const inNome = document.getElementById("in-nome");
-        const inCargo = document.getElementById("in-cargo");
-        const inVinculo = document.getElementById("in-vinculo");
-        const inCarga = document.getElementById("in-carga-horaria");
-
-        // Endereço/contatos
-        const inCep = document.getElementById("in-cep");
-        const inLogradouro = document.getElementById("in-logradouro");
-        const inNumero = document.getElementById("in-numero");
-        const inComplemento = document.getElementById("in-complemento");
-        const inBairro = document.getElementById("in-bairro");
-        const inCidade = document.getElementById("in-cidade");
-        const inUf = document.getElementById("in-uf");
-        const inWhats = document.getElementById("in-whatsapp");
-        const inTelAlt = document.getElementById("in-telefone-alt");
-        const inEmail = document.getElementById("in-email");
-        const inEmail2 = document.getElementById("in-email-2");
-        const emailHelp = document.getElementById("email-help");
-
-        // Selects dependentes
-        const selDistrito = document.getElementById("sel-distrito");
-        const selLotacao = document.getElementById("sel-lotacao");
-        const selHorario = document.getElementById("sel-horario");
-        const selRegime = document.getElementById("sel-regime");
-
-        // Tabela de preferências
-        const table = document.getElementById("prefs-table");
-        const tbody = table.querySelector("tbody");
-        const rowTpl = document.getElementById("row-template");
-        const btnAddRow = document.getElementById("btn-add-row");
-        const MAX_ROWS = 10;
-
-        // Helpers
-        const onlyDigits = (v) => (v || "").replace(/\\D/g, "");
-        const unique = (arr) => Array.from(new Set(arr.filter(Boolean)));
-        const setOptions = (select, list, placeholder) => {
-          if (!select) return;
-          select.innerHTML = "";
-          const opt0 = document.createElement("option");
-          opt0.value = ""; opt0.textContent = placeholder || "Selecione...";
-          select.appendChild(opt0);
-          (list || []).forEach(val => {
-            const opt = document.createElement("option");
-            opt.value = val; opt.textContent = val;
-            select.appendChild(opt);
-          });
-        };
-        const fmtDate = (raw) => {
-          if (!raw) return "";
-          const d = new Date(raw);
-          if (!isNaN(d)) return d.toISOString().slice(0,10);
-          // tenta dd/mm/yyyy
-          const m = String(raw).match(/^([0-3]?\\d)\\/([0-1]?\\d)\\/(\\d{4})$/);
-          if (m) return new Date(parseInt(m[3],10), parseInt(m[2],10)-1, parseInt(m[1],10)).toISOString().slice(0,10);
-          return String(raw);
-        };
-
-        // CEP -> BrasilAPI
-        let lastCep = "";
-        function cepLookup() {
-          const v = onlyDigits(inCep?.value).slice(0, 8);
-          if (inCep && inCep.value !== v) inCep.value = v;
-          if (v.length !== 8 || v === lastCep) return;
-          lastCep = v;
-          fetch("https://brasilapi.com.br/api/cep/v1/" + v)
-            .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-            .then(d => {
-              if (d?.street) inLogradouro.value = String(d.street).toUpperCase();
-              if (d?.neighborhood) inBairro.value = String(d.neighborhood).toUpperCase();
-              if (d?.city) inCidade.value = String(d.city).toUpperCase();
-              if (d?.state) inUf.value = String(d.state).toUpperCase();
-            })
-            .catch(() => { lastCep = ""; /* silencioso */ });
-        }
-        inCep?.addEventListener("input", cepLookup);
-        inCep?.addEventListener("change", cepLookup);
-        inCep?.addEventListener("blur", cepLookup);
-
-        // E-mail confirm
-        function validateEmailMatch() {
-          const e1 = (inEmail?.value || "").trim();
-          const e2 = (inEmail2?.value || "").trim();
-          const ok = !!e1 && !!e2 && e1.toLowerCase() === e2.toLowerCase();
-          emailHelp.textContent = ok ? "E-mails conferem." : "Os e-mails não conferem.";
-          emailHelp.className = ok ? "form-text text-success" : "form-text text-danger";
-          return ok;
-        }
-        inEmail?.addEventListener("input", validateEmailMatch);
-        inEmail2?.addEventListener("input", validateEmailMatch);
-
-        // 1) Carregar dados pelo CPF (matrículas + nome + nascimento + contato/endereço se houver)
-        function carregarPorCPF() {
-          if (!cpf) return;
-          fetch(matriculasEndpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cpf })
-          })
-            .then(r => { if (!r.ok) throw new Error("Falha"); return r.json(); })
-            .then(data => {
-              // Normaliza lista para popular SELECT matrícula; também tenta pegar nome/nascimento/endereço
-              const rows = Array.isArray(data) ? data : (data?.items || data?.data || data?.result || []);
-              const matriculas = unique(rows.map(x => String(x.matricula || x.MATRICULA || x.id || "").trim()).filter(Boolean));
-              setOptions(selMatricula, matriculas, "Selecione a matrícula");
-
-              // Nome e Nascimento (pelo CPF)
-              const any = rows?.[0] || {};
-              if (inNome) inNome.value = String(any.nome || any.NOME || any.nomePessoa || "").trim();
-              if (inDtNasc) inDtNasc.value = fmtDate(any.dataNascimento || any.nascimento || any.DATA_NASC || "");
-
-              // Contatos/endereço (pelo CPF) — se houver no retorno
-              inCep.value = onlyDigits(any.cep || any.CEP || inCep.value || "");
-              inLogradouro.value = String(any.logradouro || any.endereco || "").toUpperCase();
-              inNumero.value = String(any.numero || any.num || "");
-              inComplemento.value = String(any.complemento || "");
-              inBairro.value = String(any.bairro || "").toUpperCase();
-              inCidade.value = String(any.cidade || any.municipio || "").toUpperCase();
-              inUf.value = String(any.uf || any.UF || "").toUpperCase();
-              inWhats.value = onlyDigits(any.whatsapp || any.celular || "");
-              inTelAlt.value = onlyDigits(any.telefone || "");
-              inEmail.value = String(any.email || "");
-              inEmail2.value = String(any.email || "");
-              validateEmailMatch();
-            })
-            .catch(() => {
-              setOptions(selMatricula, [], "Sem resultados para este CPF");
-            });
-        }
-
-        // 2) Ao selecionar uma matrícula, tentar preencher dados funcionais e carregar tabela + selects dependentes
-        function onMatriculaChange() {
-          const mat = selMatricula?.value;
-          if (!mat) return;
-
-          // Reconsulta o endpoint de matrícula para obter dados da matrícula específica (se disponíveis no payload)
-          fetch(matriculasEndpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cpf, matricula: mat })
-          })
-            .then(r => r.json())
-            .then(data => {
-              const rows = Array.isArray(data) ? data : (data?.items || data?.data || data?.result || []);
-              // Procura o registro da matrícula
-              const found = rows.find(x => String(x.matricula || x.MATRICULA || x.id || "").trim() === mat) || rows[0] || {};
-              // Preenche campos funcionais
-              inDtAdm.value = fmtDate(found.dataAdmissao || found.admissao || found.DATA_ADMISSAO || "");
-              inCargo.value = String(found.cargo || found.CARGO || "").trim();
-              inVinculo.value = String(found.vinculo || found.VINCULO || "").trim();
-              inCarga.value = String(found.cargaHoraria || found.carga_horaria || found.CARGA_HORARIA || "").trim();
-              const grupoVal = String(found.grupo || found.GRUPO || found.grupo1 || "").trim();
-              if (grupoHidden) grupoHidden.value = grupoVal;
-              if (inGrupo) inGrupo.value = grupoVal;
-
-              // Carregar selects dependentes
-              carregarOpcoesLotacao(grupoHidden?.value || "");
-
-              // Carregar e montar tabela
-              carregarPreferencias(mat);
-            })
-            .catch(() => {
-              // fallback: limpa dependentes e tabela
-              setOptions(selDistrito, [], "—");
-              setOptions(selLotacao, [], "—");
-              setOptions(selHorario, [], "—");
-              setOptions(selRegime, [], "—");
-              tbody.innerHTML = "";
-            });
-        }
-
-        // 3) Carregar opções para os selects dependentes (filtrando por grupo)
-        let cacheOpcoes = [];
-        function carregarOpcoesLotacao(grupoVal) {
-          fetch(lotacaoOpcoesEndpoint)
-            .then(r => r.json())
-            .then(data => {
-              const items = Array.isArray(data) ? data : (data?.items || data?.data || data?.result || []);
-              // Filtra por grupo: o value do grupo precisa estar contido na string "grupos" do item
-              const filtered = (grupoVal ? items.filter(it => String(it.grupos || it.GRUPO || it.grupo || "").toUpperCase().includes(String(grupoVal).toUpperCase())) : items);
-              cacheOpcoes = filtered.map(it => ({
-                distrito: String(it.distrito || it.DISTRITO || it.ds || "").trim(),
-                lotacao: String(it.lotacao || it.LOTACAO || it.unidade || "").trim(),
-                horario: String(it.horario || it.HORARIO || it.turno || "").trim(),
-                regime: String(it.regime || it.REGIME || "").trim(),
-                grupos: String(it.grupos || "").trim()
-              }));
-
-              atualizarDependentes();
-            })
-            .catch(() => {
-              cacheOpcoes = [];
-              atualizarDependentes();
-            });
-        }
-
-        function atualizarDependentes() {
-          // Distrito únicos
-          const distritos = unique(cacheOpcoes.map(x => x.distrito));
-          setOptions(selDistrito, distritos, "Selecione o distrito");
-          setOptions(selLotacao, [], "Selecione a lotação");
-          setOptions(selHorario, [], "Selecione o horário");
-          setOptions(selRegime, [], "Selecione o regime");
-        }
-
-        selDistrito?.addEventListener("change", () => {
-          const d = selDistrito.value;
-          const lista = cacheOpcoes.filter(x => !d || x.distrito === d);
-          const lotacoes = unique(lista.map(x => x.lotacao));
-          setOptions(selLotacao, lotacoes, "Selecione a lotação");
-          setOptions(selHorario, [], "Selecione o horário");
-          setOptions(selRegime, [], "Selecione o regime");
-        });
-
-        selLotacao?.addEventListener("change", () => {
-          const d = selDistrito.value;
-          const l = selLotacao.value;
-          const lista = cacheOpcoes.filter(x => (!d || x.distrito === d) && (!l || x.lotacao === l));
-          const horarios = unique(lista.map(x => x.horario));
-          setOptions(selHorario, horarios, "Selecione o horário");
-          setOptions(selRegime, [], "Selecione o regime");
-        });
-
-        selHorario?.addEventListener("change", () => {
-          const d = selDistrito.value;
-          const l = selLotacao.value;
-          const h = selHorario.value;
-          const lista = cacheOpcoes.filter(x =>
-            (!d || x.distrito === d) &&
-            (!l || x.lotacao === l) &&
-            (!h || x.horario === h)
-          );
-          const regimes = unique(lista.map(x => x.regime));
-          setOptions(selRegime, regimes, "Selecione o regime");
-        });
-
-        // 4) Tabela de preferências (CRUD limitado + carregamento via matrícula)
-        function sortByPrioridade() {
-          const rows = Array.from(tbody.querySelectorAll("tr"));
-          rows.sort((a, b) => {
-            const va = parseInt(a.dataset.prioridade || a.querySelector("td:nth-child(1) input")?.value || "9999", 10);
-            const vb = parseInt(b.dataset.prioridade || b.querySelector("td:nth-child(1) input")?.value || "9999", 10);
-            return (va||9999) - (vb||9999);
-          });
-          rows.forEach(r => tbody.appendChild(r));
-        }
-
-        function addRow(data = null, locked = false) {
-          const count = tbody.querySelectorAll("tr").length;
-          if (count >= MAX_ROWS) { alert("Máximo de " + MAX_ROWS + " registros atingido."); return; }
-          const node = rowTpl.content.cloneNode(true);
-          const tr = node.querySelector("tr");
-          const [inpPri, inpDist, inpLot, inpDs, inpDc] = node.querySelectorAll("input");
-
-          if (data) {
-            inpPri.value = data.prioridade || "";
-            inpDist.value = data.distrito || "";
-            inpLot.value = data.lotacao || "";
-            inpDs.value = fmtDate(data.dataSolicitacao || data.data_solicitacao || "");
-            inpDc.value = fmtDate(data.dataCredenciamento || data.data_credenciamento || "");
-            tr.dataset.prioridade = inpPri.value;
-          }
-
-          if (locked) {
-            [inpPri, inpDist, inpLot, inpDs, inpDc].forEach(el => el.readOnly = true);
-            tr.classList.add("table-light");
-          }
-
-          tr.querySelector(".btn-delete").addEventListener("click", () => { tr.remove(); });
-
-          tbody.appendChild(node);
-          sortByPrioridade();
-        }
-
-        function carregarPreferencias(matricula) {
-          tbody.innerHTML = "";
-          fetch(preferenciasEndpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ matricula })
-          })
-            .then(r => r.json())
-            .then(data => {
-              const items = Array.isArray(data) ? data : (data?.items || data?.data || data?.result || []);
-              items.forEach(row => addRow({
-                prioridade: parseInt(row.prioridade || row.PRIORIDADE || "0", 10),
-                distrito: row.distrito || row.DISTRITO || "",
-                lotacao: row.lotacao || row.LOTACAO || "",
-                dataSolicitacao: row.dataSolicitacao || row.DATA_SOLICITACAO || row.solicitacao,
-                dataCredenciamento: row.dataCredenciamento || row.DATA_CREDENCIAMENTO || row.credenciamento
-              }, true /* locked */));
-            })
-            .catch(() => { /* silencioso */ });
-        }
-
-        const btnAddRow = document.getElementById("btn-add-row");
-        btnAddRow?.addEventListener("click", () => addRow());
-
-        // Eventos
-        selMatricula?.addEventListener("change", onMatriculaChange);
-
-        // Inicialização
-        carregarPorCPF();
+    function openAlertModal(errors) {
+      const list = document.getElementById('alertList');
+      list.innerHTML = '';
+      errors.forEach((err) => {
+        const li = document.createElement('li');
+        li.textContent = err.message;
+        list.appendChild(li);
       });
-    </script>
-  </body>
+      state.pendingFocusId = resolveFirstInvalidFieldId(errors);
+      modalAlerta.show();
+    }
+
+    function openSuccessModal(payload) {
+      fillResumo(payload);
+      state.lastPayload = payload;
+      state.shouldShowEmailModal = false;
+      modalSucesso.show();
+    }
+
+    async function enviarFormulario() {
+      const validation = validateForm();
+      if (!validation.isValid) {
+        openAlertModal(validation.errors);
+        return;
+      }
+
+      const payload = collectPayload();
+      const webhookPayload = buildWebhookPayload(payload);
+      const btnEnviar = document.getElementById('btnEnviar');
+      const originalText = btnEnviar?.textContent;
+
+      try {
+        if (btnEnviar) {
+          btnEnviar.textContent = 'Enviando...';
+          btnEnviar.setAttribute('aria-busy', 'true');
+          btnEnviar.disabled = true;
+        }
+        await postJSON(WEBHOOK_MOBILIDADE_URL, webhookPayload);
+        openSuccessModal(payload);
+      } catch (err) {
+        console.error('Erro ao enviar formulário de mobilidade:', err);
+        alert('Não foi possível enviar o formulário. Tente novamente mais tarde.');
+      } finally {
+        if (btnEnviar) {
+          btnEnviar.textContent = originalText || 'Enviar formulário';
+          btnEnviar.removeAttribute('aria-busy');
+          btnEnviar.disabled = false;
+        }
+      }
+    }
+
+    function collectPayload() {
+      const cpf = safeValue(BIND?.dadosComuns?.cpf);
+      const numeroSolicitacao = safeValue(BIND?.dadosComuns?.recordId);
+      return {
+        numeroSolicitacao: numeroSolicitacao || state.protocolo || null,
+        matricula: document.getElementById('matricula').value || null,
+        dadosPessoais: {
+          nome: document.getElementById('nome').value || null,
+          nascimento: document.getElementById('nascimento').value || null,
+          admissao: document.getElementById('admissao').value || null,
+          cargo: document.getElementById('cargo').value || null,
+          grupo: document.getElementById('grupo').value || null,
+          vinculo: document.getElementById('vinculo').value || null,
+          carga: document.getElementById('carga').value || null,
+          cpf: cpf || null
+        },
+        endereco: {
+          cep: document.getElementById('cep').value || null,
+          logradouro: document.getElementById('logradouro').value || null,
+          numero: document.getElementById('numero').value || null,
+          complemento: document.getElementById('complemento').value || null,
+          bairro: document.getElementById('bairro').value || null,
+          cidade: document.getElementById('cidade').value || null,
+          uf: document.getElementById('uf').value || null,
+          whatsapp: document.getElementById('whatsapp').value || null,
+          telalternativo: document.getElementById('telalt').value || null,
+          email: document.getElementById('email').value || null
+        },
+        lotacaoAtual: {
+          ds: document.getElementById('dsSelect').value || null,
+          unidade: document.getElementById('unidadeSelect').value || null,
+          turno: document.getElementById('turnoSelect').value || null,
+          regime: document.getElementById('regimeSelect').value || null
+        },
+        preferencias: state.prefs.map((p) => ({
+          prioridade: Number(p.prioridade) || null,
+          distrito: p.distrito || null,
+          unidade: p.unidade || null,
+          turno: p.turno || null,
+          regime: p.regime || null,
+          data_solicitacao: p.data_solicitacao || null,
+          data_credenciamento: p.data_credenciamento || null,
+          imported: !!p.imported
+        }))
+      };
+    }
+
+    function buildWebhookPayload(payload) {
+      const nowDateTime = formatDateTimeISO(new Date());
+      const inseridoNoBanco = new Date().toISOString();
+      const status = 'AGUARDANDO MOBILIDADE';
+      return (payload.preferencias || []).map((pref) => ({
+        data_update: nowDateTime,
+        distrito: pref.distrito || null,
+        solicitacao: formatDateISO(pref.data_solicitacao),
+        prioridade: pref.prioridade ?? null,
+        regime: pref.regime || null,
+        grupo: payload.dadosPessoais.grupo || null,
+        lotacao: pref.unidade || null,
+        turno: pref.turno || null,
+        credenciamento: formatDateISO(pref.data_credenciamento),
+        matricula: payload.matricula || null,
+        nome: payload.dadosPessoais.nome || null,
+        cargo: payload.dadosPessoais.cargo || null,
+        vinculo: payload.dadosPessoais.vinculo || null,
+        nascimento: formatDateISO(payload.dadosPessoais.nascimento),
+        admissao: formatDateISO(payload.dadosPessoais.admissao),
+        distrito_atual: payload.lotacaoAtual.ds || null,
+        lotacao_atual: payload.lotacaoAtual.unidade || null,
+        horario_atual: payload.lotacaoAtual.turno || null,
+        regime_atual: payload.lotacaoAtual.regime || null,
+        wfid: payload.numeroSolicitacao || null,
+        email: payload.endereco.email || null,
+        whatsapp: payload.endereco.whatsapp || null,
+        cep: payload.endereco.cep || null,
+        logradouro: payload.endereco.logradouro || null,
+        numero: payload.endereco.numero || null,
+        complemento: payload.endereco.complemento || null,
+        bairro: payload.endereco.bairro || null,
+        cidade: payload.endereco.cidade || null,
+        uf: payload.endereco.uf || null,
+        telalternativo: payload.endereco.telalternativo || null,
+        status_solicitacao: status,
+        cpf: payload.dadosPessoais.cpf || null,
+        categoria_do_cargo: payload.dadosPessoais.cargo || null,
+        ch_de_atuacao_hor_esp: payload.dadosPessoais.carga || null,
+        especialidade_do_cargo: 'NÃO POSSUI',
+        inserido_no_banco: inseridoNoBanco
+      }));
+    }
+
+    function resetModalUnidade() {
+      ['mDs', 'mUnidade', 'mTurno', 'mRegime'].forEach((id) => {
+        setChoiceValue(id, '');
+        if (id !== 'mDs') {
+          const placeholder = id === 'mUnidade' ? 'Selecione o distrito...' : 'Selecione a unidade...';
+          syncChoicesOptions(id, [], placeholder);
+          setChoiceDisabled(id, true);
+        } else {
+          setChoiceDisabled(id, false);
+        }
+      });
+      document.getElementById('btnModalConfirmar').classList.remove('d-none');
+      document.getElementById('btnModalCancelar').textContent = 'Cancelar';
+    }
+
+    async function openModalUnidade(mode, index = null) {
+      state.modalMode = mode;
+      state.editingIndex = index;
+      const title = document.getElementById('modalUnidadeTitulo');
+      const confirmBtn = document.getElementById('btnModalConfirmar');
+      const cancelBtn = document.getElementById('btnModalCancelar');
+      resetModalUnidade();
+
+      if (mode === 'create') {
+        title.textContent = 'Adicionar unidade';
+        confirmBtn.textContent = 'Adicionar';
+        confirmBtn.disabled = false;
+      } else {
+        const pref = state.prefs[index];
+        title.textContent = mode === 'edit' ? 'Editar unidade' : 'Visualizar unidade';
+        confirmBtn.textContent = mode === 'edit' ? 'Atualizar' : 'Fechar';
+        confirmBtn.disabled = mode === 'view';
+        if (mode === 'view') confirmBtn.classList.add('d-none');
+        if (mode === 'view') cancelBtn.textContent = 'Fechar';
+
+        const ds = pref?.distrito || '';
+        const unidade = pref?.unidade || '';
+        const turno = pref?.turno || '';
+        const regime = pref?.regime || '';
+        setChoiceValue('mDs', ds);
+
+        if (ds) {
+          await loadUnidades(ds, 'mUnidade', unidade);
+          if (unidade) {
+            await loadTurnos(unidade, 'mTurno', ds, turno);
+            await loadRegimes(unidade, 'mRegime', ds, regime);
+          }
+        }
+
+        setChoiceValue('mUnidade', unidade);
+        setChoiceValue('mTurno', turno);
+        setChoiceValue('mRegime', regime);
+
+        ['mDs', 'mUnidade', 'mTurno', 'mRegime'].forEach((id) => {
+          setChoiceDisabled(id, mode === 'view');
+        });
+      }
+
+      modalUnidade.show();
+    }
+
+    function closeModalUnidade() {
+      modalUnidade.hide();
+    }
+
+    function buildPreferenceFromModal() {
+      const ds = document.getElementById('mDs').value;
+      const unidade = document.getElementById('mUnidade').value;
+      const turno = document.getElementById('mTurno').value;
+      const regime = document.getElementById('mRegime').value;
+      if (!ds || !unidade || !turno || !regime) return null;
+      const nextPriority = state.prefs.reduce((mx, r) => Math.max(mx, Number(r.prioridade) || 0), 0) + 1;
+      return {
+        prioridade: nextPriority,
+        distrito: ds,
+        unidade,
+        turno,
+        regime,
+        data_solicitacao: new Date(),
+        data_credenciamento: new Date(),
+        imported: false
+      };
+    }
+
+    function updatePreferenceFromModal(index) {
+      const ds = document.getElementById('mDs').value;
+      const unidade = document.getElementById('mUnidade').value;
+      const turno = document.getElementById('mTurno').value;
+      const regime = document.getElementById('mRegime').value;
+      if (!ds || !unidade || !turno || !regime) return false;
+      const pref = state.prefs[index];
+      pref.distrito = ds;
+      pref.unidade = unidade;
+      pref.turno = turno;
+      pref.regime = regime;
+      if (!pref.data_solicitacao) pref.data_solicitacao = new Date();
+      if (!pref.data_credenciamento) pref.data_credenciamento = new Date();
+      return true;
+    }
+
+    function preparePrintArea() {
+      state.printMode = 'print';
+      document.body.dataset.printMode = 'print';
+      const wrapper = document.getElementById('printWrapper');
+      wrapper.classList.remove('d-none');
+      setTimeout(() => {
+        window.print();
+      }, 100);
+    }
+
+    function afterPrintCleanup() {
+      document.getElementById('printWrapper').classList.add('d-none');
+      delete document.body.dataset.printMode;
+      state.printMode = 'print';
+    }
+
+    async function gerarPdfModal() {
+      const triggerButton = document.getElementById('btnSalvarPDF');
+      const resumoContainer = document.getElementById('resumoSolicitacao');
+      const { jsPDF } = window.jspdf || {};
+      if (!jsPDF) {
+        alert('Não foi possível gerar o PDF no momento. Tente novamente mais tarde.');
+        return;
+      }
+
+      try {
+        if (triggerButton) triggerButton.setAttribute('aria-busy', 'true');
+
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        if (typeof doc.autoTable !== 'function') {
+          alert('Recurso de tabela indisponível para gerar o PDF.');
+          return;
+        }
+
+        const numero = sanitizeValue(state.protocolo) || '•';
+        const table = resumoContainer ? resumoContainer.querySelector('table') : null;
+
+        const headers = table
+          ? Array.from(table.querySelectorAll('thead th')).map((th) => th.textContent.trim())
+          : [];
+        const rows = table
+          ? Array.from(table.querySelectorAll('tbody tr')).map((tr) =>
+            Array.from(tr.children).map((td) => td.textContent.trim())
+          )
+          : [];
+
+        const matriculaColIndex = headers.findIndex((label) => /matr[íi]cula/i.test(label));
+        const cargoColIndex = headers.findIndex((label) => /cargo/i.test(label));
+        const firstRow = rows[0] || [];
+        const rawMatriculaFromTable = matriculaColIndex >= 0 ? firstRow[matriculaColIndex] : '';
+        const rawCargoFromTable = cargoColIndex >= 0 ? firstRow[cargoColIndex] : '';
+
+        const payload = state.lastPayload || {};
+        const matriculaFromPayload = sanitizeValue(payload.matricula);
+        const cargoFromPayload = sanitizeValue(payload?.dadosPessoais?.cargo);
+        const nomeServidor = sanitizeValue(payload?.dadosPessoais?.nome);
+        const cpfServidor = formatCPF(payload?.dadosPessoais?.cpf);
+        const cargoServidor = sanitizeValue(rawCargoFromTable) || cargoFromPayload;
+        const matricula = sanitizeValue(rawMatriculaFromTable) || matriculaFromPayload;
+        const subtitleText = matricula
+          ? `Solicitação registrada em banco de dados para a matrícula ${matricula}`
+          : 'Solicitação registrada em banco de dados.';
+        const dataEmissao = new Date().toLocaleDateString('pt-BR');
+
+        const logoDataUrl = await getComprovanteLogoDataUrl();
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 36;
+        const cardWidth = pageWidth - margin * 2;
+        const cardHeight = pageHeight - margin * 2;
+        const cardPaddingX = 36;
+        const cardPaddingY = 30;
+        const headerBandHeight = 120;
+        const badgeWidth = 200;
+        const badgeHeight = 64;
+
+        const drawCardBase = () => {
+          doc.setDrawColor(214, 222, 234);
+          doc.setLineWidth(1.2);
+          doc.setFillColor(244, 247, 254);
+          doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18, 'F');
+          doc.setFillColor(255, 255, 255);
+          doc.roundedRect(margin, margin, cardWidth, cardHeight, 18, 18);
+          doc.rect(margin, margin + headerBandHeight, cardWidth, Math.max(cardHeight - headerBandHeight, 0), 'F');
+          doc.setFillColor(0, 74, 173);
+          doc.roundedRect(margin, margin, cardWidth, headerBandHeight, 18, 18, 'F');
+
+          const contentX = margin + cardPaddingX;
+          const contentY = margin + cardPaddingY;
+
+          if (logoDataUrl) {
+            doc.addImage(logoDataUrl, 'PNG', contentX, contentY, 120, 38);
+          }
+
+          const headerTextX = contentX + (logoDataUrl ? 136 : 0);
+          const headerTextY = contentY + 16;
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(13);
+          doc.setTextColor(255, 255, 255);
+          doc.text('PREFEITURA DO RECIFE', headerTextX, headerTextY);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(11);
+          doc.text('Secretaria de Saúde (SESAU)', headerTextX, headerTextY + 20);
+          doc.text('Portal do Servidor • Mobilidade Interna', headerTextX, headerTextY + 38);
+
+          const badgeX = margin + cardWidth - cardPaddingX - badgeWidth;
+          const badgeY = margin + cardPaddingY;
+          doc.setFillColor(255, 255, 255);
+          doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 12, 12, 'F');
+          doc.setDrawColor(0, 74, 173);
+          doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 12, 12);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.setTextColor(0, 74, 173);
+          doc.text('NÚMERO DA SOLICITAÇÃO', badgeX + 18, badgeY + 24);
+          doc.setFontSize(22);
+          doc.setTextColor(17, 24, 39);
+          doc.text(numero || '•', badgeX + badgeWidth - 18, badgeY + 44, { align: 'right' });
+        };
+
+        drawCardBase();
+
+        let currentY = margin + headerBandHeight + 38;
+        const contentX = margin + cardPaddingX;
+        const contentMaxX = margin + cardWidth - cardPaddingX;
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(20);
+        doc.setTextColor(0, 74, 173);
+        doc.text('Comprovante de solicitação', contentX, currentY);
+        currentY += 28;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor(55, 65, 81);
+        const subtitleLines = doc.splitTextToSize(subtitleText, contentMaxX - contentX);
+        subtitleLines.forEach((line) => {
+          doc.text(line, contentX, currentY);
+          currentY += 18;
+        });
+
+        currentY += 6;
+        const infoRows = [
+          [
+            { label: 'Nome do servidor', value: nomeServidor || '•' },
+            { label: 'CPF', value: cpfServidor || '•' }
+          ],
+          [
+            { label: 'Matrícula', value: matricula || '•' },
+            { label: 'Cargo', value: cargoServidor || '•' }
+          ],
+          [
+            { label: 'Data de emissão', value: dataEmissao },
+            null
+          ]
+        ];
+
+        const columnGap = 16;
+        const infoRowHeight = 34;
+        const infoColumnWidth = (contentMaxX - contentX - columnGap) / 2;
+        infoRows.forEach((rowItems, rowIndex) => {
+          rowItems.forEach((item, columnIndex) => {
+            if (!item) return;
+            const x = contentX + columnIndex * (infoColumnWidth + columnGap);
+            const y = currentY + rowIndex * infoRowHeight;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(0, 74, 173);
+            doc.text(item.label.toUpperCase(), x, y);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(11);
+            doc.setTextColor(31, 41, 55);
+            doc.text(item.value || '•', x, y + 16);
+          });
+        });
+
+        currentY += infoRows.length * infoRowHeight + 18;
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(1);
+        doc.line(contentX, currentY, contentMaxX, currentY);
+        currentY += 24;
+
+        const allowedHeaderMatchers = [
+          { test: /prioridade/i, label: 'Prioridade' },
+          { test: /distrito/i, label: 'Distrito' },
+          { test: /lota[cç][aã]o/i, label: 'Lotação' },
+          { test: /credenciamento/i, label: 'Credenciamento' },
+          { test: /solicita[cç][aã]o/i, label: 'Solicitação' }
+        ];
+        const allowedColumns = allowedHeaderMatchers
+          .map(({ test, label }) => {
+            const matchIndex = headers.findIndex((header) => test.test(header));
+            return matchIndex >= 0 ? { index: matchIndex, label } : null;
+          })
+          .filter(Boolean);
+        const pdfHeaders = allowedColumns.map((column) => column.label);
+        const pdfRows = allowedColumns.length
+          ? rows.map((row) => allowedColumns.map((column) => row[column.index]))
+          : [];
+
+        let footerBaseY = currentY;
+        if (pdfHeaders.length && pdfRows.length) {
+          const columnStyles = {};
+          pdfHeaders.forEach((header, index) => {
+            const key = header.toLowerCase();
+            if (key.includes('prioridade')) {
+              columnStyles[index] = { halign: 'center', cellWidth: 65 };
+            } else if (key.includes('distrito')) {
+              columnStyles[index] = { cellWidth: 90 };
+            } else if (key.includes('lotação')) {
+              columnStyles[index] = { cellWidth: 190 };
+            } else if (key.includes('credenciamento')) {
+              columnStyles[index] = { halign: 'center', cellWidth: 95 };
+            } else if (key.includes('solicitação')) {
+              columnStyles[index] = { halign: 'center', cellWidth: 95 };
+            }
+          });
+          doc.autoTable({
+            head: [pdfHeaders],
+            body: pdfRows,
+            startY: currentY,
+            theme: 'plain',
+            margin: { left: contentX, right: pageWidth - contentMaxX },
+            tableWidth: contentMaxX - contentX,
+            styles: {
+              font: 'helvetica',
+              fontSize: 10,
+              textColor: [31, 41, 55],
+              cellPadding: { top: 6, right: 8, bottom: 6, left: 8 },
+              lineWidth: 0.6,
+              lineColor: [226, 232, 240],
+              overflow: 'linebreak'
+            },
+            headStyles: {
+              fontStyle: 'bold',
+              fontSize: 10,
+              fillColor: [226, 235, 255],
+              textColor: [0, 74, 173],
+              halign: 'left',
+              cellPadding: { top: 8, right: 8, bottom: 8, left: 8 },
+              lineWidth: 0
+            },
+            alternateRowStyles: {
+              fillColor: [248, 250, 255]
+            },
+            columnStyles,
+            pageBreak: 'avoid',
+            rowPageBreak: 'avoid'
+          });
+          footerBaseY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || currentY;
+        } else {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(12);
+          doc.setTextColor(107, 114, 128);
+          doc.text('Não há dados para exportar.', contentX, currentY + 12);
+          footerBaseY = currentY + 12;
+        }
+
+        const footerY = Math.min(pageHeight - margin - 12, footerBaseY + 32);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(107, 114, 128);
+        doc.text('Documento gerado automaticamente pelo Portal do Servidor - Prefeitura do Recife.', contentX, footerY);
+
+        const safeNumero = numero && numero !== '•' ? numero.replace(/[^\w-]+/g, '-') : 'detalhes';
+        doc.save(`solicitacao-${safeNumero}.pdf`);
+      } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        alert('Não foi possível gerar o PDF no momento. Tente novamente mais tarde.');
+      } finally {
+        if (triggerButton) triggerButton.removeAttribute('aria-busy');
+      }
+    }
+
+    function initEvents() {
+      document.getElementById('cep').addEventListener('change', (e) => fillByCEP(e.target.value));
+      document.getElementById('uf').addEventListener('input', (e) => {
+        e.target.value = sanitizeUF(e.target.value);
+      });
+
+      document.getElementById('dsSelect').addEventListener('change', async (e) => {
+        const v = e.target.value;
+        syncChoicesOptions('unidadeSelect', [], 'Selecione o distrito...');
+        setChoiceDisabled('unidadeSelect', true);
+        syncChoicesOptions('turnoSelect', [], 'Selecione a unidade...');
+        setChoiceDisabled('turnoSelect', true);
+        syncChoicesOptions('regimeSelect', [], 'Selecione a unidade...');
+        setChoiceDisabled('regimeSelect', true);
+        if (v) {
+          await loadUnidades(v, 'unidadeSelect');
+        }
+        updateAddBtn();
+      });
+      document.getElementById('unidadeSelect').addEventListener('change', async (e) => {
+        const unidade = e.target.value;
+        const ds = document.getElementById('dsSelect').value;
+        syncChoicesOptions('turnoSelect', [], 'Selecione a unidade...');
+        syncChoicesOptions('regimeSelect', [], 'Selecione a unidade...');
+        if (unidade && ds) {
+          await loadTurnos(unidade, 'turnoSelect', ds);
+          await loadRegimes(unidade, 'regimeSelect', ds);
+        }
+        updateAddBtn();
+      });
+
+      document.getElementById('mDs').addEventListener('change', async (e) => {
+        const v = e.target.value;
+        syncChoicesOptions('mUnidade', [], 'Selecione o distrito...');
+        setChoiceDisabled('mUnidade', true);
+        syncChoicesOptions('mTurno', [], 'Selecione a unidade...');
+        setChoiceDisabled('mTurno', true);
+        syncChoicesOptions('mRegime', [], 'Selecione a unidade...');
+        setChoiceDisabled('mRegime', true);
+        if (v) await loadUnidades(v, 'mUnidade');
+      });
+      document.getElementById('mUnidade').addEventListener('change', async (e) => {
+        const unidade = e.target.value;
+        const ds = document.getElementById('mDs').value;
+        syncChoicesOptions('mTurno', [], 'Selecione a unidade...');
+        syncChoicesOptions('mRegime', [], 'Selecione a unidade...');
+        if (unidade && ds) {
+          await loadTurnos(unidade, 'mTurno', ds);
+          await loadRegimes(unidade, 'mRegime', ds);
+        }
+      });
+
+      document.getElementById('btnAddLinha').addEventListener('click', () => {
+        const missing = collectPreferencePrerequisiteErrors();
+        if (missing.length) {
+          openAlertModal(missing);
+          return;
+        }
+        if (state.prefs.length < state.max) openModalUnidade('create');
+      });
+
+      document.getElementById('btnModalConfirmar').addEventListener('click', () => {
+        if (state.modalMode === 'view') {
+          closeModalUnidade();
+          return;
+        }
+        if (state.modalMode === 'edit') {
+          if (updatePreferenceFromModal(state.editingIndex)) {
+            closeModalUnidade();
+            renderPrefs();
+          }
+          return;
+        }
+        const pref = buildPreferenceFromModal();
+        if (!pref) return;
+        state.prefs.push(pref);
+        renumberPriorities();
+        closeModalUnidade();
+        updateAddBtn();
+        renderPrefs();
+      });
+
+      document.getElementById('matricula').addEventListener('change', async (e) => {
+        const m = e.target.value;
+        if (!m) return;
+        fillIdentificacaoFromVinculo(m);
+        await loadPreferenciasByMatricula(m);
+        updateAddBtn();
+      });
+
+      document.getElementById('btnEnviar').addEventListener('click', enviarFormulario);
+
+      document.getElementById('btnSalvarPDF').addEventListener('click', async () => {
+        await gerarPdfModal();
+        state.shouldShowEmailModal = true;
+        modalSucesso.hide();
+      });
+      document.getElementById('btnImprimir').addEventListener('click', () => {
+        preparePrintArea();
+        state.shouldShowEmailModal = true;
+        modalSucesso.hide();
+      });
+
+      document.querySelectorAll('#modalSucesso [data-bs-dismiss="modal"]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.shouldShowEmailModal = true;
+        });
+      });
+
+      document.getElementById('modalSucesso').addEventListener('hidden.bs.modal', () => {
+        if (state.shouldShowEmailModal) {
+          state.shouldShowEmailModal = false;
+          showEmailConfirmationModal();
+        }
+      });
+
+      window.addEventListener('afterprint', afterPrintCleanup);
+
+      document.getElementById('modalAlerta').addEventListener('hidden.bs.modal', () => {
+        if (!state.pendingFocusId) return;
+        const target = document.getElementById(state.pendingFocusId);
+        state.pendingFocusId = null;
+        if (!target) return;
+        if (typeof target.focus === 'function') {
+          try {
+            target.focus({ preventScroll: true });
+          } catch (err) {
+            target.focus();
+          }
+        }
+        if (typeof target.scrollIntoView === 'function') {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+    }
+
+    function init() {
+      initSearchableSelects();
+      populateMatriculas();
+      populateEnderecoContato();
+      const dc = BIND.dadosComuns || {};
+      document.getElementById('nome').value = safeValue(dc.nome);
+      document.getElementById('nascimento').value = toBRDate(dc.nascimento);
+      const numeroSolicitacao = safeValue(dc.recordId);
+      if (numeroSolicitacao) state.protocolo = numeroSolicitacao;
+      const solicitacaoEl = document.getElementById('numeroSolicitacaoDisplay');
+      if (solicitacaoEl) solicitacaoEl.textContent = numeroSolicitacao || '•';
+      applyUppercaseBehaviour();
+      applyNumericBehaviour();
+      bindPreferencePrerequisiteListeners();
+      updateAddBtn();
+      initEvents();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+
 </html>
